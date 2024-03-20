@@ -147,6 +147,10 @@ pub struct PerfUiEntryFrameTime {
     ///
     /// Default: `true`
     pub enable_highlight: bool,
+    /// Display the unit ("ms") alongside the number.
+    ///
+    /// Default: `true`
+    pub display_units: bool,
     /// If greater than this value, text will be colored RED.
     ///
     /// Default: frame time of 30 FPS
@@ -188,6 +192,7 @@ impl Default for PerfUiEntryFrameTime {
         PerfUiEntryFrameTime {
             enable_color: true,
             enable_highlight: true,
+            display_units: true,
             threshold_good: 1000.0 / 120.0,
             threshold_normal: 1000.0 / 60.0,
             threshold_bad: 1000.0 / 30.0,
@@ -215,6 +220,10 @@ pub struct PerfUiEntryFrameTimeWorst {
     ///
     /// Default: `true`
     pub enable_highlight: bool,
+    /// Display the unit ("ms") alongside the number.
+    ///
+    /// Default: `true`
+    pub display_units: bool,
     /// If greater than this value, text will be colored RED.
     ///
     /// Default: frame time of 30 FPS
@@ -252,6 +261,7 @@ impl Default for PerfUiEntryFrameTimeWorst {
         PerfUiEntryFrameTimeWorst {
             enable_color: true,
             enable_highlight: true,
+            display_units: true,
             threshold_good: 1000.0 / 120.0,
             threshold_normal: 1000.0 / 60.0,
             threshold_bad: 1000.0 / 30.0,
@@ -570,7 +580,11 @@ impl PerfUiEntry for PerfUiEntryFrameTime {
         &self,
         value: &Self::Value,
     ) -> String {
-        format_pretty_float(self.digits, self.precision, *value)
+        let mut s = format_pretty_float(self.digits, self.precision, *value);
+        if self.display_units {
+            s.push_str(" ms");
+        }
+        s
     }
     fn value_color(
         &self,
@@ -617,7 +631,11 @@ impl PerfUiEntry for PerfUiEntryFrameTimeWorst {
         &self,
         value: &Self::Value,
     ) -> String {
-        format_pretty_float(self.digits, self.precision, *value as f64)
+        let mut s = format_pretty_float(self.digits, self.precision, *value as f64);
+        if self.display_units {
+            s.push_str(" ms");
+        }
+        s
     }
     fn value_color(
         &self,
@@ -728,7 +746,9 @@ impl PerfUiEntry for PerfUiEntryCpuUsage {
         &self,
         value: &Self::Value,
     ) -> String {
-        format_pretty_float(2, self.precision, *value)
+        let mut s = format_pretty_float(2, self.precision, *value);
+        s.push('%');
+        s
     }
     fn value_color(
         &self,
@@ -771,7 +791,9 @@ impl PerfUiEntry for PerfUiEntryMemUsage {
         &self,
         value: &Self::Value,
     ) -> String {
-        format_pretty_float(2, self.precision, *value)
+        let mut s = format_pretty_float(2, self.precision, *value);
+        s.push('%');
+        s
     }
     fn value_color(
         &self,

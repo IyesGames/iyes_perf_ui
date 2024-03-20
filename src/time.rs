@@ -22,6 +22,12 @@ pub struct PerfUiEntryRunningTime {
     ///
     /// Default: `false`
     pub format_hms: bool,
+    /// Display the unit ("s") alongside the number.
+    ///
+    /// Only used if `format_hms = false`.
+    ///
+    /// Default: `true`
+    pub display_units: bool,
     /// Number of digits to display for the integer (whole number) part.
     ///
     /// Only used if `format_hms = false`.
@@ -41,6 +47,7 @@ impl Default for PerfUiEntryRunningTime {
         PerfUiEntryRunningTime {
             start: None,
             format_hms: false,
+            display_units: true,
             digits: 5,
             precision: 3,
             sort_key: next_sort_key(),
@@ -99,7 +106,11 @@ impl PerfUiEntry for PerfUiEntryRunningTime {
         if self.format_hms {
             format_pretty_time(self.precision, *value)
         } else {
-            format_pretty_float(self.digits, self.precision, value.as_secs_f64())
+            let mut s = format_pretty_float(self.digits, self.precision, value.as_secs_f64());
+            if self.display_units {
+                s.push_str(" s");
+            }
+            s
         }
     }
 }
