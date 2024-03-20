@@ -122,6 +122,8 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
     // Perf UI #3: Clock + running time
     commands.spawn((
         PerfUiRoot {
+            // let's not have labels for this one
+            display_labels: false,
             position: PerfUiPosition::BottomRight,
             // always display this Perf UI below the other two
             z_index: ZIndex::Global(i32::MAX - 2),

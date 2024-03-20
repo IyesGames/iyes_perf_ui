@@ -221,6 +221,11 @@ pub struct PerfUiRoot {
     ///
     /// Default: RED with alpha 1/16
     pub inner_background_color_highlight: Color,
+    /// Should labels be displayed?
+    /// If false, there will be no column for labels, only bare values.
+    ///
+    /// Default: `true`
+    pub display_labels: bool,
     /// The text to display if a value cannot be obtained.
     ///
     /// Default: `"N/A"`
@@ -287,6 +292,7 @@ impl Default for PerfUiRoot {
             background_color: Color::BLACK.with_a(0.5),
             inner_background_color: Color::NONE,
             inner_background_color_highlight: Color::RED.with_a(1.0 / 16.0),
+            display_labels: true,
             text_err: "N/A".into(),
             err_color: Color::DARK_GRAY,
             default_value_color: Color::GRAY,
@@ -397,15 +403,32 @@ fn setup_perf_ui_entry<T: PerfUiEntry>(
                 ..default()
             },
         )).id();
-        let e_label_wrapper = commands.spawn((
-            NodeBundle {
-                style: Style {
-                    padding: UiRect::all(Val::Px(4.0)),
+        if perf_ui.display_labels {
+            let e_label_wrapper = commands.spawn((
+                NodeBundle {
+                    style: Style {
+                        padding: UiRect::all(Val::Px(4.0)),
+                        ..default()
+                    },
                     ..default()
                 },
-                ..default()
-            },
-        )).id();
+            )).id();
+            let e_label = commands.spawn((
+                TextBundle {
+                    text: Text::from_section(
+                        format!("{}: ", entry.label()),
+                        TextStyle {
+                            font: perf_ui.font_label.clone(),
+                            font_size: perf_ui.fontsize_label,
+                            color: perf_ui.label_color,
+                        }
+                    ),
+                    ..default()
+                },
+            )).id();
+            commands.entity(e_label_wrapper).push_children(&[e_label]);
+            commands.entity(e_entry).push_children(&[e_label_wrapper]);
+        }
         let e_text_wrapper = commands.spawn((
             NodeBundle {
                 style: Style {
@@ -418,19 +441,6 @@ fn setup_perf_ui_entry<T: PerfUiEntry>(
                     justify_content: JustifyContent::FlexEnd,
                     ..default()
                 },
-                ..default()
-            },
-        )).id();
-        let e_label = commands.spawn((
-            TextBundle {
-                text: Text::from_section(
-                    format!("{}: ", entry.label()),
-                    TextStyle {
-                        font: perf_ui.font_label.clone(),
-                        font_size: perf_ui.fontsize_label,
-                        color: perf_ui.label_color,
-                    }
-                ),
                 ..default()
             },
         )).id();
@@ -452,9 +462,8 @@ fn setup_perf_ui_entry<T: PerfUiEntry>(
                 ..default()
             },
         )).id();
-        commands.entity(e_label_wrapper).push_children(&[e_label]);
         commands.entity(e_text_wrapper).push_children(&[e_text]);
-        commands.entity(e_entry).push_children(&[e_label_wrapper, e_text_wrapper]);
+        commands.entity(e_entry).push_children(&[e_text_wrapper]);
         commands.entity(e_root).push_children(&[e_entry]);
     }
 }
