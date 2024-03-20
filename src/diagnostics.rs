@@ -730,7 +730,7 @@ impl PerfUiEntry for PerfUiEntryCpuUsage {
     type Value = f64;
 
     fn label(&self) -> String {
-        "CPU Usage".into()
+        "Total CPU Usage".into()
     }
     fn update_value<'w>(
         &mut self,
@@ -775,7 +775,7 @@ impl PerfUiEntry for PerfUiEntryMemUsage {
     type Value = f64;
 
     fn label(&self) -> String {
-        "RAM Usage".into()
+        "Total RAM Usage".into()
     }
     fn update_value<'w>(
         &mut self,
