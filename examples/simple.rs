@@ -35,6 +35,8 @@ fn setup(mut commands: Commands) {
         PerfUiEntryEntityCount::default(),
         PerfUiEntryCpuUsage::default(),
         PerfUiEntryMemUsage::default(),
+        PerfUiEntryFixedTimeStep::default(),
+        PerfUiEntryFixedOverstep::default(),
         PerfUiEntryRunningTime::default(),
         PerfUiEntryClock::default(),
     ));

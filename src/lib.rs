@@ -44,6 +44,8 @@ pub mod prelude {
     pub use crate::time::{
         PerfUiEntryClock,
         PerfUiEntryRunningTime,
+        PerfUiEntryFixedTimeStep,
+        PerfUiEntryFixedOverstep,
     };
 }
 
@@ -73,6 +75,8 @@ impl Plugin for PerfUiPlugin {
         app.add_perf_ui_entry_type::<crate::diagnostics::PerfUiEntryMemUsage>();
         app.add_perf_ui_entry_type::<crate::time::PerfUiEntryClock>();
         app.add_perf_ui_entry_type::<crate::time::PerfUiEntryRunningTime>();
+        app.add_perf_ui_entry_type::<crate::time::PerfUiEntryFixedTimeStep>();
+        app.add_perf_ui_entry_type::<crate::time::PerfUiEntryFixedOverstep>();
     }
 }
 

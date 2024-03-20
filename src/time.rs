@@ -92,9 +92,85 @@ impl Default for PerfUiEntryClock {
     }
 }
 
+/// Perf UI Entry to display Bevy's Fixed Time Step duration.
+#[derive(Component, Debug, Clone)]
+pub struct PerfUiEntryFixedTimeStep {
+    /// Custom label. If empty (default), the default label will be used.
+    pub label: String,
+    /// Display the unit ("ms" or "Hz") alongside the number.
+    ///
+    /// Default: `true`
+    pub display_units: bool,
+    /// Display it as a rate in Hz instead of duration in milliseconds.
+    ///
+    /// Default: `true`
+    pub as_hz: bool,
+    /// Number of digits to display for the integer (whole number) part.
+    ///
+    /// Default: `3`
+    pub digits: u8,
+    /// Number of digits to display for the fractional (after the decimal point) part.
+    ///
+    /// Default: `2`
+    pub precision: u8,
+    /// Sort Key (control where the entry will appear in the Perf UI).
+    pub sort_key: i32,
+}
+
+impl Default for PerfUiEntryFixedTimeStep {
+    fn default() -> Self {
+        PerfUiEntryFixedTimeStep {
+            label: String::new(),
+            display_units: true,
+            as_hz: true,
+            digits: 3,
+            precision: 2,
+            sort_key: next_sort_key(),
+        }
+    }
+}
+
+/// Perf UI Entry to display Bevy's Fixed Time overstep.
+#[derive(Component, Debug, Clone)]
+pub struct PerfUiEntryFixedOverstep {
+    /// Custom label. If empty (default), the default label will be used.
+    pub label: String,
+    /// Display the unit ("ms" or "%") alongside the number.
+    ///
+    /// Default: `true`
+    pub display_units: bool,
+    /// Display it as a percentage of the timestep instead of duration in milliseconds.
+    ///
+    /// Default: `true`
+    pub as_percent: bool,
+    /// Number of digits to display for the integer (whole number) part.
+    ///
+    /// Default: `2`
+    pub digits: u8,
+    /// Number of digits to display for the fractional (after the decimal point) part.
+    ///
+    /// Default: `3`
+    pub precision: u8,
+    /// Sort Key (control where the entry will appear in the Perf UI).
+    pub sort_key: i32,
+}
+
+impl Default for PerfUiEntryFixedOverstep {
+    fn default() -> Self {
+        PerfUiEntryFixedOverstep {
+            label: String::new(),
+            display_units: true,
+            as_percent: true,
+            digits: 3,
+            precision: 2,
+            sort_key: next_sort_key(),
+        }
+    }
+}
+
 impl PerfUiEntry for PerfUiEntryRunningTime {
     type Value = Duration;
-    type SystemParam = SRes<Time>;
+    type SystemParam = SRes<Time<Real>>;
 
     fn label(&self) -> &str {
         if self.label.is_empty() {
@@ -168,6 +244,83 @@ impl PerfUiEntry for PerfUiEntryClock {
         &(h, m, s, nanos): &Self::Value,
     ) -> String {
         format_pretty_time_hms(self.precision, h, m, s, nanos)
+    }
+}
+
+impl PerfUiEntry for PerfUiEntryFixedTimeStep {
+    type Value = Duration;
+    type SystemParam = SRes<Time<Fixed>>;
+
+    fn label(&self) -> &str {
+        if self.label.is_empty() {
+            "Fixed Time Step"
+        } else {
+            &self.label
+        }
+    }
+    fn sort_key(&self) -> i32 {
+        self.sort_key
+    }
+    fn update_value(
+        &mut self,
+        time: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
+    ) -> Option<Self::Value> {
+        Some(time.timestep())
+    }
+    fn format_value(
+        &self,
+        value: &Self::Value,
+    ) -> String {
+        let (unit, value) = if self.as_hz {
+            (" Hz", 1_000_000_000f64 / value.as_nanos() as f64)
+        } else {
+            (" ms", value.as_nanos() as f64 / 1_000_000f64)
+        };
+        let mut s = format_pretty_float(self.digits, self.precision, value);
+        if self.display_units {
+            s.push_str(unit);
+        }
+        s
+    }
+}
+
+impl PerfUiEntry for PerfUiEntryFixedOverstep {
+    type Value = f64;
+    type SystemParam = SRes<Time<Fixed>>;
+
+    fn label(&self) -> &str {
+        if self.label.is_empty() {
+            "Fixed Overstep"
+        } else {
+            &self.label
+        }
+    }
+    fn sort_key(&self) -> i32 {
+        self.sort_key
+    }
+    fn update_value(
+        &mut self,
+        time: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
+    ) -> Option<Self::Value> {
+        Some(if self.as_percent {
+            time.overstep_fraction_f64() * 100.0
+        } else {
+            time.overstep().as_secs_f64() * 1000.0
+        })
+    }
+    fn format_value(
+        &self,
+        value: &Self::Value,
+    ) -> String {
+        let mut s = format_pretty_float(self.digits, self.precision, *value);
+        if self.display_units {
+            if self.as_percent {
+                s.push_str(" %");
+            } else {
+                s.push_str(" ms");
+            }
+        }
+        s
     }
 }
 
