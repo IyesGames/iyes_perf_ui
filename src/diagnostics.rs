@@ -476,9 +476,9 @@ impl PerfUiEntry for PerfUiEntryFPS {
     fn label(&self) -> &str {
         "FPS"
     }
-    fn update_value<'w>(
+    fn update_value(
         &mut self,
-        diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'w, '_>,
+        diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         Some(if self.smoothed {
             diagnostics.get(&FrameTimeDiagnosticsPlugin::FPS)?.smoothed()?
@@ -492,7 +492,7 @@ impl PerfUiEntry for PerfUiEntryFPS {
     ) -> String {
         format_pretty_float(self.digits, self.precision, *value)
     }
-    fn value_color<'w>(
+    fn value_color(
         &self,
         value: &Self::Value,
     ) -> Option<Color> {
@@ -519,9 +519,9 @@ impl PerfUiEntry for PerfUiEntryFPSWorst {
     fn label(&self) -> &str {
         "FPS (min)"
     }
-    fn update_value<'w>(
+    fn update_value(
         &mut self,
-        diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'w, '_>,
+        diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         Some(diagnostics.get(&FrameTimeDiagnosticsPlugin::FPS)?
             .values()
@@ -552,7 +552,7 @@ impl PerfUiEntry for PerfUiEntryFPSWorst {
         &self,
         value: &Self::Value,
     ) -> bool {
-        self.enable_highlight && *value as f32 <= self.threshold_highlight
+        self.enable_highlight && *value <= self.threshold_highlight
     }
     fn sort_key(&self) -> i32 {
         self.sort_key
@@ -566,9 +566,9 @@ impl PerfUiEntry for PerfUiEntryFrameTime {
     fn label(&self) -> &str {
         "Frame Time"
     }
-    fn update_value<'w>(
+    fn update_value(
         &mut self,
-        diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'w, '_>,
+        diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         Some(if self.smoothed {
             diagnostics.get(&FrameTimeDiagnosticsPlugin::FRAME_TIME)?.smoothed()?
@@ -613,9 +613,9 @@ impl PerfUiEntry for PerfUiEntryFrameTimeWorst {
     fn label(&self) -> &str {
         "Frame Time (max)"
     }
-    fn update_value<'w>(
+    fn update_value(
         &mut self,
-        diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'w, '_>,
+        diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         Some(diagnostics.get(&FrameTimeDiagnosticsPlugin::FRAME_TIME)?
             .values()
@@ -650,7 +650,7 @@ impl PerfUiEntry for PerfUiEntryFrameTimeWorst {
         &self,
         value: &Self::Value,
     ) -> bool {
-        self.enable_highlight && *value as f32 >= self.threshold_highlight
+        self.enable_highlight && *value >= self.threshold_highlight
     }
     fn sort_key(&self) -> i32 {
         self.sort_key
@@ -664,9 +664,9 @@ impl PerfUiEntry for PerfUiEntryFrameCount {
     fn label(&self) -> &str {
         "Frame Count"
     }
-    fn update_value<'w>(
+    fn update_value(
         &mut self,
-        diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'w, '_>,
+        diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         Some(diagnostics.get(&FrameTimeDiagnosticsPlugin::FRAME_COUNT)?.value()? as u32)
     }
@@ -688,9 +688,9 @@ impl PerfUiEntry for PerfUiEntryEntityCount {
     fn label(&self) -> &str {
         "Entity Count"
     }
-    fn update_value<'w>(
+    fn update_value(
         &mut self,
-        diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'w, '_>,
+        diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         Some(diagnostics.get(&EntityCountDiagnosticsPlugin::ENTITY_COUNT)?.value()? as u32)
     }
@@ -732,9 +732,9 @@ impl PerfUiEntry for PerfUiEntryCpuUsage {
     fn label(&self) -> &str {
         "Total CPU Usage"
     }
-    fn update_value<'w>(
+    fn update_value(
         &mut self,
-        diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'w, '_>,
+        diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         Some(if self.smoothed {
             diagnostics.get(&SystemInformationDiagnosticsPlugin::CPU_USAGE)?.smoothed()?
@@ -777,9 +777,9 @@ impl PerfUiEntry for PerfUiEntryMemUsage {
     fn label(&self) -> &str {
         "Total RAM Usage"
     }
-    fn update_value<'w>(
+    fn update_value(
         &mut self,
-        diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'w, '_>,
+        diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         Some(if self.smoothed {
             diagnostics.get(&SystemInformationDiagnosticsPlugin::MEM_USAGE)?.smoothed()?

@@ -128,9 +128,9 @@ pub trait PerfUiEntry: Component {
     /// in the `PerfUiSet::Update` set.
     ///
     /// You may store state in your component type (hence the `&mut self`).
-    fn update_value<'w>(
+    fn update_value(
         &mut self,
-        param: &mut <Self::SystemParam as SystemParam>::Item<'w, '_>,
+        param: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value>;
 
     /// Format the raw value into a string for display

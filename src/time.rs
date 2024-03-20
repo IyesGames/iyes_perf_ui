@@ -96,9 +96,9 @@ impl PerfUiEntry for PerfUiEntryRunningTime {
     fn sort_key(&self) -> i32 {
         self.sort_key
     }
-    fn update_value<'w>(
+    fn update_value(
         &mut self,
-        time: &mut <Self::SystemParam as SystemParam>::Item<'w, '_>,
+        time: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         let elapsed = time.elapsed();
         if let Some(start) = self.start {
@@ -138,9 +138,9 @@ impl PerfUiEntry for PerfUiEntryClock {
     fn sort_key(&self) -> i32 {
         self.sort_key
     }
-    fn update_value<'w>(
+    fn update_value(
         &mut self,
-        _: &mut <Self::SystemParam as SystemParam>::Item<'w, '_>,
+        _: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         #[cfg(feature = "chrono")]
         if !self.prefer_utc {

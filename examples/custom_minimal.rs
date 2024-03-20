@@ -70,9 +70,9 @@ impl PerfUiEntry for PerfUiTimeSinceLastClick {
         -1
     }
 
-    fn update_value<'w>(
+    fn update_value(
         &mut self,
-        (time, lastclick): &mut <Self::SystemParam as SystemParam>::Item<'w, '_>,
+        (time, lastclick): &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         let d = time.elapsed() - lastclick.last_click;
         Some(d.as_secs())
