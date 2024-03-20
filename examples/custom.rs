@@ -43,9 +43,8 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
 
     commands.spawn((
         PerfUiRoot {
-            // if we want to support highlighting of values,
-            // we need to provide custom fonts
-            // (Bevy only has one default font)
+            // Let's provide some custom fonts, so we can also
+            // see the font changing when an entry is highlighted
             font_label: ass.load("Ubuntu-B.ttf"),
             font_value: ass.load("Ubuntu-R.ttf"),
             font_highlight: ass.load("Ubuntu-RI.ttf"),

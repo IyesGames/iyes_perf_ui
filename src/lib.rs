@@ -217,6 +217,10 @@ pub struct PerfUiRoot {
     ///
     /// Default: NONE
     pub inner_background_color: Color,
+    /// The color to use for the background of highlighted entries.
+    ///
+    /// Default: RED with alpha 1/16
+    pub inner_background_color_highlight: Color,
     /// The text to display if a value cannot be obtained.
     ///
     /// Default: `"N/A"`
@@ -282,6 +286,7 @@ impl Default for PerfUiRoot {
         PerfUiRoot {
             background_color: Color::BLACK.with_a(0.5),
             inner_background_color: Color::NONE,
+            inner_background_color_highlight: Color::RED.with_a(1.0 / 16.0),
             text_err: "N/A".into(),
             err_color: Color::DARK_GRAY,
             default_value_color: Color::GRAY,
@@ -337,6 +342,7 @@ struct PerfUiEntryMarker<T: PerfUiEntry> {
 #[derive(Component)]
 struct PerfUiTextMarker<T: PerfUiEntry> {
     e_root: Entity,
+    e_entry: Entity,
     _pd: PhantomData<T>,
 }
 
@@ -373,6 +379,24 @@ fn setup_perf_ui_entry<T: PerfUiEntry>(
     q_root: Query<(Entity, &PerfUiRoot, &T), Added<T>>,
 ) {
     for (e_root, perf_ui, entry) in &q_root {
+        let e_entry = commands.spawn((
+            PerfUiEntryMarker::<T> {
+                _pd: PhantomData,
+            },
+            PerfUiSortKey(entry.sort_key()),
+            NodeBundle {
+                background_color: BackgroundColor(perf_ui.inner_background_color),
+                style: Style {
+                    flex_direction: FlexDirection::Row,
+                    justify_content: JustifyContent::SpaceBetween,
+                    align_items: AlignItems::Center,
+                    margin: UiRect::all(Val::Px(perf_ui.inner_margin)),
+                    padding: UiRect::all(Val::Px(perf_ui.inner_padding)),
+                    ..default()
+                },
+                ..default()
+            },
+        )).id();
         let e_label_wrapper = commands.spawn((
             NodeBundle {
                 style: Style {
@@ -413,6 +437,7 @@ fn setup_perf_ui_entry<T: PerfUiEntry>(
         let e_text = commands.spawn((
             PerfUiTextMarker::<T> {
                 e_root,
+                e_entry,
                 _pd: PhantomData,
             },
             TextBundle {
@@ -424,24 +449,6 @@ fn setup_perf_ui_entry<T: PerfUiEntry>(
                         color: perf_ui.err_color,
                     }
                 ),
-                ..default()
-            },
-        )).id();
-        let e_entry = commands.spawn((
-            PerfUiEntryMarker::<T> {
-                _pd: PhantomData,
-            },
-            PerfUiSortKey(entry.sort_key()),
-            NodeBundle {
-                background_color: BackgroundColor(perf_ui.inner_background_color),
-                style: Style {
-                    flex_direction: FlexDirection::Row,
-                    justify_content: JustifyContent::SpaceBetween,
-                    align_items: AlignItems::Center,
-                    margin: UiRect::all(Val::Px(perf_ui.inner_margin)),
-                    padding: UiRect::all(Val::Px(perf_ui.inner_padding)),
-                    ..default()
-                },
                 ..default()
             },
         )).id();
@@ -467,6 +474,7 @@ fn sort_perf_ui_entries(
 #[allow(private_interfaces)]
 pub fn update_perf_ui_entry<T: PerfUiEntry>(
     mut q_root: Query<(&PerfUiRoot, &mut T)>,
+    mut q_entry: Query<&mut BackgroundColor, With<PerfUiEntryMarker<T>>>,
     mut q_text: Query<(&mut Text, &PerfUiTextMarker<T>)>,
     entry_param: StaticSystemParam<T::SystemParam>,
 ) {
@@ -475,6 +483,7 @@ pub fn update_perf_ui_entry<T: PerfUiEntry>(
         let Ok((root, mut entry)) = q_root.get_mut(marker.e_root) else {
             continue;
         };
+        let mut entry_highlight = false;
         if let Some(value) = entry.update_value(&mut entry_param) {
             let color = entry.value_color(&value)
                 .unwrap_or(root.default_value_color);
@@ -482,6 +491,7 @@ pub fn update_perf_ui_entry<T: PerfUiEntry>(
             text.sections[0].style.color = color;
             if entry.value_highlight(&value) {
                 text.sections[0].style.font = root.font_highlight.clone();
+                entry_highlight = true;
             } else {
                 text.sections[0].style.font = root.font_value.clone();
             }
@@ -489,6 +499,13 @@ pub fn update_perf_ui_entry<T: PerfUiEntry>(
             text.sections[0].value = root.text_err.clone();
             text.sections[0].style.color = root.err_color;
             text.sections[0].style.font = root.font_value.clone();
+        }
+        if let Ok(mut entry_bgcolor) = q_entry.get_mut(marker.e_entry) {
+            if entry_highlight {
+                entry_bgcolor.0 = root.inner_background_color_highlight;
+            } else {
+                entry_bgcolor.0 = root.inner_background_color;
+            }
         }
     }
 }

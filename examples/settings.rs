@@ -28,6 +28,7 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
     let root_config = PerfUiRoot {
         background_color: Color::WHITE.with_a(0.75),
         inner_background_color: Color::BLACK.with_a(0.25),
+        inner_background_color_highlight: Color::YELLOW.with_a(0.75),
         text_err: "Unavailable!".into(),
         err_color: Color::BLACK.with_a(0.25),
         default_value_color: Color::DARK_GRAY,
