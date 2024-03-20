@@ -66,6 +66,10 @@ pub struct TimeSinceLastClick {
 /// Custom Perf UI entry to show the time since the last mouse click
 #[derive(Component)]
 pub struct PerfUiTimeSinceLastClick {
+    /// The label text to display, to allow customization
+    pub label: String,
+    /// Should we display units?
+    pub display_units: bool,
     /// Highlight the value if it goes above this threshold
     pub threshold_highlight: f32,
     /// Display with custom color below this value (default color otherwise)
@@ -82,6 +86,8 @@ pub struct PerfUiTimeSinceLastClick {
 impl Default for PerfUiTimeSinceLastClick {
     fn default() -> Self {
         PerfUiTimeSinceLastClick {
+            label: String::new(),
+            display_units: true,
             threshold_highlight: 10.0,
             threshold_low: 1.0,
             digits: 2,
@@ -100,7 +106,12 @@ impl PerfUiEntry for PerfUiTimeSinceLastClick {
 
     // The text that will be shown as the Perf UI label
     fn label(&self) -> &str {
-        "Time since last click"
+        // return our stored value, if customized, or the default
+        if self.label.is_empty() {
+            "Time since last click"
+        } else {
+            &self.label
+        }
     }
 
     // We must return the sort key we stored when constructing the struct
@@ -122,7 +133,12 @@ impl PerfUiEntry for PerfUiTimeSinceLastClick {
         value: &Self::Value,
     ) -> String {
         // we can use a premade helper function for nice-looking formatting
-        iyes_perf_ui::utils::format_pretty_float(self.digits, self.precision, *value)
+        let mut s = iyes_perf_ui::utils::format_pretty_float(self.digits, self.precision, *value);
+        // (and append units to it)
+        if self.display_units {
+            s.push_str(" s");
+        }
+        s
     }
 
     // (optional) Called every frame to determine if a custom color should be used for the value
