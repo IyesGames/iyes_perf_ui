@@ -127,13 +127,10 @@ pub fn format_pretty_int(digits: u8, mut value: i64) -> String {
     )
 }
 
-/// Format time in a pretty way.
+/// Format a time duration in a pretty way.
 ///
-/// - Right aligned
-/// - `HH:MM:SS.mmm` (hours, minutes, seconds, milliseconds)
-/// - Milliseconds optional (precision = 0 to disable)
-/// - Automatically omits hours and minutes if they would be zero
-/// - Padded with spaces to accomodate maximum width
+/// See [`format_pretty_time_hms`].
+///
 /// - Clamped to all 9s if above max (example: `99:59:59.999`)
 pub fn format_pretty_time(precision: u8, value: Duration) -> String {
     let max = 99 * 3600 + 59 * 60 + 59;
@@ -149,6 +146,13 @@ pub fn format_pretty_time(precision: u8, value: Duration) -> String {
     format_pretty_time_hms(precision, secs / 3600, secs / 60, secs, value.subsec_nanos())
 }
 
+/// Format time (provided as hours, minutes, seconds, nanoseconds) in a pretty way.
+///
+/// - Right aligned
+/// - `HH:MM:SS.f*` (hours, minutes, seconds, fractional seconds)
+/// - Fractional part optional (precision = 0 to disable)
+/// - Automatically omits hours and minutes if they would be zero
+/// - Padded with spaces to accomodate maximum width
 pub fn format_pretty_time_hms(precision: u8, h: u32, m: u32, s: u32, nanos: u32) -> String {
     // sanitize
     let hrs = h % 100;

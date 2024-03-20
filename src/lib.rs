@@ -15,11 +15,14 @@
 //!  - Support for highlighting values using a custom font or color!
 //!    - Allows you to quickly notice if something demands your attention.
 
+#![warn(missing_docs)]
+
 use std::marker::PhantomData;
 
 use bevy::prelude::*;
 use bevy::ecs::system::{StaticSystemParam, SystemParam};
 
+/// Prelude of common types for users of the library
 pub mod prelude {
     pub use crate::{
         PerfUiPlugin,
@@ -172,10 +175,14 @@ pub trait PerfUiEntry: Component {
 /// Which corner of the screen to display the Perf UI at?
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PerfUiPosition {
+    /// Absolute positioning based on distance from top and left edges of viewport.
     TopLeft,
+    /// Absolute positioning based on distance from top and right edges of viewport.
     #[default]
     TopRight,
+    /// Absolute positioning based on distance from bottom and left edges of viewport.
     BottomLeft,
+    /// Absolute positioning based on distance from bottom and right edges of viewport.
     BottomRight,
 }
 
