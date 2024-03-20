@@ -82,8 +82,8 @@ impl PerfUiEntry for PerfUiEntryRunningTime {
     type Value = Duration;
     type SystemParam = SRes<Time>;
 
-    fn label(&self) -> String {
-        "Running Time".into()
+    fn label(&self) -> &str {
+        "Running Time"
     }
     fn sort_key(&self) -> i32 {
         self.sort_key
@@ -120,11 +120,11 @@ impl PerfUiEntry for PerfUiEntryClock {
     type Value = (u32, u32, u32, u32);
     type SystemParam = ();
 
-    fn label(&self) -> String {
+    fn label(&self) -> &str {
         if cfg!(feature = "chrono") {
-            "Clock".into()
+            "Clock"
         } else {
-            "Clock (UTC)".into()
+            "Clock (UTC)"
         }
     }
     fn sort_key(&self) -> i32 {

@@ -473,8 +473,8 @@ impl PerfUiEntry for PerfUiEntryFPS {
     type SystemParam = SRes<DiagnosticsStore>;
     type Value = f64;
 
-    fn label(&self) -> String {
-        "FPS".into()
+    fn label(&self) -> &str {
+        "FPS"
     }
     fn update_value<'w>(
         &mut self,
@@ -516,8 +516,8 @@ impl PerfUiEntry for PerfUiEntryFPSWorst {
     type SystemParam = SRes<DiagnosticsStore>;
     type Value = f32;
 
-    fn label(&self) -> String {
-        "FPS (min)".into()
+    fn label(&self) -> &str {
+        "FPS (min)"
     }
     fn update_value<'w>(
         &mut self,
@@ -563,8 +563,8 @@ impl PerfUiEntry for PerfUiEntryFrameTime {
     type SystemParam = SRes<DiagnosticsStore>;
     type Value = f64;
 
-    fn label(&self) -> String {
-        "Frame Time".into()
+    fn label(&self) -> &str {
+        "Frame Time"
     }
     fn update_value<'w>(
         &mut self,
@@ -610,8 +610,8 @@ impl PerfUiEntry for PerfUiEntryFrameTimeWorst {
     type SystemParam = SRes<DiagnosticsStore>;
     type Value = f32;
 
-    fn label(&self) -> String {
-        "Frame Time (max)".into()
+    fn label(&self) -> &str {
+        "Frame Time (max)"
     }
     fn update_value<'w>(
         &mut self,
@@ -661,8 +661,8 @@ impl PerfUiEntry for PerfUiEntryFrameCount {
     type SystemParam = SRes<DiagnosticsStore>;
     type Value = u32;
 
-    fn label(&self) -> String {
-        "Frame Count".into()
+    fn label(&self) -> &str {
+        "Frame Count"
     }
     fn update_value<'w>(
         &mut self,
@@ -685,8 +685,8 @@ impl PerfUiEntry for PerfUiEntryEntityCount {
     type SystemParam = SRes<DiagnosticsStore>;
     type Value = u32;
 
-    fn label(&self) -> String {
-        "Entity Count".into()
+    fn label(&self) -> &str {
+        "Entity Count"
     }
     fn update_value<'w>(
         &mut self,
@@ -729,8 +729,8 @@ impl PerfUiEntry for PerfUiEntryCpuUsage {
     type SystemParam = SRes<DiagnosticsStore>;
     type Value = f64;
 
-    fn label(&self) -> String {
-        "Total CPU Usage".into()
+    fn label(&self) -> &str {
+        "Total CPU Usage"
     }
     fn update_value<'w>(
         &mut self,
@@ -774,8 +774,8 @@ impl PerfUiEntry for PerfUiEntryMemUsage {
     type SystemParam = SRes<DiagnosticsStore>;
     type Value = f64;
 
-    fn label(&self) -> String {
-        "Total RAM Usage".into()
+    fn label(&self) -> &str {
+        "Total RAM Usage"
     }
     fn update_value<'w>(
         &mut self,

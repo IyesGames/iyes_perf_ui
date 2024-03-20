@@ -99,8 +99,8 @@ impl PerfUiEntry for PerfUiTimeSinceLastClick {
     type SystemParam = (SRes<Time>, SRes<TimeSinceLastClick>);
 
     // The text that will be shown as the Perf UI label
-    fn label(&self) -> String {
-        "Time since last click".into()
+    fn label(&self) -> &str {
+        "Time since last click"
     }
 
     // We must return the sort key we stored when constructing the struct

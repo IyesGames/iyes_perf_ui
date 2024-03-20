@@ -53,13 +53,13 @@ pub struct PerfUiTimeSinceLastClick;
 
 // Implement the trait for integration into the Perf UI
 impl PerfUiEntry for PerfUiTimeSinceLastClick {
-    type Value = f64;
+    type Value = u64;
     // Any system parameters we need in order to compute our value
     type SystemParam = (SRes<Time>, SRes<TimeSinceLastClick>);
 
     // The text that will be shown as the Perf UI label
-    fn label(&self) -> String {
-        "Time since last click".into()
+    fn label(&self) -> &str {
+        "Time since last click"
     }
 
     // We must return a sort key, to determine where to place the entry
@@ -75,15 +75,11 @@ impl PerfUiEntry for PerfUiTimeSinceLastClick {
         (time, lastclick): &mut <Self::SystemParam as SystemParam>::Item<'w, '_>,
     ) -> Option<Self::Value> {
         let d = time.elapsed() - lastclick.last_click;
-        Some(d.as_secs_f64())
+        Some(d.as_secs())
     }
 
-    fn format_value(
-        &self,
-        value: &Self::Value,
-    ) -> String {
-        format!("{:.2}", value)
-    }
+    // since we don't provide an implementation of `fn format_value`,
+    // the value will just be printed with its `Debug` formatting.
 }
 
 fn handle_click(

@@ -119,7 +119,7 @@ pub trait PerfUiEntry: Component {
     type Value: std::fmt::Debug;
 
     /// The label text to display in the Perf UI.
-    fn label(&self) -> String;
+    fn label(&self) -> &str;
 
     /// Update the value to display in the Perf UI.
     ///
