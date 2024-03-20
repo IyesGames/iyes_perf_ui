@@ -54,6 +54,8 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
             ..root_config.clone()
         },
         PerfUiEntryFPS {
+            // provide a custom label string
+            label: "Frame Rate (current)".into(),
             // let's say we *really* care about high framerates‼
             threshold_bad: 90.0,
             threshold_normal: 144.0,
@@ -63,6 +65,7 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
             ..default()
         },
         PerfUiEntryFPSWorst {
+            label: "Frame Rate (worst)".into(),
             threshold_bad: 90.0,
             threshold_normal: 144.0,
             threshold_good: 240.0,
@@ -71,6 +74,7 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
             ..default()
         },
         PerfUiEntryFrameTime {
+            label: "Frame Duration (current)".into(),
             threshold_bad: 5.0,
             threshold_normal: 2.0,
             threshold_good: 1.0,
@@ -79,6 +83,7 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
             ..default()
         },
         PerfUiEntryFrameTimeWorst {
+            label: "Frame Duration (worst)".into(),
             threshold_bad: 5.0,
             threshold_normal: 2.0,
             threshold_good: 1.0,
@@ -97,6 +102,7 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
             ..root_config.clone()
         },
         PerfUiEntryEntityCount {
+            label: "Number of ECS Entities".into(),
             // disable color and highlighting for this one
             enable_color: false,
             enable_highlight: false,
@@ -104,6 +110,7 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
             ..default()
         },
         PerfUiEntryCpuUsage {
+            label: "System CPU Utilization".into(),
             // and we want to keep the cpu usage low
             threshold_high: 50.0,
             threshold_normal: 20.0,
@@ -112,6 +119,7 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
             ..default()
         },
         PerfUiEntryMemUsage {
+            label: "System RAM Utilization".into(),
             threshold_high: 25.0,
             threshold_normal: 15.0,
             threshold_low: 10.0,

@@ -11,6 +11,8 @@ use crate::utils::*;
 /// Perf UI Entry to display the time the Bevy app has been running.
 #[derive(Component, Debug, Clone)]
 pub struct PerfUiEntryRunningTime {
+    /// Custom label. If empty (default), the default label will be used.
+    pub label: String,
     /// If set, count time relative to this.
     /// If unset, count time since app startup.
     /// (represented as a duration since startup, as per Bevy's `Time::elapsed()`)
@@ -45,6 +47,7 @@ pub struct PerfUiEntryRunningTime {
 impl Default for PerfUiEntryRunningTime {
     fn default() -> Self {
         PerfUiEntryRunningTime {
+            label: String::new(),
             start: None,
             format_hms: false,
             display_units: true,
@@ -61,6 +64,8 @@ impl Default for PerfUiEntryRunningTime {
 /// this crate. If `chrono` is enabled, it will be in local time.
 #[derive(Component, Debug, Clone)]
 pub struct PerfUiEntryClock {
+    /// Custom label. If empty (default), the default label will be used.
+    pub label: String,
     /// If true, time will be displayed in UTC and not the local timezone.
     ///
     /// If the `chrono` cargo feature is disabled, time will always be displayed
@@ -79,6 +84,7 @@ pub struct PerfUiEntryClock {
 impl Default for PerfUiEntryClock {
     fn default() -> Self {
         PerfUiEntryClock {
+            label: String::new(),
             prefer_utc: false,
             precision: 0,
             sort_key: next_sort_key(),
@@ -91,7 +97,11 @@ impl PerfUiEntry for PerfUiEntryRunningTime {
     type SystemParam = SRes<Time>;
 
     fn label(&self) -> &str {
-        "Running Time"
+        if self.label.is_empty() {
+            "Running Time"
+        } else {
+            &self.label
+        }
     }
     fn sort_key(&self) -> i32 {
         self.sort_key
@@ -129,10 +139,14 @@ impl PerfUiEntry for PerfUiEntryClock {
     type SystemParam = ();
 
     fn label(&self) -> &str {
-        if cfg!(feature = "chrono") && !self.prefer_utc {
-            "Clock"
+        if self.label.is_empty() {
+            if cfg!(feature = "chrono") && !self.prefer_utc {
+                "Clock"
+            } else {
+                "Clock (UTC)"
+            }
         } else {
-            "Clock (UTC)"
+            &self.label
         }
     }
     fn sort_key(&self) -> i32 {

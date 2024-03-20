@@ -12,6 +12,8 @@ use crate::utils::*;
 /// Perf UI Entry to display Bevy's built-in FPS measurement diagnostic.
 #[derive(Component, Debug, Clone)]
 pub struct PerfUiEntryFPS {
+    /// Custom label. If empty (default), the default label will be used.
+    pub label: String,
     /// Enable color based on value
     ///
     /// Default: `true`
@@ -59,6 +61,7 @@ pub struct PerfUiEntryFPS {
 impl Default for PerfUiEntryFPS {
     fn default() -> Self {
         PerfUiEntryFPS {
+            label: String::new(),
             enable_color: true,
             enable_highlight: true,
             threshold_good: 120.0,
@@ -78,6 +81,8 @@ impl Default for PerfUiEntryFPS {
 /// Displays the worst (lowest) value in recent history.
 #[derive(Component, Debug, Clone)]
 pub struct PerfUiEntryFPSWorst {
+    /// Custom label. If empty (default), the default label will be used.
+    pub label: String,
     /// Enable color based on value
     ///
     /// Default: `true`
@@ -121,6 +126,7 @@ pub struct PerfUiEntryFPSWorst {
 impl Default for PerfUiEntryFPSWorst {
     fn default() -> Self {
         PerfUiEntryFPSWorst {
+            label: String::new(),
             enable_color: true,
             enable_highlight: true,
             threshold_good: 120.0,
@@ -139,6 +145,8 @@ impl Default for PerfUiEntryFPSWorst {
 /// Displays the frame time in *milliseconds*.
 #[derive(Component, Debug, Clone)]
 pub struct PerfUiEntryFrameTime {
+    /// Custom label. If empty (default), the default label will be used.
+    pub label: String,
     /// Enable color based on value
     ///
     /// Default: `true`
@@ -190,6 +198,7 @@ pub struct PerfUiEntryFrameTime {
 impl Default for PerfUiEntryFrameTime {
     fn default() -> Self {
         PerfUiEntryFrameTime {
+            label: String::new(),
             enable_color: true,
             enable_highlight: true,
             display_units: true,
@@ -212,6 +221,8 @@ impl Default for PerfUiEntryFrameTime {
 /// Displays the frame time in *milliseconds*.
 #[derive(Component, Debug, Clone)]
 pub struct PerfUiEntryFrameTimeWorst {
+    /// Custom label. If empty (default), the default label will be used.
+    pub label: String,
     /// Enable color based on value
     ///
     /// Default: `true`
@@ -259,6 +270,7 @@ pub struct PerfUiEntryFrameTimeWorst {
 impl Default for PerfUiEntryFrameTimeWorst {
     fn default() -> Self {
         PerfUiEntryFrameTimeWorst {
+            label: String::new(),
             enable_color: true,
             enable_highlight: true,
             display_units: true,
@@ -276,6 +288,8 @@ impl Default for PerfUiEntryFrameTimeWorst {
 /// Perf UI Entry to display Bevy's built-in frame counter.
 #[derive(Component, Debug, Clone)]
 pub struct PerfUiEntryFrameCount {
+    /// Custom label. If empty (default), the default label will be used.
+    pub label: String,
     /// Number of digits to display.
     ///
     /// Default: `6`
@@ -287,6 +301,7 @@ pub struct PerfUiEntryFrameCount {
 impl Default for PerfUiEntryFrameCount {
     fn default() -> Self {
         PerfUiEntryFrameCount {
+            label: String::new(),
             digits: 6,
             sort_key: next_sort_key(),
         }
@@ -296,6 +311,8 @@ impl Default for PerfUiEntryFrameCount {
 /// Perf UI Entry to display Bevy's built-in ECS entity counter.
 #[derive(Component, Debug, Clone)]
 pub struct PerfUiEntryEntityCount {
+    /// Custom label. If empty (default), the default label will be used.
+    pub label: String,
     /// Enable color based on value
     ///
     /// Default: `true`
@@ -335,6 +352,7 @@ pub struct PerfUiEntryEntityCount {
 impl Default for PerfUiEntryEntityCount {
     fn default() -> Self {
         PerfUiEntryEntityCount {
+            label: String::new(),
             enable_color: true,
             enable_highlight: true,
             threshold_high: 10000,
@@ -352,6 +370,8 @@ impl Default for PerfUiEntryEntityCount {
 /// Displays the usage as a percentage.
 #[derive(Component, Debug, Clone)]
 pub struct PerfUiEntryCpuUsage {
+    /// Custom label. If empty (default), the default label will be used.
+    pub label: String,
     /// Enable color based on value
     ///
     /// Default: `true`
@@ -395,6 +415,7 @@ pub struct PerfUiEntryCpuUsage {
 impl Default for PerfUiEntryCpuUsage {
     fn default() -> Self {
         PerfUiEntryCpuUsage {
+            label: String::new(),
             enable_color: true,
             enable_highlight: true,
             threshold_high: 75.0,
@@ -413,6 +434,8 @@ impl Default for PerfUiEntryCpuUsage {
 /// Displays the usage as a percentage.
 #[derive(Component, Debug, Clone)]
 pub struct PerfUiEntryMemUsage {
+    /// Custom label. If empty (default), the default label will be used.
+    pub label: String,
     /// Enable color based on value
     ///
     /// Default: `true`
@@ -456,6 +479,7 @@ pub struct PerfUiEntryMemUsage {
 impl Default for PerfUiEntryMemUsage {
     fn default() -> Self {
         PerfUiEntryMemUsage {
+            label: String::new(),
             enable_color: true,
             enable_highlight: true,
             threshold_high: 75.0,
@@ -474,7 +498,11 @@ impl PerfUiEntry for PerfUiEntryFPS {
     type Value = f64;
 
     fn label(&self) -> &str {
-        "FPS"
+        if self.label.is_empty() {
+            "FPS"
+        } else {
+            &self.label
+        }
     }
     fn update_value(
         &mut self,
@@ -517,7 +545,11 @@ impl PerfUiEntry for PerfUiEntryFPSWorst {
     type Value = f32;
 
     fn label(&self) -> &str {
-        "FPS (min)"
+        if self.label.is_empty() {
+            "FPS (min)"
+        } else {
+            &self.label
+        }
     }
     fn update_value(
         &mut self,
@@ -564,7 +596,11 @@ impl PerfUiEntry for PerfUiEntryFrameTime {
     type Value = f64;
 
     fn label(&self) -> &str {
-        "Frame Time"
+        if self.label.is_empty() {
+            "Frame Time"
+        } else {
+            &self.label
+        }
     }
     fn update_value(
         &mut self,
@@ -611,7 +647,11 @@ impl PerfUiEntry for PerfUiEntryFrameTimeWorst {
     type Value = f32;
 
     fn label(&self) -> &str {
-        "Frame Time (max)"
+        if self.label.is_empty() {
+            "Frame Time (max)"
+        } else {
+            &self.label
+        }
     }
     fn update_value(
         &mut self,
@@ -662,7 +702,11 @@ impl PerfUiEntry for PerfUiEntryFrameCount {
     type Value = u32;
 
     fn label(&self) -> &str {
-        "Frame Count"
+        if self.label.is_empty() {
+            "Frame Count"
+        } else {
+            &self.label
+        }
     }
     fn update_value(
         &mut self,
@@ -686,7 +730,11 @@ impl PerfUiEntry for PerfUiEntryEntityCount {
     type Value = u32;
 
     fn label(&self) -> &str {
-        "Entity Count"
+        if self.label.is_empty() {
+            "Entity Count"
+        } else {
+            &self.label
+        }
     }
     fn update_value(
         &mut self,
@@ -730,7 +778,11 @@ impl PerfUiEntry for PerfUiEntryCpuUsage {
     type Value = f64;
 
     fn label(&self) -> &str {
-        "Total CPU Usage"
+        if self.label.is_empty() {
+            "Total CPU Usage"
+        } else {
+            &self.label
+        }
     }
     fn update_value(
         &mut self,
@@ -775,7 +827,11 @@ impl PerfUiEntry for PerfUiEntryMemUsage {
     type Value = f64;
 
     fn label(&self) -> &str {
-        "Total RAM Usage"
+        if self.label.is_empty() {
+            "Total RAM Usage"
+        } else {
+            &self.label
+        }
     }
     fn update_value(
         &mut self,
