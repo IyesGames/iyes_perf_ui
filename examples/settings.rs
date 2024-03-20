@@ -136,8 +136,11 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
             ..default()
         },
         PerfUiEntryClock {
+            // always show time in UTC
+            prefer_utc: true,
             precision: 1,
             sort_key: 0, // we can manually control the order of the entries
+            ..default()
         },
     ));
 }

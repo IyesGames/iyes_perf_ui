@@ -61,6 +61,13 @@ impl Default for PerfUiEntryRunningTime {
 /// this crate. If `chrono` is enabled, it will be in local time.
 #[derive(Component, Debug, Clone)]
 pub struct PerfUiEntryClock {
+    /// If true, time will be displayed in UTC and not the local timezone.
+    ///
+    /// If the `chrono` cargo feature is disabled, time will always be displayed
+    /// in UTC regardless of this setting.
+    ///
+    /// Default: `false`
+    pub prefer_utc: bool,
     /// Number of digits to display for the fractional (after the decimal point) part.
     ///
     /// Default: `0`
@@ -72,6 +79,7 @@ pub struct PerfUiEntryClock {
 impl Default for PerfUiEntryClock {
     fn default() -> Self {
         PerfUiEntryClock {
+            prefer_utc: false,
             precision: 0,
             sort_key: next_sort_key(),
         }
@@ -121,7 +129,7 @@ impl PerfUiEntry for PerfUiEntryClock {
     type SystemParam = ();
 
     fn label(&self) -> &str {
-        if cfg!(feature = "chrono") {
+        if cfg!(feature = "chrono") && !self.prefer_utc {
             "Clock"
         } else {
             "Clock (UTC)"
@@ -135,25 +143,11 @@ impl PerfUiEntry for PerfUiEntryClock {
         _: &mut <Self::SystemParam as SystemParam>::Item<'w, '_>,
     ) -> Option<Self::Value> {
         #[cfg(feature = "chrono")]
-        {
-            use chrono::Timelike;
-            let now = chrono::Local::now();
-            let h = now.hour();
-            let m = now.minute();
-            let s = now.second();
-            let nanos = now.timestamp_subsec_nanos();
-            Some((h as u32, m as u32, s as u32, nanos))
+        if !self.prefer_utc {
+            return get_system_clock_local();
         }
-        #[cfg(not(feature = "chrono"))]
-        {
-            let now = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).ok()?;
-            let secs = now.as_secs();
-            let h = (secs / 3600) % 24;
-            let m = (secs / 60) % 60;
-            let s = secs % 60;
-            let nanos = now.subsec_nanos();
-            Some((h as u32, m as u32, s as u32, nanos))
-        }
+
+        get_system_clock_utc()
     }
     fn format_value(
         &self,
@@ -161,4 +155,25 @@ impl PerfUiEntry for PerfUiEntryClock {
     ) -> String {
         format_pretty_time_hms(self.precision, h, m, s, nanos)
     }
+}
+
+#[cfg(feature = "chrono")]
+fn get_system_clock_local() -> Option<(u32, u32, u32, u32)> {
+    use chrono::Timelike;
+    let now = chrono::Local::now();
+    let h = now.hour();
+    let m = now.minute();
+    let s = now.second();
+    let nanos = now.timestamp_subsec_nanos();
+    Some((h as u32, m as u32, s as u32, nanos))
+}
+
+fn get_system_clock_utc() -> Option<(u32, u32, u32, u32)> {
+    let now = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).ok()?;
+    let secs = now.as_secs();
+    let h = (secs / 3600) % 24;
+    let m = (secs / 60) % 60;
+    let s = secs % 60;
+    let nanos = now.subsec_nanos();
+    Some((h as u32, m as u32, s as u32, nanos))
 }
