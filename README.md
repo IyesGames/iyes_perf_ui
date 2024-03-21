@@ -4,6 +4,10 @@
 [![docs](https://docs.rs/iyes_perf_ui/badge.svg)](https://docs.rs/iyes_perf_ui/)
 [![MIT/Apache 2.0](https://img.shields.io/badge/license-MIT%2FApache-blue.svg)](./LICENSE)
 
+Sponsor me:
+
+<a href="https://github.com/sponsors/inodentry"><button class="ghsponsors-button">GitHub Sponsors</button></a>
+
 Bevy Compatibility:
 
 | Bevy Version | Plugin Version |
