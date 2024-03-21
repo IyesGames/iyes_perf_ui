@@ -198,6 +198,13 @@ pub trait PerfUiEntry: Component {
     }
 
     /// The sort key controls where the entry will appear in the Perf UI.
+    ///
+    /// The recommended way to implement this is to have a field in your struct,
+    /// which you can set to `iyes_perf_ui::utils::next_sort_key()` in your
+    /// `impl Default`. Then return that value here.
+    ///
+    /// That way, the entry will be sorted according to the order in which the
+    /// user creates the entries.
     fn sort_key(&self) -> i32;
 }
 

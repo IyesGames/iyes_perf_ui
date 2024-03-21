@@ -15,7 +15,7 @@ use crate::utils::*;
 pub struct PerfUiEntryWindowMode {
     /// Custom label. If empty (default), the default label will be used.
     pub label: String,
-    /// Display the cursor position within the specified window (in a multi-window application).
+    /// Display the value from the specified window (in a multi-window application).
     ///
     /// If `None` (the default), the primary window is selected.
     pub window: Option<Entity>,
@@ -38,7 +38,7 @@ impl Default for PerfUiEntryWindowMode {
 pub struct PerfUiEntryWindowPresentMode {
     /// Custom label. If empty (default), the default label will be used.
     pub label: String,
-    /// Display the cursor position within the specified window (in a multi-window application).
+    /// Display the value from the specified window (in a multi-window application).
     ///
     /// If `None` (the default), the primary window is selected.
     pub window: Option<Entity>,
@@ -77,7 +77,7 @@ pub struct PerfUiEntryWindowResolution {
     ///
     /// Default: `false`
     pub physical_pixels: bool,
-    /// Display the cursor position within the specified window (in a multi-window application).
+    /// Display the value from the specified window (in a multi-window application).
     ///
     /// If `None` (the default), the primary window is selected.
     pub window: Option<Entity>,
@@ -130,7 +130,7 @@ pub struct PerfUiEntryCursorPosition {
     ///
     /// Default: `false`
     pub physical_pixels: bool,
-    /// Display the cursor position within the specified window (in a multi-window application).
+    /// Display the value from the specified window (in a multi-window application).
     ///
     /// If `None` (the default), the primary window is selected.
     pub window: Option<Entity>,
