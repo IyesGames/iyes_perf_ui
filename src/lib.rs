@@ -5,18 +5,6 @@
 //!
 //! The goal of this crate is to make it as useful as possible for any Bevy project:
 //!  - Made with Bevy UI (not egui or any other 3rd-party UI solution)
-//!  - Easy to set up (see `simple` example)
-//!  - Customizable appearance/styling (see `settings` example)
-//!  - Modular! You decide what info you want to display!
-//!    - Choose any combination of predefined entries for:
-//!      - Framerate (FPS), Frame Time, Frame Count, ECS Entity Count, CPU Usage, RAM Usage, Wall Clock, Running Time
-//!    - Implement your own custom entries to display anything you like!
-//!      - (see `custom_minimal` and `custom` examples)
-//!  - Support for highlighting values using a custom font or color!
-//!    - Allows you to quickly notice if something demands your attention.
-//!
-//! The goal of this crate is to make it as useful as possible for any Bevy project:
-//!  - Made with Bevy UI (not egui or any other 3rd-party UI solution)
 //!  - Easy to set up (see [`simple`](https://github.com/IyesGames/iyes_perf_ui/blob/v0.2.3/examples/simple.rs) example)
 //!  - Modular! You decide what info you want to display!
 //!    - Choose any combination of predefined entries
