@@ -122,7 +122,7 @@ impl PerfUiEntry for PerfUiTimeSinceLastClick {
 
     // Called every frame to compute a new value to show
     fn update_value(
-        &mut self,
+        &self,
         (time, lastclick): &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         let d = time.elapsed() - lastclick.last_click;
@@ -140,6 +140,20 @@ impl PerfUiEntry for PerfUiTimeSinceLastClick {
             s.push_str(" s");
         }
         s
+    }
+
+    // (optional) We should add a width hint, so that the displayed
+    // strings in the UI can be correctly aligned.
+    // This value represents the largest length the formatted string
+    // is expected to have.
+    fn width_hint(&self) -> usize {
+        // there is a helper we can use, since we use `format_pretty_float`
+        let w = iyes_perf_ui::utils::width_hint_pretty_float(self.digits, self.precision);
+        if self.display_units {
+            w + 2
+        } else {
+            w
+        }
     }
 
     // (optional) Called every frame to determine if a custom color should be used for the value
