@@ -137,6 +137,17 @@ pub trait PerfUiEntry: Component {
     /// The label text to display in the Perf UI.
     fn label(&self) -> &str;
 
+    /// Optional: provide a desired width for the value string.
+    ///
+    /// The formatted value will be padded with spaces. This allows
+    /// everything to line up nicely in the UI and prevents the UI from
+    /// spontaneously resizing as the values change.
+    ///
+    /// (assuming a monospace font)
+    fn width_hint(&self) -> usize {
+        0
+    }
+
     /// Update the value to display in the Perf UI.
     ///
     /// This function will be called once per frame,
@@ -512,7 +523,13 @@ pub fn update_perf_ui_entry<T: PerfUiEntry>(
         if let Some(value) = entry.update_value(&mut entry_param) {
             let color = entry.value_color(&value)
                 .unwrap_or(root.default_value_color);
-            text.sections[0].value = entry.format_value(&value);
+            let s = entry.format_value(&value);
+            let width_hint = entry.width_hint();
+            text.sections[0].value = if s.len() < width_hint {
+                format!("{:>w$}", s, w = width_hint)
+            } else {
+                s
+            };
             text.sections[0].style.color = color;
             if entry.value_highlight(&value) {
                 text.sections[0].style.font = root.font_highlight.clone();
@@ -521,7 +538,13 @@ pub fn update_perf_ui_entry<T: PerfUiEntry>(
                 text.sections[0].style.font = root.font_value.clone();
             }
         } else {
-            text.sections[0].value = root.text_err.clone();
+            let s = root.text_err.clone();
+            let width_hint = entry.width_hint();
+            text.sections[0].value = if s.len() < width_hint {
+                format!("{:>w$}", s, w = width_hint)
+            } else {
+                s
+            };
             text.sections[0].style.color = root.err_color;
             text.sections[0].style.font = root.font_value.clone();
         }

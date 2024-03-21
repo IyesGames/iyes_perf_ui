@@ -192,18 +192,21 @@ pub fn format_pretty_float(digits: u8, precision: u8, mut value: f64) -> String 
         value = max - 10.0f64.powi(-(precision as i32));
     }
 
-    let width = if precision > 0 {
-        digits + precision + 1
-    } else {
-        digits
-    };
-
     format!(
         "{number:>width$.prec$}",
         number = value,
-        width = width as usize,
+        width = width_hint_pretty_float(digits, precision),
         prec = precision as usize,
     )
+}
+
+/// Width hint for a value formatted with `format_pretty_float`
+pub fn width_hint_pretty_float(digits: u8, precision: u8) -> usize {
+    if precision > 0 {
+        digits as usize + precision as usize + 1
+    } else {
+        digits as usize
+    }
 }
 
 /// Format an integer in a pretty way.
@@ -212,27 +215,30 @@ pub fn format_pretty_float(digits: u8, precision: u8, mut value: f64) -> String 
 /// - Padded with spaces to accomodate total width (digits)
 /// - Clamped to all 9s if above digits count (example: `99` if digits = 2)
 pub fn format_pretty_int(digits: u8, mut value: i64) -> String {
-    let width = if value < 0 {
+    if value < 0 {
         let digits = digits.max(2) - 1;
         let max = 10i64.pow(digits as u32);
         if -value >= max {
             value = -(max - 1);
         }
-        digits + 1
     } else {
         let digits = digits.max(1);
         let max = 10i64.pow(digits as u32);
         if value >= max {
             value = max - 1;
         }
-        digits
     };
 
     format!(
         "{number:>width$}",
         number = value,
-        width = width as usize,
+        width = width_hint_pretty_int(digits),
     )
+}
+
+/// Width hint for a value formatted with `format_pretty_int`
+pub fn width_hint_pretty_int(digits: u8) -> usize {
+    digits as usize + 1
 }
 
 /// Format a time duration in a pretty way.
@@ -283,5 +289,15 @@ pub fn format_pretty_time_hms(precision: u8, h: u32, m: u32, s: u32, nanos: u32)
         } else {
             format!("{:8}", secs)
         }
+    }
+}
+
+/// Width hint for a value formatted with `format_pretty_time`/`format_pretty_time_hms`
+pub fn width_hint_pretty_time(precision: u8) -> usize {
+    if precision > 0 {
+        // "HH:MM:SS.f+"
+        9 + precision as usize
+    } else {
+        8
     }
 }

@@ -237,6 +237,14 @@ impl PerfUiEntry for PerfUiEntryWindowResolution {
     fn sort_key(&self) -> i32 {
         self.sort_key
     }
+    fn width_hint(&self) -> usize {
+        match (self.display_axis, self.display_units) {
+            (true, true) => self.width as usize + self.separator.len() + 12,
+            (true, false) => self.width as usize + self.separator.len() + 6,
+            (false, true) => self.width as usize + self.separator.len() + 6,
+            (false, false) => self.width as usize + self.separator.len(),
+        }
+    }
     fn update_value(
         &mut self,
         (q_primary, q_any): &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
@@ -271,25 +279,24 @@ impl PerfUiEntry for PerfUiEntryWindowResolution {
         &self,
         value: &Self::Value,
     ) -> String {
-        let (full_width, s) = match (self.display_axis, self.display_units) {
-            (true, true) => (self.width as usize + self.separator.len() + 12, format!(
+        match (self.display_axis, self.display_units) {
+            (true, true) => format!(
                 "X: {:.p$} px{}Y: {:.p$} px",
                 value.x, self.separator, value.y, p = self.precision as usize
-            )),
-            (true, false) => (self.width as usize + self.separator.len() + 6, format!(
+            ),
+            (true, false) => format!(
                 "X: {:.p$}{}Y: {:.p$}",
                 value.x, self.separator, value.y, p = self.precision as usize
-            )),
-            (false, true) => (self.width as usize + self.separator.len() + 6, format!(
+            ),
+            (false, true) => format!(
                 "{:.p$} px{}{:.p$} px",
                 value.x, self.separator, value.y, p = self.precision as usize
-            )),
-            (false, false) => (self.width as usize + self.separator.len(), format!(
+            ),
+            (false, false) => format!(
                 "{:.p$}{}{:.p$}",
                 value.x, self.separator, value.y, p = self.precision as usize
-            )),
-        };
-        format!("{:>w$}", s, w = full_width)
+            ),
+        }
     }
 }
 
@@ -309,6 +316,14 @@ impl PerfUiEntry for PerfUiEntryCursorPosition {
     }
     fn sort_key(&self) -> i32 {
         self.sort_key
+    }
+    fn width_hint(&self) -> usize {
+        match (self.display_axis, self.display_units) {
+            (true, true) => self.width as usize + self.separator.len() + 12,
+            (true, false) => self.width as usize + self.separator.len() + 6,
+            (false, true) => self.width as usize + self.separator.len() + 6,
+            (false, false) => self.width as usize + self.separator.len(),
+        }
     }
     fn update_value(
         &mut self,
@@ -332,24 +347,23 @@ impl PerfUiEntry for PerfUiEntryCursorPosition {
         &self,
         value: &Self::Value,
     ) -> String {
-        let (full_width, s) = match (self.display_axis, self.display_units) {
-            (true, true) => (self.width as usize + self.separator.len() + 12, format!(
+        match (self.display_axis, self.display_units) {
+            (true, true) => format!(
                 "X: {:.p$} px{}Y: {:.p$} px",
                 value.x, self.separator, value.y, p = self.precision as usize
-            )),
-            (true, false) => (self.width as usize + self.separator.len() + 6, format!(
+            ),
+            (true, false) => format!(
                 "X: {:.p$}{}Y: {:.p$}",
                 value.x, self.separator, value.y, p = self.precision as usize
-            )),
-            (false, true) => (self.width as usize + self.separator.len() + 6, format!(
+            ),
+            (false, true) => format!(
                 "{:.p$} px{}{:.p$} px",
                 value.x, self.separator, value.y, p = self.precision as usize
-            )),
-            (false, false) => (self.width as usize + self.separator.len(), format!(
+            ),
+            (false, false) => format!(
                 "{:.p$}{}{:.p$}",
                 value.x, self.separator, value.y, p = self.precision as usize
-            )),
-        };
-        format!("{:>w$}", s, w = full_width)
+            ),
+        }
     }
 }

@@ -358,6 +358,9 @@ impl PerfUiEntry for PerfUiEntryFPS {
             &self.label
         }
     }
+    fn width_hint(&self) -> usize {
+        width_hint_pretty_float(self.digits, self.precision)
+    }
     fn update_value(
         &mut self,
         diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
@@ -403,6 +406,9 @@ impl PerfUiEntry for PerfUiEntryFPSWorst {
         } else {
             &self.label
         }
+    }
+    fn width_hint(&self) -> usize {
+        width_hint_pretty_float(self.digits, self.precision)
     }
     fn update_value(
         &mut self,
@@ -454,6 +460,14 @@ impl PerfUiEntry for PerfUiEntryFrameTime {
             &self.label
         }
     }
+    fn width_hint(&self) -> usize {
+        let w = width_hint_pretty_float(self.digits, self.precision);
+        if self.display_units {
+            w + 3
+        } else {
+            w
+        }
+    }
     fn update_value(
         &mut self,
         diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
@@ -502,6 +516,14 @@ impl PerfUiEntry for PerfUiEntryFrameTimeWorst {
             "Frame Time (max)"
         } else {
             &self.label
+        }
+    }
+    fn width_hint(&self) -> usize {
+        let w = width_hint_pretty_float(self.digits, self.precision);
+        if self.display_units {
+            w + 3
+        } else {
+            w
         }
     }
     fn update_value(
@@ -558,6 +580,9 @@ impl PerfUiEntry for PerfUiEntryFrameCount {
             &self.label
         }
     }
+    fn width_hint(&self) -> usize {
+        width_hint_pretty_int(self.digits)
+    }
     fn update_value(
         &mut self,
         diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
@@ -585,6 +610,9 @@ impl PerfUiEntry for PerfUiEntryEntityCount {
         } else {
             &self.label
         }
+    }
+    fn width_hint(&self) -> usize {
+        width_hint_pretty_int(self.digits)
     }
     fn update_value(
         &mut self,
@@ -627,6 +655,9 @@ impl PerfUiEntry for PerfUiEntryCpuUsage {
         } else {
             &self.label
         }
+    }
+    fn width_hint(&self) -> usize {
+        width_hint_pretty_float(2, self.precision) + 1
     }
     fn update_value(
         &mut self,
@@ -675,6 +706,9 @@ impl PerfUiEntry for PerfUiEntryMemUsage {
         } else {
             &self.label
         }
+    }
+    fn width_hint(&self) -> usize {
+        width_hint_pretty_float(2, self.precision) + 1
     }
     fn update_value(
         &mut self,
