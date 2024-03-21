@@ -153,10 +153,8 @@ pub trait PerfUiEntry: Component {
     /// This function will be called once per frame,
     /// in the `Update` schedule,
     /// in the `PerfUiSet::Update` set.
-    ///
-    /// You may store state in your component type (hence the `&mut self`).
     fn update_value(
-        &mut self,
+        &self,
         param: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value>;
 
@@ -509,14 +507,14 @@ fn sort_perf_ui_entries(
 /// Exposed as `pub` so you can refer to it for ordering.
 #[allow(private_interfaces)]
 pub fn update_perf_ui_entry<T: PerfUiEntry>(
-    mut q_root: Query<(&PerfUiRoot, &mut T)>,
+    q_root: Query<(&PerfUiRoot, &T)>,
     mut q_entry: Query<&mut BackgroundColor, With<PerfUiEntryMarker<T>>>,
     mut q_text: Query<(&mut Text, &PerfUiTextMarker<T>)>,
     entry_param: StaticSystemParam<T::SystemParam>,
 ) {
     let mut entry_param = entry_param.into_inner();
     for (mut text, marker) in &mut q_text {
-        let Ok((root, mut entry)) = q_root.get_mut(marker.e_root) else {
+        let Ok((root, entry)) = q_root.get(marker.e_root) else {
             continue;
         };
         let mut entry_highlight = false;

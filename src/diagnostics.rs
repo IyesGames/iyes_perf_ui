@@ -362,7 +362,7 @@ impl PerfUiEntry for PerfUiEntryFPS {
         width_hint_pretty_float(self.digits, self.precision)
     }
     fn update_value(
-        &mut self,
+        &self,
         diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         Some(if self.smoothed {
@@ -411,7 +411,7 @@ impl PerfUiEntry for PerfUiEntryFPSWorst {
         width_hint_pretty_float(self.digits, self.precision)
     }
     fn update_value(
-        &mut self,
+        &self,
         diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         Some(diagnostics.get(&FrameTimeDiagnosticsPlugin::FPS)?
@@ -469,7 +469,7 @@ impl PerfUiEntry for PerfUiEntryFrameTime {
         }
     }
     fn update_value(
-        &mut self,
+        &self,
         diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         Some(if self.smoothed {
@@ -527,7 +527,7 @@ impl PerfUiEntry for PerfUiEntryFrameTimeWorst {
         }
     }
     fn update_value(
-        &mut self,
+        &self,
         diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         Some(diagnostics.get(&FrameTimeDiagnosticsPlugin::FRAME_TIME)?
@@ -584,7 +584,7 @@ impl PerfUiEntry for PerfUiEntryFrameCount {
         width_hint_pretty_int(self.digits)
     }
     fn update_value(
-        &mut self,
+        &self,
         diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         Some(diagnostics.get(&FrameTimeDiagnosticsPlugin::FRAME_COUNT)?.value()? as u32)
@@ -615,7 +615,7 @@ impl PerfUiEntry for PerfUiEntryEntityCount {
         width_hint_pretty_int(self.digits)
     }
     fn update_value(
-        &mut self,
+        &self,
         diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         Some(diagnostics.get(&EntityCountDiagnosticsPlugin::ENTITY_COUNT)?.value()? as u32)
@@ -660,7 +660,7 @@ impl PerfUiEntry for PerfUiEntryCpuUsage {
         width_hint_pretty_float(2, self.precision) + 1
     }
     fn update_value(
-        &mut self,
+        &self,
         diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         Some(if self.smoothed {
@@ -711,7 +711,7 @@ impl PerfUiEntry for PerfUiEntryMemUsage {
         width_hint_pretty_float(2, self.precision) + 1
     }
     fn update_value(
-        &mut self,
+        &self,
         diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         Some(if self.smoothed {

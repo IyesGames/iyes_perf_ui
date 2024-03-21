@@ -190,7 +190,7 @@ impl PerfUiEntry for PerfUiEntryRunningTime {
         }
     }
     fn update_value(
-        &mut self,
+        &self,
         time: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         let elapsed = time.elapsed();
@@ -239,7 +239,7 @@ impl PerfUiEntry for PerfUiEntryClock {
         width_hint_pretty_time(self.precision)
     }
     fn update_value(
-        &mut self,
+        &self,
         _: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         #[cfg(feature = "chrono")]
@@ -280,7 +280,7 @@ impl PerfUiEntry for PerfUiEntryFixedTimeStep {
         }
     }
     fn update_value(
-        &mut self,
+        &self,
         time: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         Some(time.timestep())
@@ -325,7 +325,7 @@ impl PerfUiEntry for PerfUiEntryFixedOverstep {
         }
     }
     fn update_value(
-        &mut self,
+        &self,
         time: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         Some(if self.as_percent {

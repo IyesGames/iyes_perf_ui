@@ -180,7 +180,7 @@ impl PerfUiEntry for PerfUiEntryWindowMode {
         self.sort_key
     }
     fn update_value(
-        &mut self,
+        &self,
         (q_primary, q_any): &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         if let Some(e) = self.window {
@@ -209,7 +209,7 @@ impl PerfUiEntry for PerfUiEntryWindowPresentMode {
         self.sort_key
     }
     fn update_value(
-        &mut self,
+        &self,
         (q_primary, q_any): &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         if let Some(e) = self.window {
@@ -246,7 +246,7 @@ impl PerfUiEntry for PerfUiEntryWindowResolution {
         }
     }
     fn update_value(
-        &mut self,
+        &self,
         (q_primary, q_any): &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         if let Some(e) = self.window {
@@ -326,7 +326,7 @@ impl PerfUiEntry for PerfUiEntryCursorPosition {
         }
     }
     fn update_value(
-        &mut self,
+        &self,
         (q_primary, q_any): &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         if let Some(e) = self.window {
