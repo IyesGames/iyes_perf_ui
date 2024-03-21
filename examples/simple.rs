@@ -27,17 +27,29 @@ fn setup(mut commands: Commands) {
     // and all entries provided by the crate:
     commands.spawn((
         PerfUiRoot::default(),
-        PerfUiEntryFPS::default(),
-        PerfUiEntryFPSWorst::default(),
-        PerfUiEntryFrameTime::default(),
-        PerfUiEntryFrameTimeWorst::default(),
-        PerfUiEntryFrameCount::default(),
-        PerfUiEntryEntityCount::default(),
-        PerfUiEntryCpuUsage::default(),
-        PerfUiEntryMemUsage::default(),
-        PerfUiEntryFixedTimeStep::default(),
-        PerfUiEntryFixedOverstep::default(),
-        PerfUiEntryRunningTime::default(),
-        PerfUiEntryClock::default(),
+        // when we have lots of entries, we have to group them
+        // into tuples, because of Bevy Rust syntax limitations
+        (
+            PerfUiEntryFPS::default(),
+            PerfUiEntryFPSWorst::default(),
+            PerfUiEntryFrameTime::default(),
+            PerfUiEntryFrameTimeWorst::default(),
+            PerfUiEntryFrameCount::default(),
+            PerfUiEntryEntityCount::default(),
+            PerfUiEntryCpuUsage::default(),
+            PerfUiEntryMemUsage::default(),
+        ),
+        (
+            PerfUiEntryFixedTimeStep::default(),
+            PerfUiEntryFixedOverstep::default(),
+            PerfUiEntryRunningTime::default(),
+            PerfUiEntryClock::default(),
+        ),
+        (
+            PerfUiEntryCursorPosition::default(),
+            PerfUiEntryWindowResolution::default(),
+            PerfUiEntryWindowMode::default(),
+            PerfUiEntryWindowPresentMode::default(),
+        ),
     ));
 }

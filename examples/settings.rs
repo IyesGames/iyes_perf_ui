@@ -128,6 +128,7 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
             ..default()
         },
     ));
+
     // Perf UI #3: Clock + running time
     commands.spawn((
         PerfUiRoot {
@@ -149,6 +150,42 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
             prefer_utc: true,
             precision: 1,
             sort_key: 0, // we can manually control the order of the entries
+            ..default()
+        },
+    ));
+
+    // Perf UI #4: Cursor Position, Window Properties
+    commands.spawn((
+        PerfUiRoot {
+            position: PerfUiPosition::TopRight,
+            // always display this Perf UI below the other three
+            z_index: ZIndex::Global(i32::MAX - 3),
+            ..root_config.clone()
+        },
+        PerfUiEntryCursorPosition {
+            label: "Mouse".into(),
+            separator: "\n",
+            width: 0, // no padding with spaces
+            display_units: true,
+            display_axis: false,
+            physical_pixels: true,
+            ..default()
+        },
+        PerfUiEntryWindowResolution {
+            label: "Window Size".into(),
+            separator: "\n",
+            width: 0, // no padding with spaces
+            display_units: true,
+            display_axis: false,
+            physical_pixels: true,
+            ..default()
+        },
+        PerfUiEntryWindowMode {
+            label: "Mode".into(),
+            ..default()
+        },
+        PerfUiEntryWindowPresentMode {
+            label: "VSync".into(),
             ..default()
         },
     ));

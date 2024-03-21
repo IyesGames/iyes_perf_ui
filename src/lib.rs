@@ -47,11 +47,19 @@ pub mod prelude {
         PerfUiEntryFixedTimeStep,
         PerfUiEntryFixedOverstep,
     };
+    pub use crate::window::{
+        PerfUiEntryWindowResolution,
+        PerfUiEntryWindowMode,
+        PerfUiEntryWindowPresentMode,
+        PerfUiEntryCursorPosition,
+    };
 }
+
+pub mod utils;
 
 pub mod diagnostics;
 pub mod time;
-pub mod utils;
+pub mod window;
 
 /// The Bevy Plugin
 #[derive(Default)]
@@ -77,6 +85,10 @@ impl Plugin for PerfUiPlugin {
         app.add_perf_ui_entry_type::<crate::time::PerfUiEntryRunningTime>();
         app.add_perf_ui_entry_type::<crate::time::PerfUiEntryFixedTimeStep>();
         app.add_perf_ui_entry_type::<crate::time::PerfUiEntryFixedOverstep>();
+        app.add_perf_ui_entry_type::<crate::window::PerfUiEntryWindowResolution>();
+        app.add_perf_ui_entry_type::<crate::window::PerfUiEntryWindowMode>();
+        app.add_perf_ui_entry_type::<crate::window::PerfUiEntryWindowPresentMode>();
+        app.add_perf_ui_entry_type::<crate::window::PerfUiEntryCursorPosition>();
     }
 }
 
