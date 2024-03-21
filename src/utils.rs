@@ -47,6 +47,17 @@ impl ColorGradient {
         }
     }
 
+    /// Create a "gradient" with only one color.
+    ///
+    /// This color will be used for all values.
+    pub fn single(color: Color) -> Self {
+        ColorGradient {
+            stops: vec![
+                (FloatOrd(f32::NEG_INFINITY), color.as_lcha()),
+            ],
+        }
+    }
+
     /// Preset constructor: Red-Yellow-Green between the specified low-mid-high values.
     pub fn new_preset_ryg(low: f32, mid: f32, high: f32) -> Result<Self, ()> {
         if low.is_nan() || mid.is_nan() || high.is_nan() || low > mid || mid > high {
