@@ -14,34 +14,16 @@ use crate::utils::*;
 pub struct PerfUiEntryFPS {
     /// Custom label. If empty (default), the default label will be used.
     pub label: String,
-    /// Enable color based on value
+    /// Enable color based on value.
     ///
-    /// Default: `true`
-    pub enable_color: bool,
-    /// Enable highlighting based on value
+    /// To disable (always use default color), set to empty `ColorGradient::default()`.
     ///
-    /// Default: `true`
-    pub enable_highlight: bool,
-    /// If FPS is less than this value, text will be colored RED.
-    ///
-    /// Default: `30.0`
-    pub threshold_bad: f32,
-    /// If FPS is at this value, text will be colored YELLOW.
-    ///
-    /// Between bad and normal, will gradually transition from red to yellow.
-    ///
-    /// Between normal and good, will gradually transition from yellow to green.
-    ///
-    /// Default: `60.0`
-    pub threshold_normal: f32,
-    /// If FPS is greater than this value, text will be colored GREEN.
-    ///
-    /// Default: `120.0`
-    pub threshold_good: f32,
-    /// If FPS is below this value, use highlight font.
+    /// Default: Red-Yellow-Green gradient between 30-60-120 FPS.
+    pub color_gradient: ColorGradient,
+    /// Highlight the value if FPS is below this threshold.
     ///
     /// Default: `20.0`
-    pub threshold_highlight: f32,
+    pub threshold_highlight: Option<f32>,
     /// Should we display the smoothed value or the raw value?
     ///
     /// Default: true (smoothed)
@@ -62,12 +44,8 @@ impl Default for PerfUiEntryFPS {
     fn default() -> Self {
         PerfUiEntryFPS {
             label: String::new(),
-            enable_color: true,
-            enable_highlight: true,
-            threshold_good: 120.0,
-            threshold_normal: 60.0,
-            threshold_bad: 30.0,
-            threshold_highlight: 20.0,
+            color_gradient: ColorGradient::new_preset_ryg(30.0, 60.0, 120.0).unwrap(),
+            threshold_highlight: Some(20.0),
             smoothed: true,
             digits: 4,
             precision: 0,
@@ -83,34 +61,16 @@ impl Default for PerfUiEntryFPS {
 pub struct PerfUiEntryFPSWorst {
     /// Custom label. If empty (default), the default label will be used.
     pub label: String,
-    /// Enable color based on value
+    /// Enable color based on value.
     ///
-    /// Default: `true`
-    pub enable_color: bool,
-    /// Enable highlighting based on value
+    /// To disable (always use default color), set to empty `ColorGradient::default()`.
     ///
-    /// Default: `true`
-    pub enable_highlight: bool,
-    /// If FPS is less than this value, text will be colored RED.
-    ///
-    /// Default: `30.0`
-    pub threshold_bad: f32,
-    /// If FPS is at this value, text will be colored YELLOW.
-    ///
-    /// Between bad and normal, will gradually transition from red to yellow.
-    ///
-    /// Between normal and good, will gradually transition from yellow to green.
-    ///
-    /// Default: `60.0`
-    pub threshold_normal: f32,
-    /// If FPS is greater than this value, text will be colored GREEN.
-    ///
-    /// Default: `120.0`
-    pub threshold_good: f32,
-    /// If FPS is below this value, use highlight font.
+    /// Default: Red-Yellow-Green gradient between 30-60-120 FPS.
+    pub color_gradient: ColorGradient,
+    /// Highlight the value if FPS is below this threshold.
     ///
     /// Default: `20.0`
-    pub threshold_highlight: f32,
+    pub threshold_highlight: Option<f32>,
     /// Number of digits to display for the integer (whole number) part.
     ///
     /// Default: `4`
@@ -127,12 +87,8 @@ impl Default for PerfUiEntryFPSWorst {
     fn default() -> Self {
         PerfUiEntryFPSWorst {
             label: String::new(),
-            enable_color: true,
-            enable_highlight: true,
-            threshold_good: 120.0,
-            threshold_normal: 60.0,
-            threshold_bad: 30.0,
-            threshold_highlight: 20.0,
+            color_gradient: ColorGradient::new_preset_ryg(30.0, 60.0, 120.0).unwrap(),
+            threshold_highlight: Some(20.0),
             digits: 4,
             precision: 0,
             sort_key: next_sort_key(),
@@ -147,38 +103,20 @@ impl Default for PerfUiEntryFPSWorst {
 pub struct PerfUiEntryFrameTime {
     /// Custom label. If empty (default), the default label will be used.
     pub label: String,
-    /// Enable color based on value
-    ///
-    /// Default: `true`
-    pub enable_color: bool,
-    /// Enable highlighting based on value
-    ///
-    /// Default: `true`
-    pub enable_highlight: bool,
     /// Display the unit ("ms") alongside the number.
     ///
     /// Default: `true`
     pub display_units: bool,
-    /// If greater than this value, text will be colored RED.
+    /// Enable color based on value.
     ///
-    /// Default: frame time of 30 FPS
-    pub threshold_bad: f32,
-    /// If at this value, text will be colored YELLOW.
+    /// To disable (always use default color), set to empty `ColorGradient::default()`.
     ///
-    /// Between bad and normal, will gradually transition from red to yellow.
+    /// Default: Green-Yellow-Red gradient between the frametimes equivalent to 120-60-30 FPS.
+    pub color_gradient: ColorGradient,
+    /// Highlight the value if frame time is above this threshold.
     ///
-    /// Between normal and good, will gradually transition from yellow to green.
-    ///
-    /// Default: frame time of 60 FPS
-    pub threshold_normal: f32,
-    /// If less than this value, text will be colored GREEN.
-    ///
-    /// Default: frame time of 120 FPS
-    pub threshold_good: f32,
-    /// If above this value, use highlight font.
-    ///
-    /// Default: frame time of 20 FPS
-    pub threshold_highlight: f32,
+    /// Default: frametime equivalent to 20 FPS
+    pub threshold_highlight: Option<f32>,
     /// Should we display the smoothed value or the raw value?
     ///
     /// Default: true (smoothed)
@@ -199,13 +137,13 @@ impl Default for PerfUiEntryFrameTime {
     fn default() -> Self {
         PerfUiEntryFrameTime {
             label: String::new(),
-            enable_color: true,
-            enable_highlight: true,
             display_units: true,
-            threshold_good: 1000.0 / 120.0,
-            threshold_normal: 1000.0 / 60.0,
-            threshold_bad: 1000.0 / 30.0,
-            threshold_highlight: 1000.0 / 20.0,
+            color_gradient: ColorGradient::new_preset_gyr(
+                1000.0 / 120.0,
+                1000.0 / 60.0,
+                1000.0 / 30.0,
+            ).unwrap(),
+            threshold_highlight: Some(1000.0 / 20.0),
             smoothed: true,
             digits: 2,
             precision: 3,
@@ -223,38 +161,20 @@ impl Default for PerfUiEntryFrameTime {
 pub struct PerfUiEntryFrameTimeWorst {
     /// Custom label. If empty (default), the default label will be used.
     pub label: String,
-    /// Enable color based on value
-    ///
-    /// Default: `true`
-    pub enable_color: bool,
-    /// Enable highlighting based on value
-    ///
-    /// Default: `true`
-    pub enable_highlight: bool,
     /// Display the unit ("ms") alongside the number.
     ///
     /// Default: `true`
     pub display_units: bool,
-    /// If greater than this value, text will be colored RED.
+    /// Enable color based on value.
     ///
-    /// Default: frame time of 30 FPS
-    pub threshold_bad: f32,
-    /// If at this value, text will be colored YELLOW.
+    /// To disable (always use default color), set to empty `ColorGradient::default()`.
     ///
-    /// Between bad and normal, will gradually transition from red to yellow.
+    /// Default: Green-Yellow-Red gradient between the frametimes equivalent to 120-60-30 FPS.
+    pub color_gradient: ColorGradient,
+    /// Highlight the value if frame time is above this threshold.
     ///
-    /// Between normal and good, will gradually transition from yellow to green.
-    ///
-    /// Default: frame time of 60 FPS
-    pub threshold_normal: f32,
-    /// If less than this value, text will be colored GREEN.
-    ///
-    /// Default: frame time of 120 FPS
-    pub threshold_good: f32,
-    /// If above this value, use highlight font.
-    ///
-    /// Default: frame time of 20 FPS
-    pub threshold_highlight: f32,
+    /// Default: frametime equivalent to 20 FPS
+    pub threshold_highlight: Option<f32>,
     /// Number of digits to display for the integer (whole number) part.
     ///
     /// Default: `2`
@@ -271,13 +191,13 @@ impl Default for PerfUiEntryFrameTimeWorst {
     fn default() -> Self {
         PerfUiEntryFrameTimeWorst {
             label: String::new(),
-            enable_color: true,
-            enable_highlight: true,
             display_units: true,
-            threshold_good: 1000.0 / 120.0,
-            threshold_normal: 1000.0 / 60.0,
-            threshold_bad: 1000.0 / 30.0,
-            threshold_highlight: 1000.0 / 20.0,
+            color_gradient: ColorGradient::new_preset_gyr(
+                1000.0 / 120.0,
+                1000.0 / 60.0,
+                1000.0 / 30.0,
+            ).unwrap(),
+            threshold_highlight: Some(1000.0 / 20.0),
             digits: 2,
             precision: 3,
             sort_key: next_sort_key(),
@@ -313,34 +233,16 @@ impl Default for PerfUiEntryFrameCount {
 pub struct PerfUiEntryEntityCount {
     /// Custom label. If empty (default), the default label will be used.
     pub label: String,
-    /// Enable color based on value
+    /// Enable color based on value.
     ///
-    /// Default: `true`
-    pub enable_color: bool,
-    /// Enable highlighting based on value
+    /// To disable (always use default color), set to empty `ColorGradient::default()`.
     ///
-    /// Default: `true`
-    pub enable_highlight: bool,
-    /// If greater than this value, text will be colored RED.
-    ///
-    /// Default: `10000`
-    pub threshold_high: u32,
-    /// If at this value, text will be colored YELLOW.
-    ///
-    /// Between low and normal, will gradually transition from green to yellow.
-    ///
-    /// Between normal and high, will gradually transition from yellow to red.
-    ///
-    /// Default: `1000`
-    pub threshold_normal: u32,
-    /// If less than this value, text will be colored GREEN.
-    ///
-    /// Default: `100`
-    pub threshold_low: u32,
-    /// If above this value, use highlight font.
+    /// Default: Green-Yellow-Red gradient between 100-1000-10000.
+    pub color_gradient: ColorGradient,
+    /// Highlight the value if above this threshold.
     ///
     /// Default: `20000`
-    pub threshold_highlight: u32,
+    pub threshold_highlight: Option<u32>,
     /// Number of digits to display.
     ///
     /// Default: `6`
@@ -353,12 +255,8 @@ impl Default for PerfUiEntryEntityCount {
     fn default() -> Self {
         PerfUiEntryEntityCount {
             label: String::new(),
-            enable_color: true,
-            enable_highlight: true,
-            threshold_high: 10000,
-            threshold_normal: 1000,
-            threshold_low: 100,
-            threshold_highlight: 20000,
+            color_gradient: ColorGradient::new_preset_gyr(100.0, 1000.0, 10000.0).unwrap(),
+            threshold_highlight: Some(20000),
             digits: 6,
             sort_key: next_sort_key(),
         }
@@ -372,34 +270,16 @@ impl Default for PerfUiEntryEntityCount {
 pub struct PerfUiEntryCpuUsage {
     /// Custom label. If empty (default), the default label will be used.
     pub label: String,
-    /// Enable color based on value
+    /// Enable color based on value.
     ///
-    /// Default: `true`
-    pub enable_color: bool,
-    /// Enable highlighting based on value
+    /// To disable (always use default color), set to empty `ColorGradient::default()`.
     ///
-    /// Default: `true`
-    pub enable_highlight: bool,
-    /// If greater than this value, text will be colored RED.
+    /// Default: Green-Yellow-Red gradient between 25%-50%-75%.
+    pub color_gradient: ColorGradient,
+    /// Highlight the value if above this threshold.
     ///
-    /// Default: 75.0 %
-    pub threshold_high: f32,
-    /// If at this value, text will be colored YELLOW.
-    ///
-    /// Between low and normal, will gradually transition from green to yellow.
-    ///
-    /// Between normal and high, will gradually transition from yellow to red.
-    ///
-    /// Default: 50.0 %
-    pub threshold_normal: f32,
-    /// If less than this value, text will be colored GREEN.
-    ///
-    /// Default: 25.0 %
-    pub threshold_low: f32,
-    /// If above this value, use highlight font.
-    ///
-    /// Default: 90.0 %
-    pub threshold_highlight: f32,
+    /// Default: 90%
+    pub threshold_highlight: Option<f32>,
     /// Should we display the smoothed value or the raw value?
     ///
     /// Default: true (smoothed)
@@ -416,12 +296,8 @@ impl Default for PerfUiEntryCpuUsage {
     fn default() -> Self {
         PerfUiEntryCpuUsage {
             label: String::new(),
-            enable_color: true,
-            enable_highlight: true,
-            threshold_high: 75.0,
-            threshold_normal: 50.0,
-            threshold_low: 25.0,
-            threshold_highlight: 90.0,
+            color_gradient: ColorGradient::new_preset_gyr(25.0, 50.0, 75.0).unwrap(),
+            threshold_highlight: Some(90.0),
             smoothed: true,
             precision: 2,
             sort_key: next_sort_key(),
@@ -436,34 +312,16 @@ impl Default for PerfUiEntryCpuUsage {
 pub struct PerfUiEntryMemUsage {
     /// Custom label. If empty (default), the default label will be used.
     pub label: String,
-    /// Enable color based on value
+    /// Enable color based on value.
     ///
-    /// Default: `true`
-    pub enable_color: bool,
-    /// Enable highlighting based on value
+    /// To disable (always use default color), set to empty `ColorGradient::default()`.
     ///
-    /// Default: `true`
-    pub enable_highlight: bool,
-    /// If greater than this value, text will be colored RED.
+    /// Default: Green-Yellow-Red gradient between 25%-50%-75%.
+    pub color_gradient: ColorGradient,
+    /// Highlight the value if above this threshold.
     ///
-    /// Default: 75.0 %
-    pub threshold_high: f32,
-    /// If at this value, text will be colored YELLOW.
-    ///
-    /// Between low and normal, will gradually transition from green to yellow.
-    ///
-    /// Between normal and high, will gradually transition from yellow to red.
-    ///
-    /// Default: 50.0 %
-    pub threshold_normal: f32,
-    /// If less than this value, text will be colored GREEN.
-    ///
-    /// Default: 25.0 %
-    pub threshold_low: f32,
-    /// If above this value, use highlight font.
-    ///
-    /// Default: 90.0 %
-    pub threshold_highlight: f32,
+    /// Default: 90%
+    pub threshold_highlight: Option<f32>,
     /// Should we display the smoothed value or the raw value?
     ///
     /// Default: true (smoothed)
@@ -480,12 +338,8 @@ impl Default for PerfUiEntryMemUsage {
     fn default() -> Self {
         PerfUiEntryMemUsage {
             label: String::new(),
-            enable_color: true,
-            enable_highlight: true,
-            threshold_high: 75.0,
-            threshold_normal: 50.0,
-            threshold_low: 25.0,
-            threshold_highlight: 90.0,
+            color_gradient: ColorGradient::new_preset_gyr(25.0, 50.0, 75.0).unwrap(),
+            threshold_highlight: Some(90.0),
             smoothed: true,
             precision: 2,
             sort_key: next_sort_key(),
@@ -524,16 +378,15 @@ impl PerfUiEntry for PerfUiEntryFPS {
         &self,
         value: &Self::Value,
     ) -> Option<Color> {
-        if !self.enable_color {
-            return None;
-        }
-        Some(ryg_gradient_down(self.threshold_bad, self.threshold_normal, self.threshold_good, *value))
+        self.color_gradient.get_color_for_value(*value as f32)
     }
     fn value_highlight(
         &self,
         value: &Self::Value,
     ) -> bool {
-        self.enable_highlight && *value as f32 <= self.threshold_highlight
+        self.threshold_highlight
+            .map(|t| (*value as f32) < t)
+            .unwrap_or(false)
     }
     fn sort_key(&self) -> i32 {
         self.sort_key
@@ -575,16 +428,15 @@ impl PerfUiEntry for PerfUiEntryFPSWorst {
         &self,
         value: &Self::Value,
     ) -> Option<Color> {
-        if !self.enable_color {
-            return None;
-        }
-        Some(ryg_gradient_down(self.threshold_bad, self.threshold_normal, self.threshold_good, *value as f64))
+        self.color_gradient.get_color_for_value(*value)
     }
     fn value_highlight(
         &self,
         value: &Self::Value,
     ) -> bool {
-        self.enable_highlight && *value <= self.threshold_highlight
+        self.threshold_highlight
+            .map(|t| *value < t)
+            .unwrap_or(false)
     }
     fn sort_key(&self) -> i32 {
         self.sort_key
@@ -626,16 +478,15 @@ impl PerfUiEntry for PerfUiEntryFrameTime {
         &self,
         value: &Self::Value,
     ) -> Option<Color> {
-        if !self.enable_color {
-            return None;
-        }
-        Some(ryg_gradient_up(self.threshold_good, self.threshold_normal, self.threshold_bad, *value))
+        self.color_gradient.get_color_for_value(*value as f32)
     }
     fn value_highlight(
         &self,
         value: &Self::Value,
     ) -> bool {
-        self.enable_highlight && *value as f32 >= self.threshold_highlight
+        self.threshold_highlight
+            .map(|t| (*value as f32) > t)
+            .unwrap_or(false)
     }
     fn sort_key(&self) -> i32 {
         self.sort_key
@@ -681,16 +532,15 @@ impl PerfUiEntry for PerfUiEntryFrameTimeWorst {
         &self,
         value: &Self::Value,
     ) -> Option<Color> {
-        if !self.enable_color {
-            return None;
-        }
-        Some(ryg_gradient_up(self.threshold_good, self.threshold_normal, self.threshold_bad, *value as f64))
+        self.color_gradient.get_color_for_value(*value)
     }
     fn value_highlight(
         &self,
         value: &Self::Value,
     ) -> bool {
-        self.enable_highlight && *value >= self.threshold_highlight
+        self.threshold_highlight
+            .map(|t| *value > t)
+            .unwrap_or(false)
     }
     fn sort_key(&self) -> i32 {
         self.sort_key
@@ -752,21 +602,15 @@ impl PerfUiEntry for PerfUiEntryEntityCount {
         &self,
         value: &Self::Value,
     ) -> Option<Color> {
-        if !self.enable_color {
-            return None;
-        }
-        Some(ryg_gradient_up(
-            self.threshold_low as f32,
-            self.threshold_normal as f32,
-            self.threshold_high as f32,
-            *value as f64,
-        ))
+        self.color_gradient.get_color_for_value(*value as f32)
     }
     fn value_highlight(
         &self,
         value: &Self::Value,
     ) -> bool {
-        self.enable_highlight && *value >= self.threshold_highlight
+        self.threshold_highlight
+            .map(|t| *value > t)
+            .unwrap_or(false)
     }
     fn sort_key(&self) -> i32 {
         self.sort_key
@@ -806,16 +650,15 @@ impl PerfUiEntry for PerfUiEntryCpuUsage {
         &self,
         value: &Self::Value,
     ) -> Option<Color> {
-        if !self.enable_color {
-            return None;
-        }
-        Some(ryg_gradient_up(self.threshold_low, self.threshold_normal, self.threshold_high, *value))
+        self.color_gradient.get_color_for_value(*value as f32)
     }
     fn value_highlight(
         &self,
         value: &Self::Value,
     ) -> bool {
-        self.enable_highlight && *value as f32 >= self.threshold_highlight
+        self.threshold_highlight
+            .map(|t| (*value as f32) > t)
+            .unwrap_or(false)
     }
     fn sort_key(&self) -> i32 {
         self.sort_key
@@ -855,16 +698,15 @@ impl PerfUiEntry for PerfUiEntryMemUsage {
         &self,
         value: &Self::Value,
     ) -> Option<Color> {
-        if !self.enable_color {
-            return None;
-        }
-        Some(ryg_gradient_up(self.threshold_low, self.threshold_normal, self.threshold_high, *value))
+        self.color_gradient.get_color_for_value(*value as f32)
     }
     fn value_highlight(
         &self,
         value: &Self::Value,
     ) -> bool {
-        self.enable_highlight && *value as f32 >= self.threshold_highlight
+        self.threshold_highlight
+            .map(|t| (*value as f32) > t)
+            .unwrap_or(false)
     }
     fn sort_key(&self) -> i32 {
         self.sort_key

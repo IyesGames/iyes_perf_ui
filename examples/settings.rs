@@ -1,7 +1,7 @@
 //! This example shows how to customize the appearance of your Perf UIs.
 
 use bevy::prelude::*;
-use iyes_perf_ui::prelude::*;
+use iyes_perf_ui::{prelude::*, utils::ColorGradient};
 
 fn main() {
     App::new()
@@ -57,36 +57,38 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
             // provide a custom label string
             label: "Frame Rate (current)".into(),
             // let's say we *really* care about high framerates‼
-            threshold_bad: 90.0,
-            threshold_normal: 144.0,
-            threshold_good: 240.0,
+            color_gradient: ColorGradient::new()
+                .with_stop(90.0, Color::RED)
+                .with_stop(240.0, Color::DARK_GREEN),
+            threshold_highlight: Some(60.0),
             digits: 5,
             precision: 2,
             ..default()
         },
         PerfUiEntryFPSWorst {
             label: "Frame Rate (worst)".into(),
-            threshold_bad: 90.0,
-            threshold_normal: 144.0,
-            threshold_good: 240.0,
+            color_gradient: ColorGradient::new()
+                .with_stop(90.0, Color::RED)
+                .with_stop(240.0, Color::DARK_GREEN),
+            threshold_highlight: Some(60.0),
             digits: 5,
             precision: 2,
             ..default()
         },
         PerfUiEntryFrameTime {
             label: "Frame Duration (current)".into(),
-            threshold_bad: 5.0,
-            threshold_normal: 2.0,
-            threshold_good: 1.0,
+            color_gradient: ColorGradient::new()
+                .with_stops([(1.0, Color::CYAN), (8.0, Color::PURPLE)]),
+            threshold_highlight: Some(10.0),
             digits: 2,
             precision: 4,
             ..default()
         },
         PerfUiEntryFrameTimeWorst {
             label: "Frame Duration (worst)".into(),
-            threshold_bad: 5.0,
-            threshold_normal: 2.0,
-            threshold_good: 1.0,
+            color_gradient: ColorGradient::new()
+                .with_stops([(1.0, Color::CYAN), (8.0, Color::PURPLE)]),
+            threshold_highlight: Some(10.0),
             digits: 2,
             precision: 4,
             ..default()
@@ -104,26 +106,25 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
         PerfUiEntryEntityCount {
             label: "Number of ECS Entities".into(),
             // disable color and highlighting for this one
-            enable_color: false,
-            enable_highlight: false,
+            color_gradient: ColorGradient::default(),
+            threshold_highlight: None,
             digits: 4,
             ..default()
         },
         PerfUiEntryCpuUsage {
             label: "System CPU Utilization".into(),
-            // and we want to keep the cpu usage low
-            threshold_high: 50.0,
-            threshold_normal: 20.0,
-            threshold_low: 5.0,
+            color_gradient: ColorGradient::new()
+                .with_stops([(0.0, Color::BLUE), (100.0, Color::RED)]),
+            threshold_highlight: None,
             precision: 1,
             ..default()
         },
         PerfUiEntryMemUsage {
             label: "System RAM Utilization".into(),
-            threshold_high: 25.0,
-            threshold_normal: 15.0,
-            threshold_low: 10.0,
-            precision: 2,
+            color_gradient: ColorGradient::new()
+                .with_stops([(0.0, Color::BLUE), (100.0, Color::RED)]),
+            threshold_highlight: None,
+            precision: 1,
             ..default()
         },
     ));

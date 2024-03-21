@@ -17,6 +17,7 @@ use bevy::input::ButtonState;
 use bevy::ecs::system::lifetimeless::SRes;
 use bevy::ecs::system::SystemParam;
 use iyes_perf_ui::prelude::*;
+use iyes_perf_ui::utils::ColorGradient;
 
 fn main() {
     App::new()
@@ -71,9 +72,9 @@ pub struct PerfUiTimeSinceLastClick {
     /// Should we display units?
     pub display_units: bool,
     /// Highlight the value if it goes above this threshold
-    pub threshold_highlight: f32,
-    /// Display with custom color below this value (default color otherwise)
-    pub threshold_low: f32,
+    pub threshold_highlight: Option<f32>,
+    /// Support color gradients!
+    pub color_gradient: ColorGradient,
     /// Width for formatting the string
     pub digits: u8,
     /// Precision for formatting the string
@@ -88,8 +89,8 @@ impl Default for PerfUiTimeSinceLastClick {
         PerfUiTimeSinceLastClick {
             label: String::new(),
             display_units: true,
-            threshold_highlight: 10.0,
-            threshold_low: 1.0,
+            threshold_highlight: Some(10.0),
+            color_gradient: ColorGradient::new_preset_gyr(1.0, 4.0, 8.0).unwrap(),
             digits: 2,
             precision: 3,
             // get the correct value from the library
@@ -146,12 +147,7 @@ impl PerfUiEntry for PerfUiTimeSinceLastClick {
         &self,
         value: &Self::Value,
     ) -> Option<Color> {
-        if *value < self.threshold_low as f64 {
-            Some(Color::RED)
-        } else {
-            // will use the default color
-            None
-        }
+        self.color_gradient.get_color_for_value(*value as f32)
     }
 
     // (optional) Called every frame to determine if the value should be highlighted
@@ -159,7 +155,9 @@ impl PerfUiEntry for PerfUiTimeSinceLastClick {
         &self,
         value: &Self::Value,
     ) -> bool {
-        *value > self.threshold_highlight as f64
+        self.threshold_highlight
+            .map(|t| (*value as f32) > t)
+            .unwrap_or(false)
     }
 }
 

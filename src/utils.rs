@@ -6,7 +6,7 @@
 use std::sync::atomic::{AtomicI32, Ordering};
 
 use bevy::prelude::*;
-use bevy::utils::Duration;
+use bevy::utils::{Duration, FloatOrd};
 
 static NEXT_SORT_KEY: AtomicI32 = AtomicI32::new(1);
 
@@ -19,55 +19,163 @@ pub fn next_sort_key() -> i32 {
     NEXT_SORT_KEY.fetch_add(1, Ordering::SeqCst)
 }
 
-/// Generate a Red->Yellow->Green gradient from Low->Mid->High
-pub fn ryg_gradient_down(low: f32, mid: f32, high: f32, value: f64) -> Color {
-    let value = value as f32;
-    if value >= high {
-        Color::GREEN
-    } else if value >= mid {
-        let n = value - mid;
-        let d = high - mid;
-        Color::rgb(
-            1.0 - n / d,
-            1.0,
-            0.0,
-        )
-    } else if value >= low {
-        let n = value - low;
-        let d = mid - low;
-        Color::rgb(
-            1.0,
-            n / d,
-            0.0,
-        )
-    } else {
-        Color::RED
-    }
+/// Represents a color gradient with any number of stops.
+///
+/// Each "stop" is a predefined color associated with a specific value.
+///
+/// You can then interpolate based on an arbitrary value, to get a
+/// smoothly-varying color.
+///
+/// The interpolation is done in Bevy's LCHa color space, so it looks
+/// nicer and more perceputally-uniform.
+#[derive(Debug, Default, Clone)]
+pub struct ColorGradient {
+    stops: Vec<(FloatOrd, Color)>,
 }
 
-/// Generate a Green->Yellow->Red gradient from Low->Mid->High
-pub fn ryg_gradient_up(low: f32, mid: f32, high: f32, value: f64) -> Color {
-    let value = value as f32;
-    if value >= high {
-        Color::RED
-    } else if value >= mid {
-        let n = value - mid;
-        let d = high - mid;
-        Color::rgb(
-            1.0,
-            1.0 - n / d,
-            0.0,
-        )
-    } else if value >= low {
-        let n = value - low;
-        let d = mid - low;
-        Color::rgb(
-            n / d,
-            1.0,
-            0.0,
-        )
-    } else {
-        Color::GREEN
+impl ColorGradient {
+    /// Create a new empty gradient.
+    ///
+    /// Use the `with_stop`/`with_stops` builder methods to conveniently
+    /// add your desired stops.
+    ///
+    /// If you don't add any stops, `get_color_for_value` will always
+    /// return `None`.
+    pub fn new() -> Self {
+        ColorGradient {
+            stops: vec![],
+        }
+    }
+
+    /// Preset constructor: Red-Yellow-Green between the specified low-mid-high values.
+    pub fn new_preset_ryg(low: f32, mid: f32, high: f32) -> Result<Self, ()> {
+        if low.is_nan() || mid.is_nan() || high.is_nan() || low > mid || mid > high {
+            return Err(());
+        }
+        Ok(ColorGradient {
+            stops: vec![
+                (FloatOrd(low), Color::RED.as_lcha()),
+                (FloatOrd(mid), Color::YELLOW.as_lcha()),
+                (FloatOrd(high), Color::GREEN.as_lcha()),
+            ],
+        })
+    }
+
+    /// Preset constructor: Green-Yellow-Red between the specified low-mid-high values.
+    pub fn new_preset_gyr(low: f32, mid: f32, high: f32) -> Result<Self, ()> {
+        if low.is_nan() || mid.is_nan() || high.is_nan() || low > mid || mid > high {
+            return Err(());
+        }
+        Ok(ColorGradient {
+            stops: vec![
+                (FloatOrd(low), Color::GREEN.as_lcha()),
+                (FloatOrd(mid), Color::YELLOW.as_lcha()),
+                (FloatOrd(high), Color::RED.as_lcha()),
+            ],
+        })
+    }
+
+    /// Add a stop to the gradient.
+    ///
+    /// See `with_stop` for a builder-style version of this method.
+    pub fn add_stop(&mut self, value: f32, color: Color) {
+        // NaN values are nonsensical, avoid getting them into our Vec
+        if value.is_nan() {
+            return;
+        }
+        let stop = (FloatOrd(value), color.as_lcha());
+
+        // ensure our Vec is always in sorted order
+        match self.stops.binary_search_by_key(&stop.0, |x| x.0) {
+            Ok(i) => {
+                // replace existing stop
+                self.stops[i].1 = stop.1;
+            }
+            Err(i) => {
+                // add new stop
+                self.stops.insert(i, stop);
+            }
+        }
+    }
+
+    /// Add multiple stops to the gradient.
+    ///
+    /// See `with_stops` for a builder-style version of this method.
+    pub fn add_stops<Iter, Item>(&mut self, stops: Iter)
+    where
+        Item: Into<(f32, Color)>,
+        Iter: IntoIterator<Item = Item>,
+    {
+        for stop in stops {
+            let stop = stop.into();
+            self.add_stop(stop.0, stop.1);
+        }
+    }
+
+    /// Add a stop to the gradient (builder-style API).
+    ///
+    /// See `add_stop` for a non-builder-style version of this method.
+    pub fn with_stop(mut self, value: f32, color: Color) -> Self {
+        self.add_stop(value, color);
+        self
+    }
+
+    /// Add multiple stops to the gradient (builder-style API).
+    ///
+    /// See `add_stops` for a non-builder-style version of this method.
+    pub fn with_stops<Iter, Item>(mut self, stops: Iter) -> Self
+    where
+        Item: Into<(f32, Color)>,
+        Iter: IntoIterator<Item = Item>,
+    {
+        self.add_stops(stops);
+        self
+    }
+
+    /// Perform the actual interpolation. Return a color for the provided value.
+    ///
+    /// If the value is above the highest stop, the highest stop's color is returned.
+    ///
+    /// If the value is below the lowest stop, the lowest stop's color is returned.
+    ///
+    /// If the value is in-between, a color interpolated between the nearest two stops'
+    /// colors is returned.
+    ///
+    /// If the gradient is empty (no stops were added), returns `None`.
+    pub fn get_color_for_value(&self, value: f32) -> Option<Color> {
+        if value.is_nan() {
+            return None;
+        }
+        let value = FloatOrd(value);
+
+        let first_stop = self.stops.first()?;
+        let last_stop = self.stops.last()?;
+
+        if value >= last_stop.0 {
+            return Some(last_stop.1);
+        }
+        if value <= first_stop.0 {
+            return Some(first_stop.1);
+        }
+
+        match self.stops.binary_search_by_key(&value, |x| x.0) {
+            Ok(i) => {
+                Some(self.stops[i].1)
+            }
+            Err(i) => {
+                let stop_low = self.stops[i - 1];
+                let stop_high = self.stops[i];
+                let lerp_value = (value.0 - stop_low.0.0) / (stop_high.0.0 - stop_low.0.0);
+                let lcha_low = stop_low.1.as_lcha_f32();
+                let lcha_high = stop_high.1.as_lcha_f32();
+                Some(Color::Lcha {
+                    lightness: lcha_low[0].lerp(lcha_high[0], lerp_value),
+                    chroma: lcha_low[1].lerp(lcha_high[1], lerp_value),
+                    hue: lcha_low[2].lerp(lcha_high[2], lerp_value),
+                    alpha: lcha_low[3].lerp(lcha_high[3], lerp_value),
+                })
+            }
+        }
     }
 }
 
