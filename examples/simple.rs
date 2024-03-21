@@ -48,6 +48,7 @@ fn setup(mut commands: Commands) {
         (
             PerfUiEntryCursorPosition::default(),
             PerfUiEntryWindowResolution::default(),
+            PerfUiEntryWindowScaleFactor::default(),
             PerfUiEntryWindowMode::default(),
             PerfUiEntryWindowPresentMode::default(),
         ),

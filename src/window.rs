@@ -58,6 +58,39 @@ impl Default for PerfUiEntryWindowPresentMode {
 
 /// Perf UI Entry to display the window size / resolution.
 #[derive(Component, Debug, Clone)]
+pub struct PerfUiEntryWindowScaleFactor {
+    /// Custom label. If empty (default), the default label will be used.
+    pub label: String,
+    /// Display the value from the specified window (in a multi-window application).
+    ///
+    /// If `None` (the default), the primary window is selected.
+    pub window: Option<Entity>,
+    /// Number of digits to display for the integer (whole number) part.
+    ///
+    /// Default: `2`
+    pub digits: u8,
+    /// Number of digits to display for the fractional (after the decimal point) part.
+    ///
+    /// Default: `2`
+    pub precision: u8,
+    /// Sort Key (control where the entry will appear in the Perf UI).
+    pub sort_key: i32,
+}
+
+impl Default for PerfUiEntryWindowScaleFactor {
+    fn default() -> Self {
+        PerfUiEntryWindowScaleFactor {
+            label: String::new(),
+            window: None,
+            digits: 2,
+            precision: 2,
+            sort_key: next_sort_key(),
+        }
+    }
+}
+
+/// Perf UI Entry to display the window size / resolution.
+#[derive(Component, Debug, Clone)]
 pub struct PerfUiEntryWindowResolution {
     /// Custom label. If empty (default), the default label will be used.
     pub label: String,
@@ -217,6 +250,44 @@ impl PerfUiEntry for PerfUiEntryWindowPresentMode {
         } else {
             Some(q_primary.get_single().ok()?.present_mode)
         }
+    }
+}
+
+impl PerfUiEntry for PerfUiEntryWindowScaleFactor {
+    type Value = f32;
+    type SystemParam = (
+        SQuery<&'static Window, With<PrimaryWindow>>,
+        SQuery<&'static Window>,
+    );
+
+    fn label(&self) -> &str {
+        if self.label.is_empty() {
+            "Scale Factor"
+        } else {
+            &self.label
+        }
+    }
+    fn sort_key(&self) -> i32 {
+        self.sort_key
+    }
+    fn width_hint(&self) -> usize {
+        width_hint_pretty_float(self.digits, self.precision)
+    }
+    fn update_value(
+        &self,
+        (q_primary, q_any): &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
+    ) -> Option<Self::Value> {
+        if let Some(e) = self.window {
+            q_any.get(e).ok().map(|w| w.scale_factor())
+        } else {
+            q_primary.get_single().ok().map(|w| w.scale_factor())
+        }
+    }
+    fn format_value(
+        &self,
+        value: &Self::Value,
+    ) -> String {
+        format_pretty_float(self.digits, self.precision, *value as f64)
     }
 }
 

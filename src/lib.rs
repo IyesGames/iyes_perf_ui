@@ -49,6 +49,7 @@ pub mod prelude {
     };
     pub use crate::window::{
         PerfUiEntryWindowResolution,
+        PerfUiEntryWindowScaleFactor,
         PerfUiEntryWindowMode,
         PerfUiEntryWindowPresentMode,
         PerfUiEntryCursorPosition,
@@ -89,6 +90,7 @@ impl Plugin for PerfUiPlugin {
         app.add_perf_ui_entry_type::<crate::time::PerfUiEntryFixedTimeStep>();
         app.add_perf_ui_entry_type::<crate::time::PerfUiEntryFixedOverstep>();
         app.add_perf_ui_entry_type::<crate::window::PerfUiEntryWindowResolution>();
+        app.add_perf_ui_entry_type::<crate::window::PerfUiEntryWindowScaleFactor>();
         app.add_perf_ui_entry_type::<crate::window::PerfUiEntryWindowMode>();
         app.add_perf_ui_entry_type::<crate::window::PerfUiEntryWindowPresentMode>();
         app.add_perf_ui_entry_type::<crate::window::PerfUiEntryCursorPosition>();

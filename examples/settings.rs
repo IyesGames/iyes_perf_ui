@@ -180,6 +180,10 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
             physical_pixels: true,
             ..default()
         },
+        PerfUiEntryWindowScaleFactor {
+            label: "Window Scaling Factor".into(),
+            ..default()
+        },
         PerfUiEntryWindowMode {
             label: "Mode".into(),
             ..default()
