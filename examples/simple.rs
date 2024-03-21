@@ -25,32 +25,5 @@ fn setup(mut commands: Commands) {
 
     // create a simple Perf UI with default settings
     // and all entries provided by the crate:
-    commands.spawn((
-        PerfUiRoot::default(),
-        // when we have lots of entries, we have to group them
-        // into tuples, because of Bevy Rust syntax limitations
-        (
-            PerfUiEntryFPS::default(),
-            PerfUiEntryFPSWorst::default(),
-            PerfUiEntryFrameTime::default(),
-            PerfUiEntryFrameTimeWorst::default(),
-            PerfUiEntryFrameCount::default(),
-            PerfUiEntryEntityCount::default(),
-            PerfUiEntryCpuUsage::default(),
-            PerfUiEntryMemUsage::default(),
-        ),
-        (
-            PerfUiEntryFixedTimeStep::default(),
-            PerfUiEntryFixedOverstep::default(),
-            PerfUiEntryRunningTime::default(),
-            PerfUiEntryClock::default(),
-        ),
-        (
-            PerfUiEntryCursorPosition::default(),
-            PerfUiEntryWindowResolution::default(),
-            PerfUiEntryWindowScaleFactor::default(),
-            PerfUiEntryWindowMode::default(),
-            PerfUiEntryWindowPresentMode::default(),
-        ),
-    ));
+    commands.spawn(PerfUiCompleteBundle::default());
 }

@@ -14,6 +14,48 @@
 //!      - (see `custom_minimal` and `custom` examples)
 //!  - Support for highlighting values using a custom font or color!
 //!    - Allows you to quickly notice if something demands your attention.
+//!
+//! The goal of this crate is to make it as useful as possible for any Bevy project:
+//!  - Made with Bevy UI (not egui or any other 3rd-party UI solution)
+//!  - Easy to set up (see [`simple`](https://github.com/IyesGames/iyes_perf_ui/blob/v0.2.3/examples/simple.rs) example)
+//!  - Modular! You decide what info you want to display!
+//!    - Choose any combination of predefined entries
+//!      (see [`specific_entries`](https://github.com/IyesGames/iyes_perf_ui/blob/v0.2.3/examples/specific_entries.rs) example):
+//!      - Framerate (FPS), Frame Time, Frame Count, ECS Entity Count, CPU Usage, RAM Usage,
+//!        Wall Clock, Running Time, Fixed Time Step, Fixed Overstep,
+//!        Cursor Position, Window Resolution, Window Scale Factor, Window Mode, Present Mode
+//!    - Implement your own custom entries to display anything you like!
+//!      - (see [`custom_minimal`](https://github.com/IyesGames/iyes_perf_ui/blob/v0.2.3/examples/custom_minimal.rs) and [`custom`](https://github.com/IyesGames/iyes_perf_ui/blob/v0.2.3/examples/custom.rs) examples)
+//!  - Customizable appearance/styling (see [`settings`](https://github.com/IyesGames/iyes_perf_ui/blob/v0.2.3/examples/settings.rs), [`fps_minimalist`](https://github.com/IyesGames/iyes_perf_ui/blob/v0.2.3/examples/fps_minimalist.rs) examples)
+//!  - Support for highlighting values using a custom font or color!
+//!    - Allows you to quickly notice if something demands your attention.
+//!
+//! Spawning a Perf UI can be as simple as:
+//!
+//! ```rust
+//! commands.spawn(PerfUiCompleteBundle::default());
+//! ```
+//!
+//! If you want to create a Perf UI with specific entries of your choice,
+//! just spawn an entity with [`PerfUiRoot`] + your desired entries, instead
+//! of using this bundle.
+//!
+//! ```rust
+//! commands.spawn((
+//!     PerfUiRoot::default(),
+//!     PerfUiEntryFPS::default(),
+//!     PerfUiEntryClock::default(),
+//!     // ...
+//! ));
+//! ```
+//!
+//! If you want to customize the appearance, set the various fields in each of the
+//! structs, instead of using `default()`.
+//!
+//! If you want to implement your own custom entry, create a component type
+//! to represent your entry (you can use it to store any settings),
+//! implement [`PerfUiEntry`] for it, and register it using
+//! `app.add_perf_ui_entry_type::<T>()`.
 
 #![warn(missing_docs)]
 
@@ -22,9 +64,12 @@ use std::marker::PhantomData;
 use bevy::prelude::*;
 use bevy::ecs::system::{StaticSystemParam, SystemParam};
 
+use crate::prelude::*;
+
 /// Prelude of common types for users of the library
 pub mod prelude {
     pub use crate::{
+        PerfUiCompleteBundle,
         PerfUiPlugin,
         PerfUiAppExt,
         PerfUiRoot,
@@ -63,6 +108,48 @@ pub mod diagnostics;
 pub mod time;
 pub mod window;
 
+/// Bundle for a Perf UI with all entry types provided by `iyes_perf_ui`.
+///
+/// This gives you a simple one-liner to spawn a comprehensive Perf UI!
+///
+/// ```rust
+/// commands.spawn(PerfUiCompleteBundle::default());
+/// ```
+///
+/// If you want to create a Perf UI with specific entries of your choice,
+/// just spawn an entity with [`PerfUiRoot`] + your desired entries, instead
+/// of using this bundle.
+///
+/// ```rust
+/// commands.spawn((
+///     PerfUiRoot::default(),
+///     PerfUiEntryFPS::default(),
+///     PerfUiEntryClock::default(),
+///     // ...
+/// ));
+/// ```
+#[derive(Bundle, Default)]
+pub struct PerfUiCompleteBundle {
+    root: PerfUiRoot,
+    fps: PerfUiEntryFPS,
+    fps_worst: PerfUiEntryFPSWorst,
+    frametime: PerfUiEntryFrameTime,
+    frametime_worst: PerfUiEntryFrameTimeWorst,
+    frame_count: PerfUiEntryFrameCount,
+    entity_count: PerfUiEntryEntityCount,
+    cpu_usage: PerfUiEntryCpuUsage,
+    mem_usage: PerfUiEntryMemUsage,
+    fixed_timestep: PerfUiEntryFixedTimeStep,
+    fixed_overstep: PerfUiEntryFixedOverstep,
+    time_running: PerfUiEntryRunningTime,
+    time_clock: PerfUiEntryClock,
+    cursor_position: PerfUiEntryCursorPosition,
+    window_resolution: PerfUiEntryWindowResolution,
+    window_scale_factor: PerfUiEntryWindowScaleFactor,
+    window_mode: PerfUiEntryWindowMode,
+    window_present_mode: PerfUiEntryWindowPresentMode,
+}
+
 /// The Bevy Plugin
 #[derive(Default)]
 pub struct PerfUiPlugin;
@@ -77,23 +164,23 @@ impl Plugin for PerfUiPlugin {
                 .run_if(rc_sort_perf_ui_entries)
                 .after(PerfUiSet::Setup),
         ).run_if(any_with_component::<PerfUiRoot>));
-        app.add_perf_ui_entry_type::<crate::diagnostics::PerfUiEntryFPS>();
-        app.add_perf_ui_entry_type::<crate::diagnostics::PerfUiEntryFrameTime>();
-        app.add_perf_ui_entry_type::<crate::diagnostics::PerfUiEntryFPSWorst>();
-        app.add_perf_ui_entry_type::<crate::diagnostics::PerfUiEntryFrameTimeWorst>();
-        app.add_perf_ui_entry_type::<crate::diagnostics::PerfUiEntryFrameCount>();
-        app.add_perf_ui_entry_type::<crate::diagnostics::PerfUiEntryEntityCount>();
-        app.add_perf_ui_entry_type::<crate::diagnostics::PerfUiEntryCpuUsage>();
-        app.add_perf_ui_entry_type::<crate::diagnostics::PerfUiEntryMemUsage>();
-        app.add_perf_ui_entry_type::<crate::time::PerfUiEntryClock>();
-        app.add_perf_ui_entry_type::<crate::time::PerfUiEntryRunningTime>();
-        app.add_perf_ui_entry_type::<crate::time::PerfUiEntryFixedTimeStep>();
-        app.add_perf_ui_entry_type::<crate::time::PerfUiEntryFixedOverstep>();
-        app.add_perf_ui_entry_type::<crate::window::PerfUiEntryWindowResolution>();
-        app.add_perf_ui_entry_type::<crate::window::PerfUiEntryWindowScaleFactor>();
-        app.add_perf_ui_entry_type::<crate::window::PerfUiEntryWindowMode>();
-        app.add_perf_ui_entry_type::<crate::window::PerfUiEntryWindowPresentMode>();
-        app.add_perf_ui_entry_type::<crate::window::PerfUiEntryCursorPosition>();
+        app.add_perf_ui_entry_type::<PerfUiEntryFPS>();
+        app.add_perf_ui_entry_type::<PerfUiEntryFrameTime>();
+        app.add_perf_ui_entry_type::<PerfUiEntryFPSWorst>();
+        app.add_perf_ui_entry_type::<PerfUiEntryFrameTimeWorst>();
+        app.add_perf_ui_entry_type::<PerfUiEntryFrameCount>();
+        app.add_perf_ui_entry_type::<PerfUiEntryEntityCount>();
+        app.add_perf_ui_entry_type::<PerfUiEntryCpuUsage>();
+        app.add_perf_ui_entry_type::<PerfUiEntryMemUsage>();
+        app.add_perf_ui_entry_type::<PerfUiEntryClock>();
+        app.add_perf_ui_entry_type::<PerfUiEntryRunningTime>();
+        app.add_perf_ui_entry_type::<PerfUiEntryFixedTimeStep>();
+        app.add_perf_ui_entry_type::<PerfUiEntryFixedOverstep>();
+        app.add_perf_ui_entry_type::<PerfUiEntryWindowResolution>();
+        app.add_perf_ui_entry_type::<PerfUiEntryWindowScaleFactor>();
+        app.add_perf_ui_entry_type::<PerfUiEntryWindowMode>();
+        app.add_perf_ui_entry_type::<PerfUiEntryWindowPresentMode>();
+        app.add_perf_ui_entry_type::<PerfUiEntryCursorPosition>();
     }
 }
 
