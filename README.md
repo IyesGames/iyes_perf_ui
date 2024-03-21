@@ -27,7 +27,7 @@ The goal of this crate is to make it as useful as possible for any Bevy project:
    - Choose any combination of predefined entries for:
      - Framerate (FPS), Frame Time, Frame Count, ECS Entity Count, CPU Usage, RAM Usage,
        Wall Clock, Running Time, Fixed Time Step, Fixed Overstep,
-       Cursor Position, Window Resolution, Window Mode, Present Mode
+       Cursor Position, Window Resolution, Window Scale Factor, Window Mode, Present Mode
    - Implement your own custom entries to display anything you like!
      - (see [`custom_minimal`](examples/custom_minimal.rs) and [`custom`](examples/custom.rs) examples)
  - Support for highlighting values using a custom font or color!
