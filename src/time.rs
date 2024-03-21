@@ -185,7 +185,7 @@ impl PerfUiEntry for PerfUiEntryRunningTime {
     fn width_hint(&self) -> usize {
         match (self.format_hms, self.display_units) {
             (true, _) => width_hint_pretty_time(self.precision),
-            (false, true) => width_hint_pretty_float(self.digits, self.precision) + 3,
+            (false, true) => width_hint_pretty_float(self.digits, self.precision) + 2,
             (false, false) => width_hint_pretty_float(self.digits, self.precision),
         }
     }

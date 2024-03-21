@@ -255,6 +255,10 @@ pub struct PerfUiRoot {
     ///
     /// Default: `true`
     pub display_labels: bool,
+    /// Display entries horizontally instead of vertically.
+    ///
+    /// Default: `false`
+    pub layout_horizontal: bool,
     /// The text to display if a value cannot be obtained.
     ///
     /// Default: `"N/A"`
@@ -322,6 +326,7 @@ impl Default for PerfUiRoot {
             inner_background_color: Color::NONE,
             inner_background_color_highlight: Color::RED.with_a(1.0 / 16.0),
             display_labels: true,
+            layout_horizontal: false,
             text_err: "N/A".into(),
             err_color: Color::DARK_GRAY,
             default_value_color: Color::GRAY,
@@ -402,7 +407,11 @@ fn setup_perf_ui(
             bottom: perf_ui.position.bottom(perf_ui.margin),
             left: perf_ui.position.left(perf_ui.margin),
             right: perf_ui.position.right(perf_ui.margin),
-            flex_direction: FlexDirection::Column,
+            flex_direction: if perf_ui.layout_horizontal {
+                FlexDirection::Row
+            } else {
+                FlexDirection::Column
+            },
             align_items: AlignItems::Stretch,
             padding: UiRect::all(Val::Px(perf_ui.padding)),
             ..default()
