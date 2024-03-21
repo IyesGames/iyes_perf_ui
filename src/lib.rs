@@ -116,26 +116,27 @@ pub mod window;
 ///     // ...
 /// ));
 /// ```
+#[allow(missing_docs)]
 #[derive(Bundle, Default)]
 pub struct PerfUiCompleteBundle {
-    root: PerfUiRoot,
-    fps: PerfUiEntryFPS,
-    fps_worst: PerfUiEntryFPSWorst,
-    frametime: PerfUiEntryFrameTime,
-    frametime_worst: PerfUiEntryFrameTimeWorst,
-    frame_count: PerfUiEntryFrameCount,
-    entity_count: PerfUiEntryEntityCount,
-    cpu_usage: PerfUiEntryCpuUsage,
-    mem_usage: PerfUiEntryMemUsage,
-    fixed_timestep: PerfUiEntryFixedTimeStep,
-    fixed_overstep: PerfUiEntryFixedOverstep,
-    time_running: PerfUiEntryRunningTime,
-    time_clock: PerfUiEntryClock,
-    cursor_position: PerfUiEntryCursorPosition,
-    window_resolution: PerfUiEntryWindowResolution,
-    window_scale_factor: PerfUiEntryWindowScaleFactor,
-    window_mode: PerfUiEntryWindowMode,
-    window_present_mode: PerfUiEntryWindowPresentMode,
+    pub root: PerfUiRoot,
+    pub fps: PerfUiEntryFPS,
+    pub fps_worst: PerfUiEntryFPSWorst,
+    pub frametime: PerfUiEntryFrameTime,
+    pub frametime_worst: PerfUiEntryFrameTimeWorst,
+    pub frame_count: PerfUiEntryFrameCount,
+    pub entity_count: PerfUiEntryEntityCount,
+    pub cpu_usage: PerfUiEntryCpuUsage,
+    pub mem_usage: PerfUiEntryMemUsage,
+    pub fixed_timestep: PerfUiEntryFixedTimeStep,
+    pub fixed_overstep: PerfUiEntryFixedOverstep,
+    pub time_running: PerfUiEntryRunningTime,
+    pub time_clock: PerfUiEntryClock,
+    pub cursor_position: PerfUiEntryCursorPosition,
+    pub window_resolution: PerfUiEntryWindowResolution,
+    pub window_scale_factor: PerfUiEntryWindowScaleFactor,
+    pub window_mode: PerfUiEntryWindowMode,
+    pub window_present_mode: PerfUiEntryWindowPresentMode,
 }
 
 /// The Bevy Plugin
