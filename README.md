@@ -22,7 +22,7 @@ for the [Bevy game engine](https://bevyengine.org).
 The goal of this crate is to make it as useful as possible for any Bevy project:
  - Made with Bevy UI (not egui or any other 3rd-party UI solution)
  - Easy to set up (see [`simple`](examples/simple.rs) example)
- - Customizable appearance/styling (see [`settings`](examples/settings.rs) example)
+ - Customizable appearance/styling (see [`settings`](examples/settings.rs), [`fps_minimalist`](examples/fps_minimalist.rs) examples)
  - Modular! You decide what info you want to display!
    - Choose any combination of predefined entries for:
      - Framerate (FPS), Frame Time, Frame Count, ECS Entity Count, CPU Usage, RAM Usage,
