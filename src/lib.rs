@@ -69,8 +69,10 @@ impl Plugin for PerfUiPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, (
             setup_perf_ui
+                .run_if(rc_setup_perf_ui)
                 .in_set(PerfUiSet::Setup),
             sort_perf_ui_entries
+                .run_if(rc_sort_perf_ui_entries)
                 .after(PerfUiSet::Setup),
         ).run_if(any_with_component::<PerfUiRoot>));
         app.add_perf_ui_entry_type::<crate::diagnostics::PerfUiEntryFPS>();
@@ -102,12 +104,14 @@ impl PerfUiAppExt for App {
     fn add_perf_ui_entry_type<T: PerfUiEntry>(&mut self) -> &mut Self {
         self.add_systems(Update, (
             setup_perf_ui_entry::<T>
+                .run_if(rc_setup_perf_ui_entry::<T>)
                 .after(setup_perf_ui)
                 .in_set(PerfUiSet::Setup),
             update_perf_ui_entry::<T>
+                .run_if(any_with_component::<PerfUiEntryMarker<T>>)
                 .after(setup_perf_ui_entry::<T>)
                 .in_set(PerfUiSet::Update),
-        ).run_if(any_with_component::<T>));
+        ));
         self
     }
 }
@@ -367,6 +371,7 @@ impl PerfUiPosition {
 
 #[derive(Component)]
 struct PerfUiEntryMarker<T: PerfUiEntry> {
+    e_root: Entity,
     _pd: PhantomData<T>,
 }
 
@@ -380,38 +385,89 @@ struct PerfUiTextMarker<T: PerfUiEntry> {
 #[derive(Component, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 struct PerfUiSortKey(i32);
 
+fn rc_setup_perf_ui(
+    q: Query<(), Changed<PerfUiRoot>>,
+) -> bool {
+    !q.is_empty()
+}
+
 fn setup_perf_ui(
     mut commands: Commands,
-    q_root: Query<(Entity, &PerfUiRoot), Added<PerfUiRoot>>,
+    mut q_root: Query<(Entity, &PerfUiRoot, Option<&mut BackgroundColor>, Option<&mut Style>), Changed<PerfUiRoot>>,
 ) {
-    for (e, perf_ui) in &q_root {
-        commands.entity(e).insert((
-            NodeBundle {
-                background_color: BackgroundColor(perf_ui.background_color),
-                style: Style {
-                    position_type: PositionType::Absolute,
-                    top: perf_ui.position.top(perf_ui.margin),
-                    bottom: perf_ui.position.bottom(perf_ui.margin),
-                    left: perf_ui.position.left(perf_ui.margin),
-                    right: perf_ui.position.right(perf_ui.margin),
-                    flex_direction: FlexDirection::Column,
-                    align_items: AlignItems::Stretch,
-                    padding: UiRect::all(Val::Px(perf_ui.padding)),
+    for (e, perf_ui, background, style) in &mut q_root {
+        let new_style = Style {
+            position_type: PositionType::Absolute,
+            top: perf_ui.position.top(perf_ui.margin),
+            bottom: perf_ui.position.bottom(perf_ui.margin),
+            left: perf_ui.position.left(perf_ui.margin),
+            right: perf_ui.position.right(perf_ui.margin),
+            flex_direction: FlexDirection::Column,
+            align_items: AlignItems::Stretch,
+            padding: UiRect::all(Val::Px(perf_ui.padding)),
+            ..default()
+        };
+        if let (Some(mut background), Some(mut style)) = (background, style) {
+            background.0 = perf_ui.background_color;
+            *style = new_style;
+        } else {
+            commands.entity(e).insert((
+                NodeBundle {
+                    background_color: BackgroundColor(perf_ui.background_color),
+                    style: new_style,
                     ..default()
                 },
-                ..default()
-            },
-        ));
+            ));
+        }
     }
+}
+
+fn rc_setup_perf_ui_entry<T: PerfUiEntry>(
+    q: Query<(), Or<(Changed<T>, Changed<PerfUiRoot>)>>,
+    removed: RemovedComponents<T>,
+) -> bool {
+    !q.is_empty() || !removed.is_empty()
 }
 
 fn setup_perf_ui_entry<T: PerfUiEntry>(
     mut commands: Commands,
-    q_root: Query<(Entity, &PerfUiRoot, &T), Added<T>>,
+    q_root: Query<(Entity, &PerfUiRoot, &T), Or<(Changed<T>, Changed<PerfUiRoot>)>>,
+    q_entry: Query<(Entity, &PerfUiEntryMarker<T>)>,
+    mut removed: RemovedComponents<T>,
 ) {
+    // handle any removals:
+    // if the entry component was removed from a perf ui root entity,
+    // we need to find the entity of the entry's UI and despawn it.
+    for e_removed in removed.read() {
+        if let Some(e_entry) = q_entry.iter()
+            .find(|(_, marker)| marker.e_root == e_removed)
+            .map(|(e, _)| e)
+        {
+            commands.entity(e_removed)
+                .remove_children(&[e_entry]);
+            commands.entity(e_entry).despawn_recursive();
+        }
+    }
+    // handle any additions or reconfigurations:
+    // if an entry component was added/changed to a perf ui root entity,
+    // or if the ui root component itself was changed,
+    // find and despawn any existing entries and
+    // spawn a new UI hierarchy for the entry.
     for (e_root, perf_ui, entry) in &q_root {
+        // despawn any old/existing UI hierarchy for relevant entries
+        if let Some(e_entry) = q_entry.iter()
+            .find(|(_, marker)| marker.e_root == e_root)
+            .map(|(e, _)| e)
+        {
+            commands.entity(e_root)
+                .remove_children(&[e_entry]);
+            commands.entity(e_entry).despawn_recursive();
+        }
+
+        // spawn the new UI hierarchy
         let e_entry = commands.spawn((
             PerfUiEntryMarker::<T> {
+                e_root,
                 _pd: PhantomData,
             },
             PerfUiSortKey(entry.sort_key()),
@@ -491,6 +547,12 @@ fn setup_perf_ui_entry<T: PerfUiEntry>(
         commands.entity(e_entry).push_children(&[e_text_wrapper]);
         commands.entity(e_root).push_children(&[e_entry]);
     }
+}
+
+fn rc_sort_perf_ui_entries(
+    q: Query<(), (With<PerfUiRoot>, Changed<Children>)>,
+) -> bool {
+    !q.is_empty()
 }
 
 fn sort_perf_ui_entries(
