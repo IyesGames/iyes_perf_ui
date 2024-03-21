@@ -12,7 +12,7 @@ Bevy Compatibility:
 
 | Bevy Version | Plugin Version |
 |--------------|----------------|
-| `0.13`       | `0.1`          |
+| `0.13`       | `0.2`,`0.1`    |
 
 ---
 
@@ -25,7 +25,9 @@ The goal of this crate is to make it as useful as possible for any Bevy project:
  - Customizable appearance/styling (see [`settings`](examples/settings.rs) example)
  - Modular! You decide what info you want to display!
    - Choose any combination of predefined entries for:
-     - Framerate (FPS), Frame Time, Frame Count, ECS Entity Count, CPU Usage, RAM Usage, Wall Clock, Running Time
+     - Framerate (FPS), Frame Time, Frame Count, ECS Entity Count, CPU Usage, RAM Usage,
+       Wall Clock, Running Time, Fixed Time Step, Fixed Overstep,
+       Cursor Position, Window Resolution, Window Mode, Present Mode
    - Implement your own custom entries to display anything you like!
      - (see [`custom_minimal`](examples/custom_minimal.rs) and [`custom`](examples/custom.rs) examples)
  - Support for highlighting values using a custom font or color!
@@ -44,8 +46,8 @@ commands.spawn((
 ));
 ```
 
+(or instead of `default`, you can configure the parameters in any of these structs)
+
 ![Screenshot of the simple example showing default configuration](screenshots/simple.png)
 
 ![Screenshot of the settings example showing multiple UIs with custom configuration](screenshots/settings.png)
-
-(or instead of `default`, you can configure the parameters in any of these structs)
