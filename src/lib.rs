@@ -53,6 +53,7 @@ pub mod prelude {
         PerfUiEntryWindowPresentMode,
         PerfUiEntryCursorPosition,
     };
+    pub use crate::utils::ColorGradient;
 }
 
 pub mod utils;

@@ -1,7 +1,7 @@
 //! This example shows how to customize the appearance of your Perf UIs.
 
 use bevy::prelude::*;
-use iyes_perf_ui::{prelude::*, utils::ColorGradient};
+use iyes_perf_ui::prelude::*;
 
 fn main() {
     App::new()
