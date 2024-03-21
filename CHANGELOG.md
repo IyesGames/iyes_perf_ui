@@ -2,6 +2,11 @@
 
 Notable user-facing changes with each release version will be described in this file.
 
+## [0.2.1]: 2024-03-21
+
+Added:
+ - `ColorGradient::single()` constructor for when you want a fixed color.
+
 ## [0.2.0]: 2024-03-21
 
 Added:
@@ -39,5 +44,6 @@ Removed:
 
 Initial Release
 
+[0.2.1]: https://github.com/IyesGames/iyes_perf_ui/tree/v0.2.1
 [0.2.0]: https://github.com/IyesGames/iyes_perf_ui/tree/v0.2.0
 [0.1.0]: https://github.com/IyesGames/iyes_perf_ui/tree/v0.1.0
