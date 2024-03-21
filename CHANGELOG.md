@@ -2,6 +2,14 @@
 
 Notable user-facing changes with each release version will be described in this file.
 
+## [0.2.3]: 2024-03-21
+
+Added:
+ - `PerfUiCompleteBundle` to allow spawning a Perf UI with all our entries in one line of code!
+
+Changed:
+ - `simple` example renamed to `specific_entries`. New `simple` example uses `PerfUiCompleteBundle`.
+
 ## [0.2.2]: 2024-03-21
 
 Added:
@@ -50,6 +58,7 @@ Removed:
 
 Initial Release
 
+[0.2.3]: https://github.com/IyesGames/iyes_perf_ui/tree/v0.2.3
 [0.2.2]: https://github.com/IyesGames/iyes_perf_ui/tree/v0.2.2
 [0.2.1]: https://github.com/IyesGames/iyes_perf_ui/tree/v0.2.1
 [0.2.0]: https://github.com/IyesGames/iyes_perf_ui/tree/v0.2.0
