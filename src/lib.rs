@@ -52,92 +52,27 @@ use std::marker::PhantomData;
 use bevy::prelude::*;
 use bevy::ecs::system::{StaticSystemParam, SystemParam};
 
+#[allow(unused_imports)]
 use crate::prelude::*;
 
 /// Prelude of common types for users of the library
 pub mod prelude {
     pub use crate::{
-        PerfUiCompleteBundle,
         PerfUiPlugin,
         PerfUiAppExt,
         PerfUiRoot,
         PerfUiEntry,
         PerfUiPosition,
     };
-    pub use crate::diagnostics::{
-        PerfUiEntryFPS,
-        PerfUiEntryFrameTime,
-        PerfUiEntryFPSWorst,
-        PerfUiEntryFrameTimeWorst,
-        PerfUiEntryFrameCount,
-        PerfUiEntryEntityCount,
-        PerfUiEntryCpuUsage,
-        PerfUiEntryMemUsage,
-    };
-    pub use crate::time::{
-        PerfUiEntryClock,
-        PerfUiEntryRunningTime,
-        PerfUiEntryFixedTimeStep,
-        PerfUiEntryFixedOverstep,
-    };
-    pub use crate::window::{
-        PerfUiEntryWindowResolution,
-        PerfUiEntryWindowScaleFactor,
-        PerfUiEntryWindowMode,
-        PerfUiEntryWindowPresentMode,
-        PerfUiEntryCursorPosition,
-    };
     pub use crate::utils::ColorGradient;
+    #[cfg(feature = "entries")]
+    pub use crate::entries::prelude::*;
 }
 
 pub mod utils;
 
-pub mod diagnostics;
-pub mod time;
-pub mod window;
-
-/// Bundle for a Perf UI with all entry types provided by `iyes_perf_ui`.
-///
-/// This gives you a simple one-liner to spawn a comprehensive Perf UI!
-///
-/// ```rust
-/// commands.spawn(PerfUiCompleteBundle::default());
-/// ```
-///
-/// If you want to create a Perf UI with specific entries of your choice,
-/// just spawn an entity with [`PerfUiRoot`] + your desired entries, instead
-/// of using this bundle.
-///
-/// ```rust
-/// commands.spawn((
-///     PerfUiRoot::default(),
-///     PerfUiEntryFPS::default(),
-///     PerfUiEntryClock::default(),
-///     // ...
-/// ));
-/// ```
-#[allow(missing_docs)]
-#[derive(Bundle, Default)]
-pub struct PerfUiCompleteBundle {
-    pub root: PerfUiRoot,
-    pub fps: PerfUiEntryFPS,
-    pub fps_worst: PerfUiEntryFPSWorst,
-    pub frametime: PerfUiEntryFrameTime,
-    pub frametime_worst: PerfUiEntryFrameTimeWorst,
-    pub frame_count: PerfUiEntryFrameCount,
-    pub entity_count: PerfUiEntryEntityCount,
-    pub cpu_usage: PerfUiEntryCpuUsage,
-    pub mem_usage: PerfUiEntryMemUsage,
-    pub fixed_timestep: PerfUiEntryFixedTimeStep,
-    pub fixed_overstep: PerfUiEntryFixedOverstep,
-    pub time_running: PerfUiEntryRunningTime,
-    pub time_clock: PerfUiEntryClock,
-    pub cursor_position: PerfUiEntryCursorPosition,
-    pub window_resolution: PerfUiEntryWindowResolution,
-    pub window_scale_factor: PerfUiEntryWindowScaleFactor,
-    pub window_mode: PerfUiEntryWindowMode,
-    pub window_present_mode: PerfUiEntryWindowPresentMode,
-}
+#[cfg(feature = "entries")]
+pub mod entries;
 
 /// The Bevy Plugin
 #[derive(Default)]
@@ -153,23 +88,9 @@ impl Plugin for PerfUiPlugin {
                 .run_if(rc_sort_perf_ui_entries)
                 .after(PerfUiSet::Setup),
         ).run_if(any_with_component::<PerfUiRoot>));
-        app.add_perf_ui_entry_type::<PerfUiEntryFPS>();
-        app.add_perf_ui_entry_type::<PerfUiEntryFrameTime>();
-        app.add_perf_ui_entry_type::<PerfUiEntryFPSWorst>();
-        app.add_perf_ui_entry_type::<PerfUiEntryFrameTimeWorst>();
-        app.add_perf_ui_entry_type::<PerfUiEntryFrameCount>();
-        app.add_perf_ui_entry_type::<PerfUiEntryEntityCount>();
-        app.add_perf_ui_entry_type::<PerfUiEntryCpuUsage>();
-        app.add_perf_ui_entry_type::<PerfUiEntryMemUsage>();
-        app.add_perf_ui_entry_type::<PerfUiEntryClock>();
-        app.add_perf_ui_entry_type::<PerfUiEntryRunningTime>();
-        app.add_perf_ui_entry_type::<PerfUiEntryFixedTimeStep>();
-        app.add_perf_ui_entry_type::<PerfUiEntryFixedOverstep>();
-        app.add_perf_ui_entry_type::<PerfUiEntryWindowResolution>();
-        app.add_perf_ui_entry_type::<PerfUiEntryWindowScaleFactor>();
-        app.add_perf_ui_entry_type::<PerfUiEntryWindowMode>();
-        app.add_perf_ui_entry_type::<PerfUiEntryWindowPresentMode>();
-        app.add_perf_ui_entry_type::<PerfUiEntryCursorPosition>();
+
+        #[cfg(feature = "entries")]
+        app.add_plugins(entries::predefined_entries_plugin);
     }
 }
 
@@ -220,16 +141,15 @@ pub trait PerfUiEntry: Component {
     /// The label text to display in the Perf UI.
     fn label(&self) -> &str;
 
-    /// Optional: provide a desired width for the value string.
+    /// The sort key controls where the entry will appear in the Perf UI.
     ///
-    /// The formatted value will be padded with spaces. This allows
-    /// everything to line up nicely in the UI and prevents the UI from
-    /// spontaneously resizing as the values change.
+    /// The recommended way to implement this is to have a field in your struct,
+    /// which you can set to `iyes_perf_ui::utils::next_sort_key()` in your
+    /// `impl Default`. Then return that value here.
     ///
-    /// (assuming a monospace font)
-    fn width_hint(&self) -> usize {
-        0
-    }
+    /// That way, the entry will be sorted according to the order in which the
+    /// user creates the entries.
+    fn sort_key(&self) -> i32;
 
     /// Update the value to display in the Perf UI.
     ///
@@ -256,6 +176,8 @@ pub trait PerfUiEntry: Component {
 
     /// Optional: set a custom color for the value to display.
     ///
+    /// `None` means the value should be displayed using the default color.
+    ///
     /// Called every frame after `update_value`, unless it returned `None`.
     /// The `value` parameter is whatever that function returned.
     fn value_color(
@@ -276,15 +198,16 @@ pub trait PerfUiEntry: Component {
         false
     }
 
-    /// The sort key controls where the entry will appear in the Perf UI.
+    /// Optional: provide a desired width for the value string.
     ///
-    /// The recommended way to implement this is to have a field in your struct,
-    /// which you can set to `iyes_perf_ui::utils::next_sort_key()` in your
-    /// `impl Default`. Then return that value here.
+    /// The formatted value will be padded with spaces. This allows
+    /// everything to line up nicely in the UI and prevents the UI from
+    /// spontaneously resizing as the values change.
     ///
-    /// That way, the entry will be sorted according to the order in which the
-    /// user creates the entries.
-    fn sort_key(&self) -> i32;
+    /// (assuming a monospace font)
+    fn width_hint(&self) -> usize {
+        0
+    }
 }
 
 /// Which corner of the screen to display the Perf UI at?
