@@ -2,6 +2,7 @@
 
 use bevy::prelude::*;
 use iyes_perf_ui::prelude::*;
+use iyes_perf_ui::widgets::bar::{BarFillDirection, BarTextPosition};
 
 fn main() {
     App::new()
@@ -96,6 +97,7 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
     ));
 
     // Perf UI #2: ECS stats + System CPU/RAM usage
+    // (displayed using fancy Bar widgets)
     commands.spawn((
         PerfUiRoot {
             position: PerfUiPosition::BottomLeft,
@@ -103,29 +105,53 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
             z_index: ZIndex::Global(i32::MAX - 1),
             ..root_config.clone()
         },
-        PerfUiEntryEntityCount {
-            label: "Number of ECS Entities".into(),
-            // disable color and highlighting for this one
-            color_gradient: ColorGradient::default(),
-            threshold_highlight: None,
-            digits: 4,
-            ..default()
+        PerfUiWidgetBar {
+            fill_direction: BarFillDirection::Center,
+            bar_background: Color::BLACK.with_a(0.5),
+            // The color gradient also affects the range of values for the bar
+            bar_color: ColorGradient::new()
+                .with_stops([(0.0, Color::GRAY), (200.0, Color::WHITE)]),
+            bar_border_color: Color::WHITE,
+            bar_border_px: 2.0,
+            ..PerfUiWidgetBar::new(PerfUiEntryEntityCount {
+                label: "Number of ECS Entities".into(),
+                threshold_highlight: None,
+                color_gradient: ColorGradient::single(Color::BLACK),
+                digits: 4,
+                ..default()
+            })
         },
-        PerfUiEntryCpuUsage {
-            label: "System CPU Utilization".into(),
-            color_gradient: ColorGradient::new()
+        PerfUiWidgetBar {
+            text_position: BarTextPosition::OutsideEnd,
+            bar_background: Color::BLACK.with_a(0.5),
+            bar_color: ColorGradient::new()
                 .with_stops([(0.0, Color::BLUE), (100.0, Color::RED)]),
-            threshold_highlight: None,
-            precision: 1,
-            ..default()
+            bar_border_color: Color::WHITE,
+            bar_border_px: 2.0,
+            ..PerfUiWidgetBar::new(PerfUiEntryCpuUsage {
+                label: "System CPU Utilization".into(),
+                color_gradient: ColorGradient::new()
+                    .with_stops([(0.0, Color::BLUE), (100.0, Color::RED)]),
+                threshold_highlight: None,
+                precision: 1,
+                ..default()
+            })
         },
-        PerfUiEntryMemUsage {
-            label: "System RAM Utilization".into(),
-            color_gradient: ColorGradient::new()
+        PerfUiWidgetBar {
+            text_position: BarTextPosition::OutsideEnd,
+            bar_background: Color::BLACK.with_a(0.5),
+            bar_color: ColorGradient::new()
                 .with_stops([(0.0, Color::BLUE), (100.0, Color::RED)]),
-            threshold_highlight: None,
-            precision: 1,
-            ..default()
+            bar_border_color: Color::WHITE,
+            bar_border_px: 2.0,
+            ..PerfUiWidgetBar::new(PerfUiEntryMemUsage {
+                label: "System RAM Utilization".into(),
+                color_gradient: ColorGradient::new()
+                    .with_stops([(0.0, Color::BLUE), (100.0, Color::RED)]),
+                threshold_highlight: None,
+                precision: 1,
+                ..default()
+            })
         },
     ));
 

@@ -26,22 +26,26 @@ fn setup(mut commands: Commands) {
     // Instead of using `PerfUiCompleteBundle`,
     // spawn an entity with `PerfUiRoot` + whatever entries you want!
     commands.spawn((
-        PerfUiRoot::default(),
+        PerfUiRoot {
+            // set a fixed width to make all the bars line up
+            values_col_width: Some(160.0),
+            ..Default::default()
+        },
         // when we have lots of entries, we have to group them
         // into tuples, because of Bevy Rust syntax limitations
         (
-            PerfUiEntryFPS::default(),
-            PerfUiEntryFPSWorst::default(),
-            PerfUiEntryFrameTime::default(),
-            PerfUiEntryFrameTimeWorst::default(),
+            PerfUiWidgetBar::new(PerfUiEntryFPS::default()),
+            PerfUiWidgetBar::new(PerfUiEntryFPSWorst::default()),
+            PerfUiWidgetBar::new(PerfUiEntryFrameTime::default()),
+            PerfUiWidgetBar::new(PerfUiEntryFrameTimeWorst::default()),
+            PerfUiWidgetBar::new(PerfUiEntryEntityCount::default()),
+            PerfUiWidgetBar::new(PerfUiEntryCpuUsage::default()),
+            PerfUiWidgetBar::new(PerfUiEntryMemUsage::default()),
             PerfUiEntryFrameCount::default(),
-            PerfUiEntryEntityCount::default(),
-            PerfUiEntryCpuUsage::default(),
-            PerfUiEntryMemUsage::default(),
         ),
         (
             PerfUiEntryFixedTimeStep::default(),
-            PerfUiEntryFixedOverstep::default(),
+            PerfUiWidgetBar::new(PerfUiEntryFixedOverstep::default()),
             PerfUiEntryRunningTime::default(),
             PerfUiEntryClock::default(),
         ),

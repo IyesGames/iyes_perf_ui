@@ -62,6 +62,8 @@ pub mod prelude {
     pub use crate::utils::ColorGradient;
     #[cfg(feature = "entries")]
     pub use crate::entries::prelude::*;
+    #[cfg(feature = "widgets")]
+    pub use crate::widgets::prelude::*;
 }
 
 pub mod entry;
@@ -70,6 +72,8 @@ pub mod utils;
 
 #[cfg(feature = "entries")]
 pub mod entries;
+#[cfg(feature = "widgets")]
+pub mod widgets;
 
 /// The Bevy Plugin
 #[derive(Default)]
@@ -90,6 +94,8 @@ impl Plugin for PerfUiPlugin {
 
         #[cfg(feature = "entries")]
         app.add_plugins(entries::predefined_entries_plugin);
+        #[cfg(all(feature = "entries", feature = "widgets"))]
+        app.add_plugins(widgets::predefined_widgets_plugin);
     }
 }
 
