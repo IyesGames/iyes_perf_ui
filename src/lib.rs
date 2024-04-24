@@ -61,7 +61,6 @@ pub mod prelude {
         PerfUiPlugin,
         PerfUiAppExt,
         PerfUiRoot,
-        PerfUiEntry,
         PerfUiPosition,
     };
     pub use crate::utils::ColorGradient;
@@ -69,6 +68,7 @@ pub mod prelude {
     pub use crate::entries::prelude::*;
 }
 
+pub mod entry;
 pub mod utils;
 
 #[cfg(feature = "entries")]
@@ -97,11 +97,11 @@ impl Plugin for PerfUiPlugin {
 /// Extension trait for adding new types of Perf UI Entries.
 pub trait PerfUiAppExt {
     /// Add support for a custom perf UI entry type (component).
-    fn add_perf_ui_entry_type<T: PerfUiEntry>(&mut self) -> &mut Self;
+    fn add_perf_ui_entry_type<T: crate::entry::PerfUiEntry>(&mut self) -> &mut Self;
 }
 
 impl PerfUiAppExt for App {
-    fn add_perf_ui_entry_type<T: PerfUiEntry>(&mut self) -> &mut Self {
+    fn add_perf_ui_entry_type<T: crate::entry::PerfUiEntry>(&mut self) -> &mut Self {
         self.add_systems(Update, (
             setup_perf_ui_entry::<T>
                 .run_if(rc_setup_perf_ui_entry::<T>)
@@ -125,89 +125,6 @@ pub enum PerfUiSet {
     ///
     /// If you care about a specific entry only, refer to the `update_perf_ui_entry::<T>` system instead.
     Update,
-}
-
-/// Trait for components representing entries (rows) in the Perf UI.
-///
-/// If you want to display your own info in Perf UI, create your
-/// own component types and implement this trait for them.
-pub trait PerfUiEntry: Component {
-    /// Any system parameters you need to fetch/update the value.
-    type SystemParam: SystemParam + 'static;
-
-    /// The raw (unformatted) type of the value to be displayed.
-    type Value: std::fmt::Debug;
-
-    /// The label text to display in the Perf UI.
-    fn label(&self) -> &str;
-
-    /// The sort key controls where the entry will appear in the Perf UI.
-    ///
-    /// The recommended way to implement this is to have a field in your struct,
-    /// which you can set to `iyes_perf_ui::utils::next_sort_key()` in your
-    /// `impl Default`. Then return that value here.
-    ///
-    /// That way, the entry will be sorted according to the order in which the
-    /// user creates the entries.
-    fn sort_key(&self) -> i32;
-
-    /// Update the value to display in the Perf UI.
-    ///
-    /// This function will be called once per frame,
-    /// in the `Update` schedule,
-    /// in the `PerfUiSet::Update` set.
-    fn update_value(
-        &self,
-        param: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
-    ) -> Option<Self::Value>;
-
-    /// Format the raw value into a string for display
-    ///
-    /// Called every frame after `update_value`, unless it returned `None`.
-    /// The `value` parameter is whatever that function returned.
-    ///
-    /// If unimplemented, the value will be formatted with its `Debug` impl.
-    fn format_value(
-        &self,
-        value: &Self::Value,
-    ) -> String {
-        format!("{:?}", value)
-    }
-
-    /// Optional: set a custom color for the value to display.
-    ///
-    /// `None` means the value should be displayed using the default color.
-    ///
-    /// Called every frame after `update_value`, unless it returned `None`.
-    /// The `value` parameter is whatever that function returned.
-    fn value_color(
-        &self,
-        _value: &Self::Value,
-    ) -> Option<Color> {
-        None
-    }
-
-    /// Optional: set whether the value should be displayed using the "highlighted" font.
-    ///
-    /// Called every frame after `update_value`, unless it returned `None`.
-    /// The `value` parameter is whatever that function returned.
-    fn value_highlight(
-        &self,
-        _value: &Self::Value,
-    ) -> bool {
-        false
-    }
-
-    /// Optional: provide a desired width for the value string.
-    ///
-    /// The formatted value will be padded with spaces. This allows
-    /// everything to line up nicely in the UI and prevents the UI from
-    /// spontaneously resizing as the values change.
-    ///
-    /// (assuming a monospace font)
-    fn width_hint(&self) -> usize {
-        0
-    }
 }
 
 /// Which corner of the screen to display the Perf UI at?

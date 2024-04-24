@@ -5,7 +5,7 @@ use bevy::ecs::system::lifetimeless::SRes;
 use bevy::ecs::system::SystemParam;
 use bevy::utils::Duration;
 
-use crate::prelude::*;
+use crate::entry::*;
 use crate::utils::*;
 
 /// Perf UI Entry to display the time the Bevy app has been running.

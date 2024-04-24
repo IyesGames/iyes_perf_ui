@@ -6,7 +6,7 @@ use bevy::ecs::system::lifetimeless::SRes;
 use bevy::ecs::system::SystemParam;
 use bevy::utils::FloatOrd;
 
-use crate::prelude::*;
+use crate::entry::*;
 use crate::utils::*;
 
 /// Perf UI Entry to display Bevy's built-in FPS measurement diagnostic.

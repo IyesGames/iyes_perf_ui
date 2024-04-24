@@ -7,7 +7,7 @@ use bevy::window::PresentMode;
 use bevy::window::PrimaryWindow;
 use bevy::window::WindowMode;
 
-use crate::prelude::*;
+use crate::entry::*;
 use crate::utils::*;
 
 /// Perf UI Entry to display the window mode (windowed, fullscreen, etc).
