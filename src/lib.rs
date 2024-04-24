@@ -84,7 +84,9 @@ impl Plugin for PerfUiPlugin {
             crate::ui::sort_perf_ui_widgets
                 .run_if(crate::ui::rc_sort_perf_ui_widgets)
                 .after(PerfUiSet::Setup),
-        ).run_if(any_with_component::<PerfUiRoot>));
+        )
+            .run_if(crate::ui::rc_any_visible)
+        );
 
         #[cfg(feature = "entries")]
         app.add_plugins(entries::predefined_entries_plugin);

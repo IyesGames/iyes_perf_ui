@@ -23,3 +23,27 @@ pub(crate) fn sort_perf_ui_widgets(
         children.sort_by_key(|e| q_sortkey.get(*e).map(|k| k.0).unwrap_or(0));
     }
 }
+
+pub(crate) fn rc_any_visible(
+    q_root: Query<(
+        Option<&Visibility>,
+        Option<&InheritedVisibility>,
+        Option<&Style>,
+    ), With<PerfUiRoot>>,
+) -> bool {
+    q_root.iter()
+        .any(|(visibility, inherited, style)| {
+            let vis = match visibility {
+                None => true,
+                Some(Visibility::Hidden) => false,
+                Some(Visibility::Visible) => true,
+                Some(Visibility::Inherited) => inherited
+                    .map(|x| x.get())
+                    .unwrap_or(true),
+            };
+            let display = style
+                .map(|s| s.display != Display::None)
+                .unwrap_or(true);
+            vis && display
+        })
+}
