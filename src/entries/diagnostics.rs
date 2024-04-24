@@ -24,6 +24,13 @@ pub struct PerfUiEntryFPS {
     ///
     /// Default: `20.0`
     pub threshold_highlight: Option<f32>,
+    /// If displayed using a Bar (or other similar) widget that can
+    /// show the value within a range, what should its max value be?
+    ///
+    /// If `None`, the value will be computed from the color gradient.
+    ///
+    /// Default: `None`
+    pub max_value_hint: Option<f32>,
     /// Should we display the smoothed value or the raw value?
     ///
     /// Default: true (smoothed)
@@ -46,6 +53,7 @@ impl Default for PerfUiEntryFPS {
             label: String::new(),
             color_gradient: ColorGradient::new_preset_ryg(30.0, 60.0, 120.0).unwrap(),
             threshold_highlight: Some(20.0),
+            max_value_hint: None,
             smoothed: true,
             digits: 4,
             precision: 0,
@@ -71,6 +79,13 @@ pub struct PerfUiEntryFPSWorst {
     ///
     /// Default: `20.0`
     pub threshold_highlight: Option<f32>,
+    /// If displayed using a Bar (or other similar) widget that can
+    /// show the value within a range, what should its max value be?
+    ///
+    /// If `None`, the value will be computed from the color gradient.
+    ///
+    /// Default: `None`
+    pub max_value_hint: Option<f32>,
     /// Number of digits to display for the integer (whole number) part.
     ///
     /// Default: `4`
@@ -89,6 +104,7 @@ impl Default for PerfUiEntryFPSWorst {
             label: String::new(),
             color_gradient: ColorGradient::new_preset_ryg(30.0, 60.0, 120.0).unwrap(),
             threshold_highlight: Some(20.0),
+            max_value_hint: None,
             digits: 4,
             precision: 0,
             sort_key: next_sort_key(),
@@ -117,6 +133,13 @@ pub struct PerfUiEntryFrameTime {
     ///
     /// Default: frametime equivalent to 20 FPS
     pub threshold_highlight: Option<f32>,
+    /// If displayed using a Bar (or other similar) widget that can
+    /// show the value within a range, what should its max value be?
+    ///
+    /// If `None`, the value will be computed from the color gradient.
+    ///
+    /// Default: `None`
+    pub max_value_hint: Option<f32>,
     /// Should we display the smoothed value or the raw value?
     ///
     /// Default: true (smoothed)
@@ -144,6 +167,7 @@ impl Default for PerfUiEntryFrameTime {
                 1000.0 / 30.0,
             ).unwrap(),
             threshold_highlight: Some(1000.0 / 20.0),
+            max_value_hint: None,
             smoothed: true,
             digits: 2,
             precision: 3,
@@ -175,6 +199,13 @@ pub struct PerfUiEntryFrameTimeWorst {
     ///
     /// Default: frametime equivalent to 20 FPS
     pub threshold_highlight: Option<f32>,
+    /// If displayed using a Bar (or other similar) widget that can
+    /// show the value within a range, what should its max value be?
+    ///
+    /// If `None`, the value will be computed from the color gradient.
+    ///
+    /// Default: `None`
+    pub max_value_hint: Option<f32>,
     /// Number of digits to display for the integer (whole number) part.
     ///
     /// Default: `2`
@@ -198,6 +229,7 @@ impl Default for PerfUiEntryFrameTimeWorst {
                 1000.0 / 30.0,
             ).unwrap(),
             threshold_highlight: Some(1000.0 / 20.0),
+            max_value_hint: None,
             digits: 2,
             precision: 3,
             sort_key: next_sort_key(),
@@ -243,6 +275,13 @@ pub struct PerfUiEntryEntityCount {
     ///
     /// Default: `20000`
     pub threshold_highlight: Option<u32>,
+    /// If displayed using a Bar (or other similar) widget that can
+    /// show the value within a range, what should its max value be?
+    ///
+    /// If `None`, the value will be computed from the color gradient.
+    ///
+    /// Default: `None`
+    pub max_value_hint: Option<f32>,
     /// Number of digits to display.
     ///
     /// Default: `6`
@@ -257,6 +296,7 @@ impl Default for PerfUiEntryEntityCount {
             label: String::new(),
             color_gradient: ColorGradient::new_preset_gyr(100.0, 1000.0, 10000.0).unwrap(),
             threshold_highlight: Some(20000),
+            max_value_hint: None,
             digits: 6,
             sort_key: next_sort_key(),
         }
@@ -396,6 +436,18 @@ impl PerfUiEntry for PerfUiEntryFPS {
     }
 }
 
+impl PerfUiEntryDisplayRange for PerfUiEntryFPS {
+    fn max_value_hint(&self) -> Option<Self::Value> {
+        self.max_value_hint.or(
+            self.color_gradient.max_stop()
+                .map(|(v, _)| *v)
+        ).map(|v| v as f64)
+    }
+    fn min_value_hint(&self) -> Option<Self::Value> {
+        Some(0.0)
+    }
+}
+
 impl PerfUiEntry for PerfUiEntryFPSWorst {
     type SystemParam = SRes<DiagnosticsStore>;
     type Value = f32;
@@ -446,6 +498,18 @@ impl PerfUiEntry for PerfUiEntryFPSWorst {
     }
     fn sort_key(&self) -> i32 {
         self.sort_key
+    }
+}
+
+impl PerfUiEntryDisplayRange for PerfUiEntryFPSWorst {
+    fn max_value_hint(&self) -> Option<Self::Value> {
+        self.max_value_hint.or(
+            self.color_gradient.max_stop()
+                .map(|(v, _)| *v)
+        )
+    }
+    fn min_value_hint(&self) -> Option<Self::Value> {
+        Some(0.0)
     }
 }
 
@@ -504,6 +568,18 @@ impl PerfUiEntry for PerfUiEntryFrameTime {
     }
     fn sort_key(&self) -> i32 {
         self.sort_key
+    }
+}
+
+impl PerfUiEntryDisplayRange for PerfUiEntryFrameTime {
+    fn max_value_hint(&self) -> Option<Self::Value> {
+        self.max_value_hint.or(
+            self.color_gradient.max_stop()
+                .map(|(v, _)| *v)
+        ).map(|v| v as f64)
+    }
+    fn min_value_hint(&self) -> Option<Self::Value> {
+        Some(0.0)
     }
 }
 
@@ -566,6 +642,18 @@ impl PerfUiEntry for PerfUiEntryFrameTimeWorst {
     }
     fn sort_key(&self) -> i32 {
         self.sort_key
+    }
+}
+
+impl PerfUiEntryDisplayRange for PerfUiEntryFrameTimeWorst {
+    fn max_value_hint(&self) -> Option<Self::Value> {
+        self.max_value_hint.or(
+            self.color_gradient.max_stop()
+                .map(|(v, _)| *v)
+        )
+    }
+    fn min_value_hint(&self) -> Option<Self::Value> {
+        Some(0.0)
     }
 }
 
@@ -645,6 +733,18 @@ impl PerfUiEntry for PerfUiEntryEntityCount {
     }
 }
 
+impl PerfUiEntryDisplayRange for PerfUiEntryEntityCount {
+    fn max_value_hint(&self) -> Option<Self::Value> {
+        self.max_value_hint.or(
+            self.color_gradient.max_stop()
+                .map(|(v, _)| *v)
+        ).map(|v| v as u32)
+    }
+    fn min_value_hint(&self) -> Option<Self::Value> {
+        Some(0)
+    }
+}
+
 impl PerfUiEntry for PerfUiEntryCpuUsage {
     type SystemParam = SRes<DiagnosticsStore>;
     type Value = f64;
@@ -696,6 +796,15 @@ impl PerfUiEntry for PerfUiEntryCpuUsage {
     }
 }
 
+impl PerfUiEntryDisplayRange for PerfUiEntryCpuUsage {
+    fn max_value_hint(&self) -> Option<Self::Value> {
+        Some(100.0)
+    }
+    fn min_value_hint(&self) -> Option<Self::Value> {
+        Some(0.0)
+    }
+}
+
 impl PerfUiEntry for PerfUiEntryMemUsage {
     type SystemParam = SRes<DiagnosticsStore>;
     type Value = f64;
@@ -744,5 +853,14 @@ impl PerfUiEntry for PerfUiEntryMemUsage {
     }
     fn sort_key(&self) -> i32 {
         self.sort_key
+    }
+}
+
+impl PerfUiEntryDisplayRange for PerfUiEntryMemUsage {
+    fn max_value_hint(&self) -> Option<Self::Value> {
+        Some(100.0)
+    }
+    fn min_value_hint(&self) -> Option<Self::Value> {
+        Some(0.0)
     }
 }

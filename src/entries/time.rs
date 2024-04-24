@@ -348,6 +348,15 @@ impl PerfUiEntry for PerfUiEntryFixedOverstep {
     }
 }
 
+impl PerfUiEntryDisplayRange for PerfUiEntryFixedOverstep {
+    fn max_value_hint(&self) -> Option<Self::Value> {
+        Some(100.0)
+    }
+    fn min_value_hint(&self) -> Option<Self::Value> {
+        Some(0.0)
+    }
+}
+
 #[cfg(feature = "chrono")]
 fn get_system_clock_local() -> Option<(u32, u32, u32, u32)> {
     use chrono::Timelike;

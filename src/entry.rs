@@ -91,3 +91,25 @@ pub trait PerfUiEntry: Component {
         0
     }
 }
+
+/// Extension to [`PerfUiEntry`] to provide an expected range of values.
+///
+/// Used by widgets which need to visualize the value within a range,
+/// such as [`PerfUiWidgetBar`].
+pub trait PerfUiEntryDisplayRange: PerfUiEntry {
+    /// Provide an upper bound for the value.
+    ///
+    /// This is used by some widgets to influence
+    /// how to visualize the value.
+    ///
+    /// If the value is above this, it may be clipped in the UI.
+    fn max_value_hint(&self) -> Option<Self::Value>;
+
+    /// Provide a lower bound for the value
+    ///
+    /// This is used by some widgets to influence
+    /// how to visualize the value.
+    ///
+    /// If the value is below this, it may be clipped in the UI.
+    fn min_value_hint(&self) -> Option<Self::Value>;
+}
