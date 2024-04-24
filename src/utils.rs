@@ -188,6 +188,40 @@ impl ColorGradient {
             }
         }
     }
+
+    /// Get the first (lowest) stop of the gradient
+    pub fn min_stop(&self) -> Option<(&f32, &Color)> {
+        self.stops.first().map(|(f, c)| (&f.0, c))
+    }
+
+    /// Get the last (highest) stop of the gradient
+    pub fn max_stop(&self) -> Option<(&f32, &Color)> {
+        self.stops.last().map(|(f, c)| (&f.0, c))
+    }
+
+    /// Mutate the first (lowest) stop of the gradient
+    pub fn min_stop_mut(&mut self) -> Option<(&mut f32, &mut Color)> {
+        self.stops.first_mut().map(|(f, c)| (&mut f.0, c))
+    }
+
+    /// Mutate the last (highest) stop of the gradient
+    pub fn max_stop_mut(&mut self) -> Option<(&mut f32, &mut Color)> {
+        self.stops.last_mut().map(|(f, c)| (&mut f.0, c))
+    }
+
+    /// Iterate over all the stops of the gradient
+    pub fn iter_stops(&self) -> impl Iterator<Item = (&f32, &Color)> {
+        self.stops.iter().map(|(f, c)| {
+            (&f.0, c)
+        })
+    }
+
+    /// Iterate mutably over all the stops of the gradient
+    pub fn iter_stops_mut(&mut self) -> impl Iterator<Item = (&mut f32, &mut Color)> {
+        self.stops.iter_mut().map(|(f, c)| {
+            (&mut f.0, c)
+        })
+    }
 }
 
 /// Format a float in a pretty way.
