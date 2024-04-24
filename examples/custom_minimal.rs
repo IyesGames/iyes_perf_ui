@@ -23,7 +23,7 @@ fn main() {
         .add_plugins(PerfUiPlugin)
 
         // we must register our custom entry type
-        .add_perf_ui_entry_type::<PerfUiTimeSinceLastClick>()
+        .add_perf_ui_simple_entry::<PerfUiTimeSinceLastClick>()
 
         .init_resource::<TimeSinceLastClick>()
         .add_systems(Startup, setup)
