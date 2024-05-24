@@ -58,3 +58,10 @@ structs, instead of using `default()`.
 ![Screenshot of the simple example showing default configuration](screenshots/simple.png)
 
 ![Screenshot of the settings example showing multiple UIs with custom configuration](screenshots/settings.png)
+
+## FAQ
+
+Q1: Why are Total CPU and Total RAM shown as N/A?
+
+A1: The SystemInformationDiagnosticsPlugin does not support the dynamic_linking feature in Bevy. If you have this feature
+enabled, you will need to disable it.
