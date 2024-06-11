@@ -15,27 +15,23 @@ exclude = ["assets/*", "screenshots/*"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-default = [ "entries" ]
+default = ["entries"]
 # Enable the collection of built-in / predefined Perf UI Entries
 entries = []
 # Enable optional `chrono` dependency for timezone support in the Clock entry
 chrono = ["dep:chrono"]
 
 [dependencies.bevy]
-version = "0.13"
+version = "0.14.0-rc.2"
 default-features = false
-features = [
-    "bevy_ui",
-]
+features = ["bevy_ui", "sysinfo_plugin"]
 
 [dependencies.chrono]
 version = "0.4.35"
 optional = true
 default-features = false
-features = [
-    "clock",
-]
+features = ["clock"]
 
 [dev-dependencies.bevy]
-version = "0.13"
+version = "0.14.0-rc.2"
 default-features = true

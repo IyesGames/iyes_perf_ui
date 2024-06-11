@@ -49,24 +49,19 @@
 
 use std::marker::PhantomData;
 
-use bevy::prelude::*;
+use bevy::color::palettes::css;
 use bevy::ecs::system::{StaticSystemParam, SystemParam};
+use bevy::prelude::*;
 
 #[allow(unused_imports)]
 use crate::prelude::*;
 
 /// Prelude of common types for users of the library
 pub mod prelude {
-    pub use crate::{
-        PerfUiPlugin,
-        PerfUiAppExt,
-        PerfUiRoot,
-        PerfUiEntry,
-        PerfUiPosition,
-    };
-    pub use crate::utils::ColorGradient;
     #[cfg(feature = "entries")]
     pub use crate::entries::prelude::*;
+    pub use crate::utils::ColorGradient;
+    pub use crate::{PerfUiAppExt, PerfUiEntry, PerfUiPlugin, PerfUiPosition, PerfUiRoot};
 }
 
 pub mod utils;
@@ -80,14 +75,18 @@ pub struct PerfUiPlugin;
 
 impl Plugin for PerfUiPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (
-            setup_perf_ui
-                .run_if(rc_setup_perf_ui)
-                .in_set(PerfUiSet::Setup),
-            sort_perf_ui_entries
-                .run_if(rc_sort_perf_ui_entries)
-                .after(PerfUiSet::Setup),
-        ).run_if(any_with_component::<PerfUiRoot>));
+        app.add_systems(
+            Update,
+            (
+                setup_perf_ui
+                    .run_if(rc_setup_perf_ui)
+                    .in_set(PerfUiSet::Setup),
+                sort_perf_ui_entries
+                    .run_if(rc_sort_perf_ui_entries)
+                    .after(PerfUiSet::Setup),
+            )
+                .run_if(any_with_component::<PerfUiRoot>),
+        );
 
         #[cfg(feature = "entries")]
         app.add_plugins(entries::predefined_entries_plugin);
@@ -102,16 +101,19 @@ pub trait PerfUiAppExt {
 
 impl PerfUiAppExt for App {
     fn add_perf_ui_entry_type<T: PerfUiEntry>(&mut self) -> &mut Self {
-        self.add_systems(Update, (
-            setup_perf_ui_entry::<T>
-                .run_if(rc_setup_perf_ui_entry::<T>)
-                .after(setup_perf_ui)
-                .in_set(PerfUiSet::Setup),
-            update_perf_ui_entry::<T>
-                .run_if(any_with_component::<PerfUiEntryMarker<T>>)
-                .after(setup_perf_ui_entry::<T>)
-                .in_set(PerfUiSet::Update),
-        ));
+        self.add_systems(
+            Update,
+            (
+                setup_perf_ui_entry::<T>
+                    .run_if(rc_setup_perf_ui_entry::<T>)
+                    .after(setup_perf_ui)
+                    .in_set(PerfUiSet::Setup),
+                update_perf_ui_entry::<T>
+                    .run_if(any_with_component::<PerfUiEntryMarker<T>>)
+                    .after(setup_perf_ui_entry::<T>)
+                    .in_set(PerfUiSet::Update),
+            ),
+        );
         self
     }
 }
@@ -167,10 +169,7 @@ pub trait PerfUiEntry: Component {
     /// The `value` parameter is whatever that function returned.
     ///
     /// If unimplemented, the value will be formatted with its `Debug` impl.
-    fn format_value(
-        &self,
-        value: &Self::Value,
-    ) -> String {
+    fn format_value(&self, value: &Self::Value) -> String {
         format!("{:?}", value)
     }
 
@@ -180,10 +179,7 @@ pub trait PerfUiEntry: Component {
     ///
     /// Called every frame after `update_value`, unless it returned `None`.
     /// The `value` parameter is whatever that function returned.
-    fn value_color(
-        &self,
-        _value: &Self::Value,
-    ) -> Option<Color> {
+    fn value_color(&self, _value: &Self::Value) -> Option<Color> {
         None
     }
 
@@ -191,10 +187,7 @@ pub trait PerfUiEntry: Component {
     ///
     /// Called every frame after `update_value`, unless it returned `None`.
     /// The `value` parameter is whatever that function returned.
-    fn value_highlight(
-        &self,
-        _value: &Self::Value,
-    ) -> bool {
+    fn value_highlight(&self, _value: &Self::Value) -> bool {
         false
     }
 
@@ -331,15 +324,15 @@ pub struct PerfUiRoot {
 impl Default for PerfUiRoot {
     fn default() -> Self {
         PerfUiRoot {
-            background_color: Color::BLACK.with_a(0.5),
+            background_color: Color::from(css::BLACK).with_alpha(0.5),
             inner_background_color: Color::NONE,
-            inner_background_color_highlight: Color::RED.with_a(1.0 / 16.0),
+            inner_background_color_highlight: Color::from(css::RED).with_alpha(1.0 / 16.0),
             display_labels: true,
             layout_horizontal: false,
             text_err: "N/A".into(),
-            err_color: Color::DARK_GRAY,
-            default_value_color: Color::GRAY,
-            label_color: Color::WHITE,
+            err_color: Color::from(css::DARK_GRAY),
+            default_value_color: Color::from(css::GRAY),
+            label_color: Color::from(css::WHITE),
             font_label: default(),
             font_value: default(),
             font_highlight: default(),
@@ -399,15 +392,21 @@ struct PerfUiTextMarker<T: PerfUiEntry> {
 #[derive(Component, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 struct PerfUiSortKey(i32);
 
-fn rc_setup_perf_ui(
-    q: Query<(), Changed<PerfUiRoot>>,
-) -> bool {
+fn rc_setup_perf_ui(q: Query<(), Changed<PerfUiRoot>>) -> bool {
     !q.is_empty()
 }
 
 fn setup_perf_ui(
     mut commands: Commands,
-    mut q_root: Query<(Entity, &PerfUiRoot, Option<&mut BackgroundColor>, Option<&mut Style>), Changed<PerfUiRoot>>,
+    mut q_root: Query<
+        (
+            Entity,
+            &PerfUiRoot,
+            Option<&mut BackgroundColor>,
+            Option<&mut Style>,
+        ),
+        Changed<PerfUiRoot>,
+    >,
 ) {
     for (e, perf_ui, background, style) in &mut q_root {
         let new_style = Style {
@@ -429,13 +428,11 @@ fn setup_perf_ui(
             background.0 = perf_ui.background_color;
             *style = new_style;
         } else {
-            commands.entity(e).insert((
-                NodeBundle {
-                    background_color: BackgroundColor(perf_ui.background_color),
-                    style: new_style,
-                    ..default()
-                },
-            ));
+            commands.entity(e).insert((NodeBundle {
+                background_color: BackgroundColor(perf_ui.background_color),
+                style: new_style,
+                ..default()
+            },));
         }
     }
 }
@@ -457,12 +454,12 @@ fn setup_perf_ui_entry<T: PerfUiEntry>(
     // if the entry component was removed from a perf ui root entity,
     // we need to find the entity of the entry's UI and despawn it.
     for e_removed in removed.read() {
-        if let Some(e_entry) = q_entry.iter()
+        if let Some(e_entry) = q_entry
+            .iter()
             .find(|(_, marker)| marker.e_root == e_removed)
             .map(|(e, _)| e)
         {
-            commands.entity(e_removed)
-                .remove_children(&[e_entry]);
+            commands.entity(e_removed).remove_children(&[e_entry]);
             commands.entity(e_entry).despawn_recursive();
         }
     }
@@ -473,63 +470,65 @@ fn setup_perf_ui_entry<T: PerfUiEntry>(
     // spawn a new UI hierarchy for the entry.
     for (e_root, perf_ui, entry) in &q_root {
         // despawn any old/existing UI hierarchy for relevant entries
-        if let Some(e_entry) = q_entry.iter()
+        if let Some(e_entry) = q_entry
+            .iter()
             .find(|(_, marker)| marker.e_root == e_root)
             .map(|(e, _)| e)
         {
-            commands.entity(e_root)
-                .remove_children(&[e_entry]);
+            commands.entity(e_root).remove_children(&[e_entry]);
             commands.entity(e_entry).despawn_recursive();
         }
 
         // spawn the new UI hierarchy
-        let e_entry = commands.spawn((
-            PerfUiEntryMarker::<T> {
-                e_root,
-                _pd: PhantomData,
-            },
-            PerfUiSortKey(entry.sort_key()),
-            NodeBundle {
-                background_color: BackgroundColor(perf_ui.inner_background_color),
-                style: Style {
-                    flex_direction: FlexDirection::Row,
-                    justify_content: JustifyContent::SpaceBetween,
-                    align_items: AlignItems::Center,
-                    margin: UiRect::all(Val::Px(perf_ui.inner_margin)),
-                    padding: UiRect::all(Val::Px(perf_ui.inner_padding)),
+        let e_entry = commands
+            .spawn((
+                PerfUiEntryMarker::<T> {
+                    e_root,
+                    _pd: PhantomData,
+                },
+                PerfUiSortKey(entry.sort_key()),
+                NodeBundle {
+                    background_color: BackgroundColor(perf_ui.inner_background_color),
+                    style: Style {
+                        flex_direction: FlexDirection::Row,
+                        justify_content: JustifyContent::SpaceBetween,
+                        align_items: AlignItems::Center,
+                        margin: UiRect::all(Val::Px(perf_ui.inner_margin)),
+                        padding: UiRect::all(Val::Px(perf_ui.inner_padding)),
+                        ..default()
+                    },
                     ..default()
                 },
-                ..default()
-            },
-        )).id();
+            ))
+            .id();
         if perf_ui.display_labels {
-            let e_label_wrapper = commands.spawn((
-                NodeBundle {
+            let e_label_wrapper = commands
+                .spawn((NodeBundle {
                     style: Style {
                         padding: UiRect::all(Val::Px(4.0)),
                         ..default()
                     },
                     ..default()
-                },
-            )).id();
-            let e_label = commands.spawn((
-                TextBundle {
+                },))
+                .id();
+            let e_label = commands
+                .spawn((TextBundle {
                     text: Text::from_section(
                         format!("{}: ", entry.label()),
                         TextStyle {
                             font: perf_ui.font_label.clone(),
                             font_size: perf_ui.fontsize_label,
                             color: perf_ui.label_color,
-                        }
+                        },
                     ),
                     ..default()
-                },
-            )).id();
+                },))
+                .id();
             commands.entity(e_label_wrapper).push_children(&[e_label]);
             commands.entity(e_entry).push_children(&[e_label_wrapper]);
         }
-        let e_text_wrapper = commands.spawn((
-            NodeBundle {
+        let e_text_wrapper = commands
+            .spawn((NodeBundle {
                 style: Style {
                     padding: UiRect::all(Val::Px(4.0)),
                     width: if let Some(w) = perf_ui.values_col_width {
@@ -541,35 +540,35 @@ fn setup_perf_ui_entry<T: PerfUiEntry>(
                     ..default()
                 },
                 ..default()
-            },
-        )).id();
-        let e_text = commands.spawn((
-            PerfUiTextMarker::<T> {
-                e_root,
-                e_entry,
-                _pd: PhantomData,
-            },
-            TextBundle {
-                text: Text::from_section(
-                    perf_ui.text_err.clone(),
-                    TextStyle {
-                        font: perf_ui.font_value.clone(),
-                        font_size: perf_ui.fontsize_label,
-                        color: perf_ui.err_color,
-                    }
-                ),
-                ..default()
-            },
-        )).id();
+            },))
+            .id();
+        let e_text = commands
+            .spawn((
+                PerfUiTextMarker::<T> {
+                    e_root,
+                    e_entry,
+                    _pd: PhantomData,
+                },
+                TextBundle {
+                    text: Text::from_section(
+                        perf_ui.text_err.clone(),
+                        TextStyle {
+                            font: perf_ui.font_value.clone(),
+                            font_size: perf_ui.fontsize_label,
+                            color: perf_ui.err_color,
+                        },
+                    ),
+                    ..default()
+                },
+            ))
+            .id();
         commands.entity(e_text_wrapper).push_children(&[e_text]);
         commands.entity(e_entry).push_children(&[e_text_wrapper]);
         commands.entity(e_root).push_children(&[e_entry]);
     }
 }
 
-fn rc_sort_perf_ui_entries(
-    q: Query<(), (With<PerfUiRoot>, Changed<Children>)>,
-) -> bool {
+fn rc_sort_perf_ui_entries(q: Query<(), (With<PerfUiRoot>, Changed<Children>)>) -> bool {
     !q.is_empty()
 }
 
@@ -599,7 +598,8 @@ pub fn update_perf_ui_entry<T: PerfUiEntry>(
         };
         let mut entry_highlight = false;
         if let Some(value) = entry.update_value(&mut entry_param) {
-            let color = entry.value_color(&value)
+            let color = entry
+                .value_color(&value)
                 .unwrap_or(root.default_value_color);
             let s = entry.format_value(&value);
             let width_hint = entry.width_hint();
