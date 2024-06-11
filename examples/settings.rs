@@ -1,20 +1,17 @@
 //! This example shows how to customize the appearance of your Perf UIs.
 
-use bevy::prelude::*;
+use bevy::{color::palettes::css, prelude::*};
 use iyes_perf_ui::prelude::*;
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-
         // we want Bevy to measure these values for us:
         .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin)
         .add_plugins(bevy::diagnostic::EntityCountDiagnosticsPlugin)
         .add_plugins(bevy::diagnostic::SystemInformationDiagnosticsPlugin)
-
         .add_plugins(PerfUiPlugin)
         .add_systems(Startup, setup)
-
         .run();
 }
 
@@ -26,13 +23,13 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
 
     // Put common values in a variable so we don't repeat ourselves
     let root_config = PerfUiRoot {
-        background_color: Color::WHITE.with_a(0.75),
-        inner_background_color: Color::BLACK.with_a(0.25),
-        inner_background_color_highlight: Color::YELLOW.with_a(0.75),
+        background_color: Color::from(css::WHITE).with_alpha(0.75),
+        inner_background_color: Color::from(css::BLACK).with_alpha(0.25),
+        inner_background_color_highlight: Color::from(css::YELLOW).with_alpha(0.75),
         text_err: "Unavailable!".into(),
-        err_color: Color::BLACK.with_a(0.25),
-        default_value_color: Color::DARK_GRAY,
-        label_color: Color::GRAY,
+        err_color: Color::from(css::BLACK).with_alpha(0.25),
+        default_value_color: Color::from(css::DARK_GRAY),
+        label_color: Color::from(css::GRAY),
         fontsize_label: 20.0,
         fontsize_value: 24.0,
         margin: 4.0,
@@ -58,8 +55,8 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
             label: "Frame Rate (current)".into(),
             // let's say we *really* care about high framerates‼
             color_gradient: ColorGradient::new()
-                .with_stop(90.0, Color::RED)
-                .with_stop(240.0, Color::DARK_GREEN),
+                .with_stop(90.0, css::RED.into())
+                .with_stop(240.0, css::DARK_GREEN.into()),
             threshold_highlight: Some(60.0),
             digits: 5,
             precision: 2,
@@ -68,8 +65,8 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
         PerfUiEntryFPSWorst {
             label: "Frame Rate (worst)".into(),
             color_gradient: ColorGradient::new()
-                .with_stop(90.0, Color::RED)
-                .with_stop(240.0, Color::DARK_GREEN),
+                .with_stop(90.0, css::RED.into())
+                .with_stop(240.0, css::DARK_GREEN.into()),
             threshold_highlight: Some(60.0),
             digits: 5,
             precision: 2,
@@ -78,7 +75,7 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
         PerfUiEntryFrameTime {
             label: "Frame Duration (current)".into(),
             color_gradient: ColorGradient::new()
-                .with_stops([(1.0, Color::CYAN), (8.0, Color::PURPLE)]),
+                .with_stops([(1.0, css::AQUA.into()), (8.0, css::PURPLE.into())]),
             threshold_highlight: Some(10.0),
             digits: 2,
             precision: 4,
@@ -87,7 +84,7 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
         PerfUiEntryFrameTimeWorst {
             label: "Frame Duration (worst)".into(),
             color_gradient: ColorGradient::new()
-                .with_stops([(1.0, Color::CYAN), (8.0, Color::PURPLE)]),
+                .with_stops([(1.0, css::AQUA.into()), (8.0, css::PURPLE.into())]),
             threshold_highlight: Some(10.0),
             digits: 2,
             precision: 4,
@@ -114,7 +111,7 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
         PerfUiEntryCpuUsage {
             label: "System CPU Utilization".into(),
             color_gradient: ColorGradient::new()
-                .with_stops([(0.0, Color::BLUE), (100.0, Color::RED)]),
+                .with_stops([(0.0, css::BLUE.into()), (100.0, css::RED.into())]),
             threshold_highlight: None,
             precision: 1,
             ..default()
@@ -122,7 +119,7 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
         PerfUiEntryMemUsage {
             label: "System RAM Utilization".into(),
             color_gradient: ColorGradient::new()
-                .with_stops([(0.0, Color::BLUE), (100.0, Color::RED)]),
+                .with_stops([(0.0, css::BLUE.into()), (100.0, css::RED.into())]),
             threshold_highlight: None,
             precision: 1,
             ..default()

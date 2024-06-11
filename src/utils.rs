@@ -5,8 +5,10 @@
 
 use std::sync::atomic::{AtomicI32, Ordering};
 
+use bevy::color::palettes::css;
+use bevy::math::FloatOrd;
 use bevy::prelude::*;
-use bevy::utils::{Duration, FloatOrd};
+use bevy::utils::Duration;
 
 static NEXT_SORT_KEY: AtomicI32 = AtomicI32::new(1);
 
@@ -30,7 +32,7 @@ pub fn next_sort_key() -> i32 {
 /// nicer and more perceputally-uniform.
 #[derive(Debug, Default, Clone)]
 pub struct ColorGradient {
-    stops: Vec<(FloatOrd, Color)>,
+    stops: Vec<(FloatOrd, Lcha)>,
 }
 
 impl ColorGradient {
@@ -42,9 +44,7 @@ impl ColorGradient {
     /// If you don't add any stops, `get_color_for_value` will always
     /// return `None`.
     pub fn new() -> Self {
-        ColorGradient {
-            stops: vec![],
-        }
+        ColorGradient { stops: vec![] }
     }
 
     /// Create a "gradient" with only one color.
@@ -52,9 +52,7 @@ impl ColorGradient {
     /// This color will be used for all values.
     pub fn single(color: Color) -> Self {
         ColorGradient {
-            stops: vec![
-                (FloatOrd(f32::NEG_INFINITY), color.as_lcha()),
-            ],
+            stops: vec![(FloatOrd(f32::NEG_INFINITY), color.into())],
         }
     }
 
@@ -65,9 +63,9 @@ impl ColorGradient {
         }
         Ok(ColorGradient {
             stops: vec![
-                (FloatOrd(low), Color::RED.as_lcha()),
-                (FloatOrd(mid), Color::YELLOW.as_lcha()),
-                (FloatOrd(high), Color::GREEN.as_lcha()),
+                (FloatOrd(low), css::RED.into()),
+                (FloatOrd(mid), css::YELLOW.into()),
+                (FloatOrd(high), css::GREEN.into()),
             ],
         })
     }
@@ -79,9 +77,9 @@ impl ColorGradient {
         }
         Ok(ColorGradient {
             stops: vec![
-                (FloatOrd(low), Color::GREEN.as_lcha()),
-                (FloatOrd(mid), Color::YELLOW.as_lcha()),
-                (FloatOrd(high), Color::RED.as_lcha()),
+                (FloatOrd(low), css::GREEN.into()),
+                (FloatOrd(mid), css::YELLOW.into()),
+                (FloatOrd(high), css::RED.into()),
             ],
         })
     }
@@ -94,7 +92,7 @@ impl ColorGradient {
         if value.is_nan() {
             return;
         }
-        let stop = (FloatOrd(value), color.as_lcha());
+        let stop = (FloatOrd(value), color.into());
 
         // ensure our Vec is always in sorted order
         match self.stops.binary_search_by_key(&stop.0, |x| x.0) {
@@ -163,28 +161,26 @@ impl ColorGradient {
         let last_stop = self.stops.last()?;
 
         if value >= last_stop.0 {
-            return Some(last_stop.1);
+            return Some(last_stop.1.into());
         }
         if value <= first_stop.0 {
-            return Some(first_stop.1);
+            return Some(first_stop.1.into());
         }
 
         match self.stops.binary_search_by_key(&value, |x| x.0) {
-            Ok(i) => {
-                Some(self.stops[i].1)
-            }
+            Ok(i) => Some(self.stops[i].1.into()),
             Err(i) => {
                 let stop_low = self.stops[i - 1];
                 let stop_high = self.stops[i];
-                let lerp_value = (value.0 - stop_low.0.0) / (stop_high.0.0 - stop_low.0.0);
-                let lcha_low = stop_low.1.as_lcha_f32();
-                let lcha_high = stop_high.1.as_lcha_f32();
-                Some(Color::Lcha {
-                    lightness: lcha_low[0].lerp(lcha_high[0], lerp_value),
-                    chroma: lcha_low[1].lerp(lcha_high[1], lerp_value),
-                    hue: lcha_low[2].lerp(lcha_high[2], lerp_value),
-                    alpha: lcha_low[3].lerp(lcha_high[3], lerp_value),
-                })
+                let lerp_value = (value.0 - stop_low.0 .0) / (stop_high.0 .0 - stop_low.0 .0);
+                let lcha_low = stop_low.1;
+                let lcha_high = stop_high.1;
+                Some(Color::Lcha(Lcha {
+                    lightness: lcha_low.lightness.lerp(lcha_high.lightness, lerp_value),
+                    chroma: lcha_low.chroma.lerp(lcha_high.chroma, lerp_value),
+                    hue: lcha_low.hue.lerp(lcha_high.hue, lerp_value),
+                    alpha: lcha_low.alpha.lerp(lcha_high.alpha, lerp_value),
+                }))
             }
         }
     }
@@ -262,13 +258,23 @@ pub fn format_pretty_time(precision: u8, value: Duration) -> String {
     let secs = value.as_secs();
     if secs > max {
         if precision > 0 {
-            return format!("99:59:59.{dummy:9<prec$}", dummy = "", prec = precision as usize);
+            return format!(
+                "99:59:59.{dummy:9<prec$}",
+                dummy = "",
+                prec = precision as usize
+            );
         } else {
-            return "99:59:59".into()
+            return "99:59:59".into();
         }
     }
     let secs = secs as u32;
-    format_pretty_time_hms(precision, secs / 3600, secs / 60, secs, value.subsec_nanos())
+    format_pretty_time_hms(
+        precision,
+        secs / 3600,
+        secs / 60,
+        secs,
+        value.subsec_nanos(),
+    )
 }
 
 /// Format time (provided as hours, minutes, seconds, nanoseconds) in a pretty way.
@@ -286,9 +292,22 @@ pub fn format_pretty_time_hms(precision: u8, h: u32, m: u32, s: u32, nanos: u32)
     let frac = nanos / 10u32.pow(9 - (precision as u32).min(9));
     if precision > 0 {
         if hrs > 0 {
-            format!("{:2}:{:02}:{:02}.{:0w$}", hrs, mins, secs, frac, w = precision as usize)
+            format!(
+                "{:2}:{:02}:{:02}.{:0w$}",
+                hrs,
+                mins,
+                secs,
+                frac,
+                w = precision as usize
+            )
         } else if mins > 0 {
-            format!("{:5}:{:02}.{:0w$}", mins, secs, frac, w = precision as usize)
+            format!(
+                "{:5}:{:02}.{:0w$}",
+                mins,
+                secs,
+                frac,
+                w = precision as usize
+            )
         } else {
             format!("{:8}.{:0w$}", secs, frac, w = precision as usize)
         }
