@@ -58,3 +58,30 @@ structs, instead of using `default()`.
 ![Screenshot of the simple example showing default configuration](screenshots/simple.png)
 
 ![Screenshot of the settings example showing multiple UIs with custom configuration](screenshots/settings.png)
+
+## Performance Warning!
+
+This crate is somewhere in-between "a useful diagnostic/dev tool" and "a tech demo".
+
+Unfortunately, it does introduce significant overhead to your app, especially if you
+spawn a "complete" UI with lots of entries/widgets.
+
+Please keep this in mind: your game will run faster when you don't have a Perf UI spawned.
+Silver lining: If your performance seems good with the Perf UI, it will be even better
+without. ;)
+
+To make it more representative of your actual performance, consider spawning a more
+minimal Perf UI with just a few entries that are most useful to you (for example: fps,
+frame time), instead of a "complete" UI.
+
+---
+
+I know it is ironic that a tool intended to help you measure your performance
+ends up significantly degrading your performance. I am thinking about ways
+to reduce the overhead.
+
+From my own measurements, most of the overhead comes from `bevy_ui`'s layout
+system struggling to update the complex layout of the Perf UI, not from any
+of the actual code in `iyes_perf_ui`. So, to improve perfomance, I will need
+to come up with a way to simplify the UI and make it easier for Bevy to process.
+Or Bevy will have to get better at UI layout. ;)
