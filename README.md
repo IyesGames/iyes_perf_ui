@@ -37,12 +37,22 @@ The goal of this crate is to make it as useful as possible for any Bevy project:
 Spawning a Perf UI can be as simple as:
 
 ```rust
+commands.spawn(PerfUiBundle::default());
+```
+
+This creates a Perf UI with a curated selection of entries, which are in
+my opinion the most useful out of everything provided in this crate.
+
+If you want a UI with all the available entries (not recommended due
+to performance overhead):
+
+```rust
 commands.spawn(PerfUiCompleteBundle::default());
 ```
 
 If you want to create a Perf UI with specific entries of your choice,
 just spawn an entity with `PerfUiRoot` + your desired entries, instead
-of using the bundle.
+of using the above bundles.
 
 ```rust
 commands.spawn((
@@ -53,12 +63,50 @@ commands.spawn((
 ));
 ```
 
+There are also some bundles to help you add some common groups of entries:
+
+```rust
+commands.spawn((
+   PerfUiRoot::default(),
+   // Contains everything related to FPS and frame time
+   PerfUiFramerateEntries::default(),
+   // Contains everything related to the window and cursor
+   PerfUiWindowEntries::default(),
+   // Contains everything related to system diagnostics (CPU, RAM)
+   PerfUiSystemEntries::default(),
+   // Contains everything related to fixed timestep
+   PerfUiFixedTimeEntries::default(),
+   // ...
+));
+```
+
 If you want to customize the appearance, set the various fields in each of the
 structs, instead of using `default()`.
 
 ![Screenshot of the simple example showing default configuration](screenshots/simple.png)
 
 ![Screenshot of the settings example showing multiple UIs with custom configuration](screenshots/settings.png)
+
+## Fancy Widgets
+
+It is possible to visualize the value in other ways, not just display it
+as text.
+
+`iyes_perf_ui` currently provides one such widget implementation: Bar. To
+use it, wrap your entries in `PerfUiWidgetBar`.
+
+For example, to display FPS as a Bar:
+
+```rust
+commands.spawn((
+   PerfUiRoot::default(),
+   PerfUiWidgetBar::new(PerfUiEntryFPS::default()),
+   // ...
+));
+```
+
+If you want to create your own custom widgets, have a look at implementing
+the `PerfUiWidget` trait.
 
 ## Performance Warning!
 
