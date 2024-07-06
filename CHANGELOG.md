@@ -15,6 +15,7 @@ Changed:
  - Bevy 0.14 support.
  - `ColorGradient` now stores and interpolates colors in the OKLAB color space.
  - All built-in entry implementations gated behind `"entries"` cargo feature. Enabled by default. Disable for a smaller build, if you only intend to use your own custom entry implementations.
+ - CPU and RAM entries gated behind `sysinfo` cargo feature (which needs to enable `sysinfo_plugin` on `bevy`). Enabled by default.
 
 Fixed:
  - Run Conditions now take into account visibility, eliminating perf overhead when Perf UI is spawned but not visible.

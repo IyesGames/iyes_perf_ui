@@ -1,10 +1,13 @@
 //! Perf UI Entries based on Bevy Diagnostics
 
 use bevy::prelude::*;
-use bevy::diagnostic::{DiagnosticsStore, EntityCountDiagnosticsPlugin, FrameTimeDiagnosticsPlugin, SystemInformationDiagnosticsPlugin};
+use bevy::diagnostic::{DiagnosticsStore, EntityCountDiagnosticsPlugin, FrameTimeDiagnosticsPlugin};
 use bevy::ecs::system::lifetimeless::SRes;
 use bevy::ecs::system::SystemParam;
 use bevy::math::FloatOrd;
+
+#[cfg(feature = "sysinfo")]
+use bevy::diagnostic::SystemInformationDiagnosticsPlugin;
 
 use crate::entry::*;
 use crate::utils::*;
@@ -306,6 +309,7 @@ impl Default for PerfUiEntryEntityCount {
 /// Perf UI Entry to display Bevy's built-in CPU Usage measurement diagnostic.
 ///
 /// Displays the usage as a percentage.
+#[cfg(feature = "sysinfo")]
 #[derive(Component, Debug, Clone)]
 pub struct PerfUiEntryCpuUsage {
     /// Custom label. If empty (default), the default label will be used.
@@ -332,6 +336,7 @@ pub struct PerfUiEntryCpuUsage {
     pub sort_key: i32,
 }
 
+#[cfg(feature = "sysinfo")]
 impl Default for PerfUiEntryCpuUsage {
     fn default() -> Self {
         PerfUiEntryCpuUsage {
@@ -348,6 +353,7 @@ impl Default for PerfUiEntryCpuUsage {
 /// Perf UI Entry to display Bevy's built-in Memory (RAM) Usage measurement diagnostic.
 ///
 /// Displays the usage as a percentage.
+#[cfg(feature = "sysinfo")]
 #[derive(Component, Debug, Clone)]
 pub struct PerfUiEntryMemUsage {
     /// Custom label. If empty (default), the default label will be used.
@@ -374,6 +380,7 @@ pub struct PerfUiEntryMemUsage {
     pub sort_key: i32,
 }
 
+#[cfg(feature = "sysinfo")]
 impl Default for PerfUiEntryMemUsage {
     fn default() -> Self {
         PerfUiEntryMemUsage {
@@ -745,6 +752,7 @@ impl PerfUiEntryDisplayRange for PerfUiEntryEntityCount {
     }
 }
 
+#[cfg(feature = "sysinfo")]
 impl PerfUiEntry for PerfUiEntryCpuUsage {
     type SystemParam = SRes<DiagnosticsStore>;
     type Value = f64;
@@ -796,6 +804,7 @@ impl PerfUiEntry for PerfUiEntryCpuUsage {
     }
 }
 
+#[cfg(feature = "sysinfo")]
 impl PerfUiEntryDisplayRange for PerfUiEntryCpuUsage {
     fn max_value_hint(&self) -> Option<Self::Value> {
         Some(100.0)
@@ -805,6 +814,7 @@ impl PerfUiEntryDisplayRange for PerfUiEntryCpuUsage {
     }
 }
 
+#[cfg(feature = "sysinfo")]
 impl PerfUiEntry for PerfUiEntryMemUsage {
     type SystemParam = SRes<DiagnosticsStore>;
     type Value = f64;
@@ -856,6 +866,7 @@ impl PerfUiEntry for PerfUiEntryMemUsage {
     }
 }
 
+#[cfg(feature = "sysinfo")]
 impl PerfUiEntryDisplayRange for PerfUiEntryMemUsage {
     fn max_value_hint(&self) -> Option<Self::Value> {
         Some(100.0)

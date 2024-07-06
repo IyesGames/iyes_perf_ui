@@ -1,6 +1,8 @@
 //! Predefined widget types offered by this library.
 
+#[allow(unused_imports)]
 use bevy::prelude::*;
+#[allow(unused_imports)]
 use crate::prelude::*;
 
 /// Prelude of predefined widget types.
@@ -18,7 +20,9 @@ pub(crate) fn predefined_widgets_plugin(app: &mut App) {
     app.add_perf_ui_widget::<bar::PerfUiWidgetBar<PerfUiEntryFPSWorst>, _>();
     app.add_perf_ui_widget::<bar::PerfUiWidgetBar<PerfUiEntryFrameTimeWorst>, _>();
     app.add_perf_ui_widget::<bar::PerfUiWidgetBar<PerfUiEntryEntityCount>, _>();
+    #[cfg(feature = "sysinfo")]
     app.add_perf_ui_widget::<bar::PerfUiWidgetBar<PerfUiEntryCpuUsage>, _>();
+    #[cfg(feature = "sysinfo")]
     app.add_perf_ui_widget::<bar::PerfUiWidgetBar<PerfUiEntryMemUsage>, _>();
     app.add_perf_ui_widget::<bar::PerfUiWidgetBar<PerfUiEntryFixedOverstep>, _>();
 }

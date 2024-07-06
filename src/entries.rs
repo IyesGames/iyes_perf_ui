@@ -14,9 +14,14 @@ pub mod prelude {
         PerfUiEntryFrameTimeWorst,
         PerfUiEntryFrameCount,
         PerfUiEntryEntityCount,
+    };
+
+    #[cfg(feature = "sysinfo")]
+    pub use super::diagnostics::{
         PerfUiEntryCpuUsage,
         PerfUiEntryMemUsage,
     };
+
     pub use super::time::{
         PerfUiEntryClock,
         PerfUiEntryRunningTime,
@@ -43,12 +48,17 @@ pub(crate) fn predefined_entries_plugin(app: &mut App) {
     app.add_perf_ui_simple_entry::<PerfUiEntryFrameTimeWorst>();
     app.add_perf_ui_simple_entry::<PerfUiEntryFrameCount>();
     app.add_perf_ui_simple_entry::<PerfUiEntryEntityCount>();
+
+    #[cfg(feature = "sysinfo")]
     app.add_perf_ui_simple_entry::<PerfUiEntryCpuUsage>();
+    #[cfg(feature = "sysinfo")]
     app.add_perf_ui_simple_entry::<PerfUiEntryMemUsage>();
+
     app.add_perf_ui_simple_entry::<PerfUiEntryClock>();
     app.add_perf_ui_simple_entry::<PerfUiEntryRunningTime>();
     app.add_perf_ui_simple_entry::<PerfUiEntryFixedTimeStep>();
     app.add_perf_ui_simple_entry::<PerfUiEntryFixedOverstep>();
+
     app.add_perf_ui_simple_entry::<PerfUiEntryWindowResolution>();
     app.add_perf_ui_simple_entry::<PerfUiEntryWindowScaleFactor>();
     app.add_perf_ui_simple_entry::<PerfUiEntryWindowMode>();
@@ -86,7 +96,9 @@ pub struct PerfUiCompleteBundle {
     pub frametime_worst: PerfUiEntryFrameTimeWorst,
     pub frame_count: PerfUiEntryFrameCount,
     pub entity_count: PerfUiEntryEntityCount,
+    #[cfg(feature = "sysinfo")]
     pub cpu_usage: PerfUiEntryCpuUsage,
+    #[cfg(feature = "sysinfo")]
     pub mem_usage: PerfUiEntryMemUsage,
     pub fixed_timestep: PerfUiEntryFixedTimeStep,
     pub fixed_overstep: PerfUiEntryFixedOverstep,
@@ -172,6 +184,7 @@ pub struct PerfUiFramerateEntries {
 ///     // ...
 /// ));
 /// ```
+#[cfg(feature = "sysinfo")]
 #[allow(missing_docs)]
 #[derive(Bundle, Default)]
 pub struct PerfUiSystemEntries {
