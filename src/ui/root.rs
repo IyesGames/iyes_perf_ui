@@ -1,3 +1,8 @@
+//! The Root of the Perf UI.
+//!
+//! This is where the properties for the whole Perf UI are set,
+//! and what manages the UI for all your entries.
+
 use bevy::prelude::*;
 
 /// Which corner of the screen to display the Perf UI at?

@@ -1,3 +1,11 @@
+//! Bar Widget
+//!
+//! Displays a Perf UI entry as a "bar", instead of a bare value.
+//!
+//! To use it, simply wrap your entry type in the [`PerfUiWidgetBar`]
+//! struct, and insert that as a component to your Perf UI entity,
+//! instead of inserting the entry directly as a component.
+
 use std::marker::PhantomData;
 
 use bevy::ecs::system::SystemParam;
@@ -8,50 +16,80 @@ use crate::entry::{PerfUiEntry, PerfUiEntryDisplayRange};
 use crate::ui::widget::{PerfUiWidget, PerfUiWidgetMarker};
 use crate::utils::ColorGradient;
 
+/// Where should the text value be displayed inside the bar?
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub enum BarTextPosition {
+    /// Do not display the value as text. Bar only.
     NoText,
+    /// Position the text inside the bar, at the center.
     #[default]
     Center,
+    /// Position the text inside the bar, at the start.
     Start,
+    /// Position the text inside the bar, at the end.
     End,
+    /// Position the text outside the bar, at the start.
     OutsideStart,
+    /// Position the text outside the bar, at the end.
     OutsideEnd,
 }
 
+/// Which way should the bar fill up?
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub enum BarFillDirection {
+    /// From left to right.
     #[default]
     Left,
+    /// From the center, expanding towards both sides.
     Center,
+    /// From right to left.
     Right,
 }
 
+/// Display a Perf UI entry as a Bar Widget.
+///
+/// This struct wraps the entry type, which will be the source
+/// of the data value to be displayed by the bar.
+///
+/// It allows you to customize the properties of the bar.
 #[derive(Component)]
 pub struct PerfUiWidgetBar<E: PerfUiEntryDisplayRange> {
+    /// Should the bar also display the value as text? Where?
     pub text_position: BarTextPosition,
+    /// Set the color of the text that displays the value.
     pub text_color_override: Option<Color>,
+    /// Which way should the bar fill up?
     pub fill_direction: BarFillDirection,
+    /// What should be the color of the filled portion of the bar?
     pub bar_color: ColorGradient,
+    /// What should be the color of the unfilled portion of the bar?
     pub bar_background: Color,
+    /// The thickness of the bar's border.
     pub bar_border_px: f32,
+    /// The color of the bar's border.
     pub bar_border_color: Color,
+    /// Force the bar to have a specific height in pixels.
     pub bar_height_px: Option<f32>,
+    /// Force the bar to have a specific length in pixels.
     pub bar_length_px: Option<f32>,
+    /// The entry (data source for the bar widget).
     pub entry: E,
 }
 
+#[doc(hidden)]
 #[derive(Component)]
 pub struct PerfUiWidgetBarParts {
     e_bar_inner: Entity,
     e_text: Option<Entity>,
 }
 
+#[doc(hidden)]
 #[derive(Component)]
 pub struct BarWidgetInnerBarMarker<E: PerfUiEntry> {
     _pd: PhantomData<E>,
 }
 
+#[doc(hidden)]
 #[derive(Component)]
 pub struct BarWidgetTextMarker<E: PerfUiEntry> {
     _pd: PhantomData<E>,

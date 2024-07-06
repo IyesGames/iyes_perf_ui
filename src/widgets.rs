@@ -1,3 +1,5 @@
+//! Predefined widget types offered by this library.
+
 use bevy::prelude::*;
 use crate::prelude::*;
 

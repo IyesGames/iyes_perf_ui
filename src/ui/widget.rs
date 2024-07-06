@@ -1,3 +1,5 @@
+//! Framework for creating different widgets for displaying Perf UI entries.
+
 use std::marker::PhantomData;
 
 use bevy::prelude::*;
@@ -10,6 +12,7 @@ use crate::entry::PerfUiEntry;
 
 use super::PerfUiSortKey;
 
+/// Trait for Perf UI Widgets.
 pub trait PerfUiWidget<T: PerfUiEntry>: Component {
     /// Any extra system parameters you need to setup the UI.
     type SystemParamSpawn: SystemParam + 'static;
@@ -153,6 +156,7 @@ pub fn update_perf_ui_widget<E: PerfUiEntry, W: PerfUiWidget<E>>(
     }
 }
 
+#[doc(hidden)]
 #[derive(Component)]
 pub struct SimpleWidgetTextMarker<E: PerfUiEntry> {
     _pd: PhantomData<E>,
