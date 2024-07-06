@@ -2,6 +2,23 @@
 
 Notable user-facing changes with each release version will be described in this file.
 
+## [0.3.0]: 2024-07-06
+
+Added:
+ - Widget framework: `PerfUiWidget` trait, allowing implementations of alternative widgets.
+ - Bar Widget
+ - More helper bundles for spawning Perf UIs: `PerfUiBundle`, `PerfUi*Entries` (for various groups of entries).
+ - Example showing how to toggle (spawn/despawn) Perf UI.
+ - All built-in widget implementations gated behind `"widgets"` cargo feature. Enabled by default. Disable for a smaller build, if you do not intend to use any of the provided widgets.
+
+Changed:
+ - Bevy 0.14 support.
+ - `ColorGradient` now stores and interpolates colors in the OKLAB color space.
+ - All built-in entry implementations gated behind `"entries"` cargo feature. Enabled by default. Disable for a smaller build, if you only intend to use your own custom entry implementations.
+
+Fixed:
+ - Run Conditions now take into account visibility, eliminating perf overhead when Perf UI is spawned but not visible.
+
 ## [0.2.3]: 2024-03-21
 
 Added:
@@ -58,6 +75,7 @@ Removed:
 
 Initial Release
 
+[0.3.0]: https://github.com/IyesGames/iyes_perf_ui/tree/v0.3.0
 [0.2.3]: https://github.com/IyesGames/iyes_perf_ui/tree/v0.2.3
 [0.2.2]: https://github.com/IyesGames/iyes_perf_ui/tree/v0.2.2
 [0.2.1]: https://github.com/IyesGames/iyes_perf_ui/tree/v0.2.1
