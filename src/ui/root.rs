@@ -121,15 +121,15 @@ pub struct PerfUiRoot {
 impl Default for PerfUiRoot {
     fn default() -> Self {
         PerfUiRoot {
-            background_color: Color::BLACK.with_a(0.5),
+            background_color: Color::srgba(0.0, 0.0, 0.0, 0.5),
             inner_background_color: Color::NONE,
-            inner_background_color_highlight: Color::RED.with_a(1.0 / 16.0),
+            inner_background_color_highlight: Color::srgba(1.0, 0.0, 0.0, 1.0 / 16.0),
             display_labels: true,
             layout_horizontal: false,
             text_err: "N/A".into(),
-            err_color: Color::DARK_GRAY,
-            default_value_color: Color::GRAY,
-            label_color: Color::WHITE,
+            err_color: Color::srgb(0.5, 0.5, 0.5),
+            default_value_color: Color::srgb(0.75, 0.75, 0.75),
+            label_color: Color::srgb(1.0, 1.0, 1.0),
             font_label: default(),
             font_value: default(),
             font_highlight: default(),

@@ -16,6 +16,7 @@ use bevy::input::ButtonState;
 use bevy::ecs::system::lifetimeless::SRes;
 use bevy::ecs::system::SystemParam;
 use iyes_perf_ui::prelude::*;
+use iyes_perf_ui::entry::PerfUiEntry;
 
 fn main() {
     App::new()

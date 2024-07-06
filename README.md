@@ -12,6 +12,7 @@ Bevy Compatibility:
 
 | Bevy Version | Plugin Version |
 |--------------|----------------|
+| `0.14`       | `0.3`          |
 | `0.13`       | `0.2`,`0.1`    |
 
 ---

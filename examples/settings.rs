@@ -27,13 +27,13 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
 
     // Put common values in a variable so we don't repeat ourselves
     let root_config = PerfUiRoot {
-        background_color: Color::WHITE.with_a(0.75),
-        inner_background_color: Color::BLACK.with_a(0.25),
-        inner_background_color_highlight: Color::YELLOW.with_a(0.75),
+        background_color: Color::srgba(0.9, 0.95, 0.99, 0.75),
+        inner_background_color: Color::srgba(0.05, 0.1, 0.15, 0.25),
+        inner_background_color_highlight: Color::srgba(1.0, 0.9, 0.25, 0.75),
         text_err: "Unavailable!".into(),
-        err_color: Color::BLACK.with_a(0.25),
-        default_value_color: Color::DARK_GRAY,
-        label_color: Color::GRAY,
+        err_color: Color::srgba(0.15, 0.07, 0.03, 0.25),
+        default_value_color: Color::srgb(0.4, 0.4, 0.4),
+        label_color: Color::srgb(0.3, 0.4, 0.5),
         fontsize_label: 20.0,
         fontsize_value: 24.0,
         margin: 4.0,
@@ -59,8 +59,8 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
             label: "Frame Rate (current)".into(),
             // let's say we *really* care about high framerates‼
             color_gradient: ColorGradient::new()
-                .with_stop(90.0, Color::RED)
-                .with_stop(240.0, Color::DARK_GREEN),
+                .with_stop(90.0, Color::srgb(0.8, 0.0, 0.2))
+                .with_stop(240.0, Color::srgb(0.2, 0.9, 0.4)),
             threshold_highlight: Some(60.0),
             digits: 5,
             precision: 2,
@@ -69,8 +69,8 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
         PerfUiEntryFPSWorst {
             label: "Frame Rate (worst)".into(),
             color_gradient: ColorGradient::new()
-                .with_stop(90.0, Color::RED)
-                .with_stop(240.0, Color::DARK_GREEN),
+                .with_stop(90.0, Color::srgb(0.8, 0.0, 0.2))
+                .with_stop(240.0, Color::srgb(0.2, 0.9, 0.4)),
             threshold_highlight: Some(60.0),
             digits: 5,
             precision: 2,
@@ -78,8 +78,10 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
         },
         PerfUiEntryFrameTime {
             label: "Frame Duration (current)".into(),
-            color_gradient: ColorGradient::new()
-                .with_stops([(1.0, Color::CYAN), (8.0, Color::PURPLE)]),
+            color_gradient: ColorGradient::new().with_stops([
+                (1.0, Color::srgb(0.15, 0.8, 0.9)),
+                (8.0, Color::srgb(0.7, 0.15, 0.9))
+            ]),
             threshold_highlight: Some(10.0),
             digits: 2,
             precision: 4,
@@ -87,8 +89,10 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
         },
         PerfUiEntryFrameTimeWorst {
             label: "Frame Duration (worst)".into(),
-            color_gradient: ColorGradient::new()
-                .with_stops([(1.0, Color::CYAN), (8.0, Color::PURPLE)]),
+            color_gradient: ColorGradient::new().with_stops([
+                (1.0, Color::srgb(0.15, 0.8, 0.9)),
+                (8.0, Color::srgb(0.7, 0.15, 0.9))
+            ]),
             threshold_highlight: Some(10.0),
             digits: 2,
             precision: 4,
@@ -107,10 +111,12 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
         },
         PerfUiWidgetBar {
             fill_direction: BarFillDirection::Center,
-            bar_background: Color::BLACK.with_a(0.5),
+            bar_background: Color::srgba(0.0, 0.0, 0.0, 0.5),
             // The color gradient also affects the range of values for the bar
-            bar_color: ColorGradient::new()
-                .with_stops([(0.0, Color::GRAY), (200.0, Color::WHITE)]),
+            bar_color: ColorGradient::new().with_stops([
+                (0.0, Color::BLACK),
+                (200.0, Color::WHITE),
+            ]),
             bar_border_color: Color::WHITE,
             bar_border_px: 2.0,
             ..PerfUiWidgetBar::new(PerfUiEntryEntityCount {
@@ -123,15 +129,19 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
         },
         PerfUiWidgetBar {
             text_position: BarTextPosition::OutsideEnd,
-            bar_background: Color::BLACK.with_a(0.5),
-            bar_color: ColorGradient::new()
-                .with_stops([(0.0, Color::BLUE), (100.0, Color::RED)]),
+            bar_background: Color::srgba(0.0, 0.0, 0.0, 0.5),
+            bar_color: ColorGradient::new().with_stops([
+                (0.0, Color::srgb(0.0, 0.0, 1.0)),
+                (100.0, Color::srgb(1.0, 0.0, 0.0)),
+            ]),
             bar_border_color: Color::WHITE,
             bar_border_px: 2.0,
             ..PerfUiWidgetBar::new(PerfUiEntryCpuUsage {
                 label: "System CPU Utilization".into(),
-                color_gradient: ColorGradient::new()
-                    .with_stops([(0.0, Color::BLUE), (100.0, Color::RED)]),
+                color_gradient: ColorGradient::new().with_stops([
+                    (0.0, Color::srgb(0.0, 0.0, 1.0)),
+                    (100.0, Color::srgb(1.0, 0.0, 0.0)),
+                ]),
                 threshold_highlight: None,
                 precision: 1,
                 ..default()
@@ -139,15 +149,19 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
         },
         PerfUiWidgetBar {
             text_position: BarTextPosition::OutsideEnd,
-            bar_background: Color::BLACK.with_a(0.5),
-            bar_color: ColorGradient::new()
-                .with_stops([(0.0, Color::BLUE), (100.0, Color::RED)]),
+            bar_background: Color::srgba(0.0, 0.0, 0.0, 0.5),
+            bar_color: ColorGradient::new().with_stops([
+                (0.0, Color::srgb(0.0, 0.0, 1.0)),
+                (100.0, Color::srgb(1.0, 0.0, 0.0)),
+            ]),
             bar_border_color: Color::WHITE,
             bar_border_px: 2.0,
             ..PerfUiWidgetBar::new(PerfUiEntryMemUsage {
                 label: "System RAM Utilization".into(),
-                color_gradient: ColorGradient::new()
-                    .with_stops([(0.0, Color::BLUE), (100.0, Color::RED)]),
+                color_gradient: ColorGradient::new().with_stops([
+                    (0.0, Color::srgb(0.0, 0.0, 1.0)),
+                    (100.0, Color::srgb(1.0, 0.0, 0.0)),
+                ]),
                 threshold_highlight: None,
                 precision: 1,
                 ..default()

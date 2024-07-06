@@ -6,7 +6,8 @@
 use std::sync::atomic::{AtomicI32, Ordering};
 
 use bevy::prelude::*;
-use bevy::utils::{Duration, FloatOrd};
+use bevy::utils::Duration;
+use bevy::math::FloatOrd;
 
 static NEXT_SORT_KEY: AtomicI32 = AtomicI32::new(1);
 
@@ -26,11 +27,11 @@ pub fn next_sort_key() -> i32 {
 /// You can then interpolate based on an arbitrary value, to get a
 /// smoothly-varying color.
 ///
-/// The interpolation is done in Bevy's LCHa color space, so it looks
+/// The interpolation is done in Bevy's OKLAB color space, so it looks
 /// nicer and more perceputally-uniform.
 #[derive(Debug, Default, Clone)]
 pub struct ColorGradient {
-    stops: Vec<(FloatOrd, Color)>,
+    stops: Vec<(FloatOrd, Oklaba)>,
 }
 
 impl ColorGradient {
@@ -53,7 +54,7 @@ impl ColorGradient {
     pub fn single(color: Color) -> Self {
         ColorGradient {
             stops: vec![
-                (FloatOrd(f32::NEG_INFINITY), color.as_lcha()),
+                (FloatOrd(f32::NEG_INFINITY), color.into()),
             ],
         }
     }
@@ -65,9 +66,9 @@ impl ColorGradient {
         }
         Ok(ColorGradient {
             stops: vec![
-                (FloatOrd(low), Color::RED.as_lcha()),
-                (FloatOrd(mid), Color::YELLOW.as_lcha()),
-                (FloatOrd(high), Color::GREEN.as_lcha()),
+                (FloatOrd(low), Color::srgb(1.0, 0.0, 0.0).into()),
+                (FloatOrd(mid), Color::srgb(1.0, 1.0, 0.0).into()),
+                (FloatOrd(high), Color::srgb(0.0, 1.0, 0.0).into()),
             ],
         })
     }
@@ -79,9 +80,9 @@ impl ColorGradient {
         }
         Ok(ColorGradient {
             stops: vec![
-                (FloatOrd(low), Color::GREEN.as_lcha()),
-                (FloatOrd(mid), Color::YELLOW.as_lcha()),
-                (FloatOrd(high), Color::RED.as_lcha()),
+                (FloatOrd(low), Color::srgb(0.0, 1.0, 0.0).into()),
+                (FloatOrd(mid), Color::srgb(1.0, 1.0, 0.0).into()),
+                (FloatOrd(high), Color::srgb(1.0, 0.0, 0.0).into()),
             ],
         })
     }
@@ -94,7 +95,7 @@ impl ColorGradient {
         if value.is_nan() {
             return;
         }
-        let stop = (FloatOrd(value), color.as_lcha());
+        let stop = (FloatOrd(value), color.into());
 
         // ensure our Vec is always in sorted order
         match self.stops.binary_search_by_key(&stop.0, |x| x.0) {
@@ -163,61 +164,54 @@ impl ColorGradient {
         let last_stop = self.stops.last()?;
 
         if value >= last_stop.0 {
-            return Some(last_stop.1);
+            return Some(last_stop.1.into());
         }
         if value <= first_stop.0 {
-            return Some(first_stop.1);
+            return Some(first_stop.1.into());
         }
 
         match self.stops.binary_search_by_key(&value, |x| x.0) {
             Ok(i) => {
-                Some(self.stops[i].1)
+                Some(self.stops[i].1.into())
             }
             Err(i) => {
                 let stop_low = self.stops[i - 1];
                 let stop_high = self.stops[i];
                 let lerp_value = (value.0 - stop_low.0.0) / (stop_high.0.0 - stop_low.0.0);
-                let lcha_low = stop_low.1.as_lcha_f32();
-                let lcha_high = stop_high.1.as_lcha_f32();
-                Some(Color::Lcha {
-                    lightness: lcha_low[0].lerp(lcha_high[0], lerp_value),
-                    chroma: lcha_low[1].lerp(lcha_high[1], lerp_value),
-                    hue: lcha_low[2].lerp(lcha_high[2], lerp_value),
-                    alpha: lcha_low[3].lerp(lcha_high[3], lerp_value),
-                })
+                Some(stop_low.1.mix(&stop_high.1, lerp_value).into())
             }
         }
     }
 
     /// Get the first (lowest) stop of the gradient
-    pub fn min_stop(&self) -> Option<(&f32, &Color)> {
+    pub fn min_stop(&self) -> Option<(&f32, &Oklaba)> {
         self.stops.first().map(|(f, c)| (&f.0, c))
     }
 
     /// Get the last (highest) stop of the gradient
-    pub fn max_stop(&self) -> Option<(&f32, &Color)> {
+    pub fn max_stop(&self) -> Option<(&f32, &Oklaba)> {
         self.stops.last().map(|(f, c)| (&f.0, c))
     }
 
     /// Mutate the first (lowest) stop of the gradient
-    pub fn min_stop_mut(&mut self) -> Option<(&mut f32, &mut Color)> {
+    pub fn min_stop_mut(&mut self) -> Option<(&mut f32, &mut Oklaba)> {
         self.stops.first_mut().map(|(f, c)| (&mut f.0, c))
     }
 
     /// Mutate the last (highest) stop of the gradient
-    pub fn max_stop_mut(&mut self) -> Option<(&mut f32, &mut Color)> {
+    pub fn max_stop_mut(&mut self) -> Option<(&mut f32, &mut Oklaba)> {
         self.stops.last_mut().map(|(f, c)| (&mut f.0, c))
     }
 
     /// Iterate over all the stops of the gradient
-    pub fn iter_stops(&self) -> impl Iterator<Item = (&f32, &Color)> {
+    pub fn iter_stops(&self) -> impl Iterator<Item = (&f32, &Oklaba)> {
         self.stops.iter().map(|(f, c)| {
             (&f.0, c)
         })
     }
 
     /// Iterate mutably over all the stops of the gradient
-    pub fn iter_stops_mut(&mut self) -> impl Iterator<Item = (&mut f32, &mut Color)> {
+    pub fn iter_stops_mut(&mut self) -> impl Iterator<Item = (&mut f32, &mut Oklaba)> {
         self.stops.iter_mut().map(|(f, c)| {
             (&mut f.0, c)
         })

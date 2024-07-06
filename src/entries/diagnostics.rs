@@ -4,7 +4,7 @@ use bevy::prelude::*;
 use bevy::diagnostic::{DiagnosticsStore, EntityCountDiagnosticsPlugin, FrameTimeDiagnosticsPlugin, SystemInformationDiagnosticsPlugin};
 use bevy::ecs::system::lifetimeless::SRes;
 use bevy::ecs::system::SystemParam;
-use bevy::utils::FloatOrd;
+use bevy::math::FloatOrd;
 
 use crate::entry::*;
 use crate::utils::*;
