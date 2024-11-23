@@ -95,8 +95,8 @@ pub struct PerfUiRoot {
     pub fontsize_value: f32,
     /// The ZIndex of the UI.
     ///
-    /// Default: `Global(i32::MAX)` (display on top of all other UI)
-    pub z_index: ZIndex,
+    /// Default: `i32::MAX` (display on top of all other UI)
+    pub z_index: GlobalZIndex,
     /// The position of the UI.
     ///
     /// Default: top-right corner
@@ -140,7 +140,7 @@ impl Default for PerfUiRoot {
             font_highlight: default(),
             fontsize_label: 16.0,
             fontsize_value: 18.0,
-            z_index: ZIndex::Global(i32::MAX),
+            z_index: GlobalZIndex(i32::MAX),
             position: default(),
             margin: 16.0,
             padding: 2.0,
@@ -186,10 +186,10 @@ pub(crate) fn rc_setup_perf_ui(
 
 pub(crate) fn setup_perf_ui(
     mut commands: Commands,
-    mut q_root: Query<(Entity, &PerfUiRoot, Option<&mut BackgroundColor>, Option<&mut Style>), Changed<PerfUiRoot>>,
+    mut q_root: Query<(Entity, &PerfUiRoot, Option<&mut BackgroundColor>, Option<&mut Node>), Changed<PerfUiRoot>>,
 ) {
     for (e, perf_ui, background, style) in &mut q_root {
-        let new_style = Style {
+        let new_style = Node {
             position_type: PositionType::Absolute,
             top: perf_ui.position.top(perf_ui.margin),
             bottom: perf_ui.position.bottom(perf_ui.margin),
@@ -209,11 +209,8 @@ pub(crate) fn setup_perf_ui(
             *style = new_style;
         } else {
             commands.entity(e).insert((
-                NodeBundle {
-                    background_color: BackgroundColor(perf_ui.background_color),
-                    style: new_style,
-                    ..default()
-                },
+                BackgroundColor(perf_ui.background_color),
+                new_style
             ));
         }
     }

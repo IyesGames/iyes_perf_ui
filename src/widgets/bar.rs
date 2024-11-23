@@ -168,12 +168,12 @@ where
         )>,
         SQuery<(
             &'static mut BackgroundColor,
-            &'static mut Style,
+            &'static mut Node,
         ), (
             With<BarWidgetInnerBarMarker<E>>,
             Without<BarWidgetMarker<E>>,
         )>,
-        SQuery<&'static mut Text, With<BarWidgetTextMarker<E>>>,
+        SQuery<(&'static mut Text, &'static mut TextColor, &'static mut TextFont), With<BarWidgetTextMarker<E>>>,
     );
 
     fn spawn(
@@ -184,47 +184,41 @@ where
         _: &mut <Self::SystemParamSpawn as SystemParam>::Item<'_, '_>,
     ) -> Entity {
         let e_bar_outer = commands.spawn((
-            NodeBundle {
-                background_color: BackgroundColor(self.bar_background),
-                border_color: BorderColor(self.bar_border_color),
-                style: Style {
-                    border: UiRect::all(Val::Px(self.bar_border_px)),
-                    height: if let Some(h) = self.bar_height_px {
-                        Val::Px(h)
-                    } else {
-                        Val::Auto
-                    },
-                    width: if let Some(w) = self.bar_length_px {
-                        Val::Px(w)
-                    } else {
-                        Val::Auto
-                    },
-                    flex_grow: if self.bar_length_px.is_some() {
-                        0.0
-                    } else {
-                        1.0
-                    },
-                    justify_content: match self.text_position {
-                        BarTextPosition::Start => JustifyContent::FlexStart,
-                        BarTextPosition::End => JustifyContent::FlexEnd,
-                        _ => JustifyContent::Center,
-                    },
-                    align_items: AlignItems::Center,
-                    ..default()
+            BackgroundColor(self.bar_background),
+            BorderColor(self.bar_border_color),
+            Node {
+                border: UiRect::all(Val::Px(self.bar_border_px)),
+                height: if let Some(h) = self.bar_height_px {
+                    Val::Px(h)
+                } else {
+                    Val::Auto
                 },
+                width: if let Some(w) = self.bar_length_px {
+                    Val::Px(w)
+                } else {
+                    Val::Auto
+                },
+                flex_grow: if self.bar_length_px.is_some() {
+                    0.0
+                } else {
+                    1.0
+                },
+                justify_content: match self.text_position {
+                    BarTextPosition::Start => JustifyContent::FlexStart,
+                    BarTextPosition::End => JustifyContent::FlexEnd,
+                    _ => JustifyContent::Center,
+                },
+                align_items: AlignItems::Center,
                 ..default()
             },
         )).id();
         let e_bar_inner_wrapper = commands.spawn((
-            NodeBundle {
-                style: Style {
-                    position_type: PositionType::Absolute,
-                    top: Val::Px(0.0),
-                    bottom: Val::Px(self.bar_border_px * 2.0),
-                    left: Val::Px(0.0),
-                    right: Val::Px(self.bar_border_px * 2.0),
-                    ..default()
-                },
+            Node {
+                position_type: PositionType::Absolute,
+                top: Val::Px(0.0),
+                bottom: Val::Px(self.bar_border_px * 2.0),
+                left: Val::Px(0.0),
+                right: Val::Px(self.bar_border_px * 2.0),
                 ..default()
             },
         )).id();
@@ -232,140 +226,119 @@ where
             BarWidgetInnerBarMarker::<E> {
                 _pd: PhantomData,
             },
-            NodeBundle {
-                background_color: BackgroundColor(Color::NONE),
-                style: Style {
-                    position_type: PositionType::Absolute,
-                    top: Val::Px(0.0),
-                    bottom: Val::Px(0.0),
-                    left: Val::Percent(0.0),
-                    right: Val::Percent(100.0),
-                    ..default()
-                },
+            BackgroundColor(Color::NONE),
+            Node {
+                position_type: PositionType::Absolute,
+                top: Val::Px(0.0),
+                bottom: Val::Px(0.0),
+                left: Val::Percent(0.0),
+                right: Val::Percent(100.0),
                 ..default()
             },
         )).id();
-        commands.entity(e_bar_inner_wrapper).push_children(&[e_bar_inner]);
-        commands.entity(e_bar_outer).push_children(&[e_bar_inner_wrapper]);
+        commands.entity(e_bar_inner_wrapper).add_child(e_bar_inner);
+        commands.entity(e_bar_outer).add_child(e_bar_inner_wrapper);
         let mut parts = PerfUiWidgetBarParts {
             e_bar_inner,
             e_text: None,
         };
         let e_bar_wrapper = commands.spawn((
-            NodeBundle {
-                style: Style {
-                    padding: UiRect::all(Val::Px(4.0)),
-                    width: if let Some(w) = root.values_col_width {
-                        Val::Px(w)
-                    } else {
-                        Val::Auto
-                    },
-                    flex_grow: if root.values_col_width.is_some() {
-                        0.0
-                    } else {
-                        1.0
-                    },
-                    justify_content: JustifyContent::SpaceBetween,
-                    flex_direction: match self.text_position {
-                        BarTextPosition::OutsideStart => FlexDirection::RowReverse,
-                        BarTextPosition::OutsideEnd => FlexDirection::Row,
-                        _ => default(),
-                    },
-                    align_items: if self.bar_height_px.is_some() {
-                        AlignItems::Center
-                    } else {
-                        AlignItems::Stretch
-                    },
-                    ..default()
+            Node {
+                padding: UiRect::all(Val::Px(4.0)),
+                width: if let Some(w) = root.values_col_width {
+                    Val::Px(w)
+                } else {
+                    Val::Auto
+                },
+                flex_grow: if root.values_col_width.is_some() {
+                    0.0
+                } else {
+                    1.0
+                },
+                justify_content: JustifyContent::SpaceBetween,
+                flex_direction: match self.text_position {
+                    BarTextPosition::OutsideStart => FlexDirection::RowReverse,
+                    BarTextPosition::OutsideEnd => FlexDirection::Row,
+                    _ => default(),
+                },
+                align_items: if self.bar_height_px.is_some() {
+                    AlignItems::Center
+                } else {
+                    AlignItems::Stretch
                 },
                 ..default()
             },
         )).id();
-        commands.entity(e_bar_wrapper).push_children(&[e_bar_outer]);
+        commands.entity(e_bar_wrapper).add_child(e_bar_outer);
         if self.text_position != BarTextPosition::NoText {
             let e_text = commands.spawn((
                 BarWidgetTextMarker::<E> {
                     _pd: PhantomData,
                 },
-                TextBundle {
-                    style: Style {
-                        margin: match self.text_position {
-                            BarTextPosition::OutsideEnd => UiRect {
-                                left: Val::Px(4.0),
-                                ..UiRect::all(Val::Auto)
-                            },
-                            BarTextPosition::OutsideStart => UiRect {
-                                right: Val::Px(4.0),
-                                ..UiRect::all(Val::Auto)
-                            },
-                            _ => UiRect::all(Val::Auto),
+                Node {
+                    margin: match self.text_position {
+                        BarTextPosition::OutsideEnd => UiRect {
+                            left: Val::Px(4.0),
+                            ..UiRect::all(Val::Auto)
                         },
-                        ..default()
+                        BarTextPosition::OutsideStart => UiRect {
+                            right: Val::Px(4.0),
+                            ..UiRect::all(Val::Auto)
+                        },
+                        _ => UiRect::all(Val::Auto),
                     },
-                    text: Text::from_section(
-                        root.text_err.clone(),
-                        TextStyle {
-                            font: root.font_value.clone(),
-                            font_size: root.fontsize_value,
-                            color: self.text_color_override
-                                .unwrap_or(root.err_color),
-                        }
-                    ),
                     ..default()
                 },
+                Text(root.text_err.clone()),
+                TextFont {
+                    font: root.font_value.clone(),
+                    font_size: root.fontsize_value,
+                    ..default()
+                },
+                TextColor(self.text_color_override .unwrap_or(root.err_color))
             )).id();
             match self.text_position {
                 BarTextPosition::OutsideStart | BarTextPosition::OutsideEnd => {
-                    commands.entity(e_bar_wrapper).push_children(&[e_text]);
+                    commands.entity(e_bar_wrapper).add_child(e_text);
                 }
                 _ => {
-                    commands.entity(e_bar_outer).push_children(&[e_text]);
+                    commands.entity(e_bar_outer).add_child(e_text);
                 }
             }
             parts.e_text = Some(e_text);
         }
         let e_widget = commands.spawn((
             parts,
-            NodeBundle {
-                background_color: BackgroundColor(root.inner_background_color),
-                style: Style {
-                    flex_direction: FlexDirection::Row,
-                    justify_content: JustifyContent::SpaceBetween,
-                    align_items: AlignItems::Center,
-                    margin: UiRect::all(Val::Px(root.inner_margin)),
-                    padding: UiRect::all(Val::Px(root.inner_padding)),
-                    ..default()
-                },
+            BackgroundColor(root.inner_background_color),
+            Node {
+                flex_direction: FlexDirection::Row,
+                justify_content: JustifyContent::SpaceBetween,
+                align_items: AlignItems::Center,
+                margin: UiRect::all(Val::Px(root.inner_margin)),
+                padding: UiRect::all(Val::Px(root.inner_padding)),
                 ..default()
             },
         )).id();
         if root.display_labels {
             let e_label_wrapper = commands.spawn((
-                NodeBundle {
-                    style: Style {
-                        padding: UiRect::all(Val::Px(4.0)),
-                        ..default()
-                    },
+                Node {
+                    padding: UiRect::all(Val::Px(4.0)),
                     ..default()
                 },
             )).id();
             let e_label = commands.spawn((
-                TextBundle {
-                    text: Text::from_section(
-                        format!("{}: ", self.entry.label()),
-                        TextStyle {
-                            font: root.font_label.clone(),
-                            font_size: root.fontsize_label,
-                            color: root.label_color,
-                        }
-                    ),
+                Text(format!("{}: ", self.entry.label())),
+                TextFont {
+                    font: root.font_label.clone(),
+                    font_size: root.fontsize_label,
                     ..default()
                 },
+                TextColor(root.label_color)
             )).id();
-            commands.entity(e_label_wrapper).push_children(&[e_label]);
-            commands.entity(e_widget).push_children(&[e_label_wrapper]);
+            commands.entity(e_label_wrapper).add_child(e_label);
+            commands.entity(e_widget).add_child(e_label_wrapper);
         }
-        commands.entity(e_widget).push_children(&[e_bar_wrapper]);
+        commands.entity(e_widget).add_child(e_bar_wrapper);
         e_widget
     }
 
@@ -427,25 +400,25 @@ where
                 }
             }
 
-            if let Some(mut text) = parts.e_text.and_then(|e| q_text.get_mut(e).ok()) {
+            if let Some((mut text, mut color, mut font)) = parts.e_text.and_then(|e| q_text.get_mut(e).ok()) {
                 if let Some(value) = value {
                     let s = self.entry.format_value(&value);
-                    text.sections[0].value = s.trim().to_owned();
+                    *text = Text(s.trim().to_owned());
                     if entry_highlight {
-                        text.sections[0].style.font = root.font_highlight.clone();
+                        font.font = root.font_highlight.clone();
                     } else {
-                        text.sections[0].style.font = root.font_value.clone();
+                        font.font = root.font_value.clone();
                     }
                     if self.text_color_override.is_none() {
-                        let color = self.entry.value_color(&value)
+                        let new_color = self.entry.value_color(&value)
                             .unwrap_or(root.default_value_color);
-                        text.sections[0].style.color = color;
+                        *color = TextColor(new_color);
                     }
                 } else {
-                    text.sections[0].value = root.text_err.trim().to_owned();
-                    text.sections[0].style.font = root.font_value.clone();
+                    *text = Text(root.text_err.trim().to_owned());
+                    font.font = root.font_value.clone();
                     if self.text_color_override.is_none() {
-                        text.sections[0].style.color = root.err_color;
+                        *color = TextColor(root.err_color);
                     }
                 }
             }

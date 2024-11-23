@@ -28,7 +28,7 @@ chrono = ["dep:chrono"]
 num-traits = "0.2.18"
 
 [dependencies.bevy]
-version = "0.14"
+version = "0.15.0-rc.3"
 default-features = false
 features = [
     "bevy_ui",
@@ -43,5 +43,5 @@ features = [
 ]
 
 [dev-dependencies.bevy]
-version = "0.14"
+version = "0.15.0-rc.3"
 default-features = true
