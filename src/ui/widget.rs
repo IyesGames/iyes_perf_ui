@@ -6,7 +6,6 @@ use bevy::prelude::*;
 use bevy::ecs::system::SystemParam;
 use bevy::ecs::system::StaticSystemParam;
 use bevy::ecs::system::lifetimeless::SQuery;
-
 use crate::ui::root::PerfUiRoot;
 use crate::entry::PerfUiEntry;
 
@@ -134,7 +133,7 @@ pub(crate) fn setup_perf_ui_widget<E: PerfUiEntry, W: PerfUiWidget<E>>(
             },
             PerfUiSortKey(widget.sort_key()),
         ));
-        commands.entity(e_root).push_children(&[e_widget]);
+        commands.entity(e_root).add_child(e_widget);
     }
 }
 
@@ -167,7 +166,7 @@ impl<E: PerfUiEntry> PerfUiWidget<E> for E {
     type SystemParamUpdate = (
         <E as PerfUiEntry>::SystemParam,
         SQuery<&'static mut BackgroundColor, With<PerfUiWidgetMarker<E>>>,
-        SQuery<&'static mut Text, With<SimpleWidgetTextMarker<E>>>,
+        SQuery<(&'static mut Text, &'static mut TextColor, &'static mut TextFont), With<SimpleWidgetTextMarker<E>>>,
     );
 
     fn spawn(
@@ -178,57 +177,44 @@ impl<E: PerfUiEntry> PerfUiWidget<E> for E {
         _: &mut <Self::SystemParamSpawn as SystemParam>::Item<'_, '_>,
     ) -> Entity {
         let e_widget = commands.spawn((
-            NodeBundle {
-                background_color: BackgroundColor(root.inner_background_color),
-                style: Style {
-                    flex_direction: FlexDirection::Row,
-                    justify_content: JustifyContent::SpaceBetween,
-                    align_items: AlignItems::Center,
-                    margin: UiRect::all(Val::Px(root.inner_margin)),
-                    padding: UiRect::all(Val::Px(root.inner_padding)),
-                    ..default()
-                },
+            BackgroundColor(root.inner_background_color),
+            Node {
+                flex_direction: FlexDirection::Row,
+                justify_content: JustifyContent::SpaceBetween,
+                align_items: AlignItems::Center,
+                margin: UiRect::all(Val::Px(root.inner_margin)),
+                padding: UiRect::all(Val::Px(root.inner_padding)),
                 ..default()
             },
         )).id();
         if root.display_labels {
             let e_label_wrapper = commands.spawn((
-                NodeBundle {
-                    style: Style {
-                        padding: UiRect::all(Val::Px(4.0)),
-                        ..default()
-                    },
+                Node {
+                    padding: UiRect::all(Val::Px(4.0)),
                     ..default()
                 },
             )).id();
             let e_label = commands.spawn((
-                TextBundle {
-                    text: Text::from_section(
-                        format!("{}: ", self.label()),
-                        TextStyle {
-                            font: root.font_label.clone(),
-                            font_size: root.fontsize_label,
-                            color: root.label_color,
-                        }
-                    ),
+                Text(format!("{}: ", self.label())),
+                TextColor(root.label_color),
+                TextFont {
+                    font: root.font_label.clone(),
+                    font_size: root.fontsize_label,
                     ..default()
                 },
             )).id();
-            commands.entity(e_label_wrapper).push_children(&[e_label]);
-            commands.entity(e_widget).push_children(&[e_label_wrapper]);
+            commands.entity(e_label_wrapper).add_child(e_label);
+            commands.entity(e_widget).add_child(e_label_wrapper);
         }
         let e_text_wrapper = commands.spawn((
-            NodeBundle {
-                style: Style {
-                    padding: UiRect::all(Val::Px(4.0)),
-                    width: if let Some(w) = root.values_col_width {
-                        Val::Px(w)
-                    } else {
-                        Val::Auto
-                    },
-                    justify_content: JustifyContent::FlexEnd,
-                    ..default()
+            Node {
+                padding: UiRect::all(Val::Px(4.0)),
+                width: if let Some(w) = root.values_col_width {
+                    Val::Px(w)
+                } else {
+                    Val::Auto
                 },
+                justify_content: JustifyContent::FlexEnd,
                 ..default()
             },
         )).id();
@@ -236,20 +222,16 @@ impl<E: PerfUiEntry> PerfUiWidget<E> for E {
             SimpleWidgetTextMarker::<E> {
                 _pd: PhantomData,
             },
-            TextBundle {
-                text: Text::from_section(
-                    root.text_err.clone(),
-                    TextStyle {
-                        font: root.font_value.clone(),
-                        font_size: root.fontsize_value,
-                        color: root.err_color,
-                    }
-                ),
+            Text(root.text_err.clone()),
+            TextFont {
+                font: root.font_value.clone(),
+                font_size: root.fontsize_value,
                 ..default()
             },
+            TextColor(root.err_color),
         )).id();
-        commands.entity(e_text_wrapper).push_children(&[e_text]);
-        commands.entity(e_widget).push_children(&[e_text_wrapper]);
+        commands.entity(e_text_wrapper).add_child(e_text);
+        commands.entity(e_widget).add_child(e_text_wrapper);
         e_widget
     }
 
@@ -264,35 +246,35 @@ impl<E: PerfUiEntry> PerfUiWidget<E> for E {
             q_text,
         ): &mut <Self::SystemParamUpdate as SystemParam>::Item<'_, '_>,
     ) {
-        for mut text in q_text.iter_mut() {
+        for (mut text, mut color, mut font) in q_text.iter_mut() {
             let mut entry_highlight = false;
             if let Some(value) = self.update_value(entry_param) {
-                let color = self.value_color(&value)
+                let new_color = self.value_color(&value)
                     .unwrap_or(root.default_value_color);
                 let s = self.format_value(&value);
                 let width_hint = self.width_hint();
-                text.sections[0].value = if s.len() < width_hint {
-                    format!("{:>w$}", s, w = width_hint)
+                *text = if s.len() < width_hint {
+                    Text(format!("{:>w$}", s, w = width_hint))
                 } else {
-                    s
+                    Text(s)
                 };
-                text.sections[0].style.color = color;
+                *color = TextColor(new_color);
                 if self.value_highlight(&value) {
-                    text.sections[0].style.font = root.font_highlight.clone();
+                    font.font = root.font_highlight.clone();
                     entry_highlight = true;
                 } else {
-                    text.sections[0].style.font = root.font_value.clone();
+                    font.font = root.font_value.clone();
                 }
             } else {
                 let s = root.text_err.clone();
                 let width_hint = self.width_hint();
-                text.sections[0].value = if s.len() < width_hint {
-                    format!("{:>w$}", s, w = width_hint)
+                *text = if s.len() < width_hint {
+                    Text(format!("{:>w$}", s, w = width_hint))
                 } else {
-                    s
+                    Text(s)
                 };
-                text.sections[0].style.color = root.err_color;
-                text.sections[0].style.font = root.font_value.clone();
+                *color = TextColor(root.err_color);
+                font.font = root.font_value.clone();
             }
             if let Ok(mut entry_bgcolor) = q_widget.get_mut(e_widget) {
                 if entry_highlight {

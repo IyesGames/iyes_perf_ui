@@ -21,7 +21,7 @@ fn main() {
 
 fn setup(mut commands: Commands, ass: Res<AssetServer>) {
     // spawn a camera to be able to see anything
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2d::default());
 
     // Let's create multiple Perf UIs!
 
@@ -51,7 +51,7 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
     commands.spawn((
         PerfUiRoot {
             position: PerfUiPosition::TopLeft,
-            z_index: ZIndex::Global(i32::MAX),
+            z_index: GlobalZIndex(i32::MAX),
             ..root_config.clone()
         },
         PerfUiEntryFPS {
@@ -106,7 +106,7 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
         PerfUiRoot {
             position: PerfUiPosition::BottomLeft,
             // always display this Perf UI below the other one
-            z_index: ZIndex::Global(i32::MAX - 1),
+            z_index: GlobalZIndex(i32::MAX - 1),
             ..root_config.clone()
         },
         PerfUiWidgetBar {
@@ -176,7 +176,7 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
             display_labels: false,
             position: PerfUiPosition::BottomRight,
             // always display this Perf UI below the other two
-            z_index: ZIndex::Global(i32::MAX - 2),
+            z_index: GlobalZIndex(i32::MAX - 2),
             ..root_config.clone()
         },
         PerfUiEntryRunningTime {
@@ -199,7 +199,7 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
         PerfUiRoot {
             position: PerfUiPosition::TopRight,
             // always display this Perf UI below the other three
-            z_index: ZIndex::Global(i32::MAX - 3),
+            z_index: GlobalZIndex(i32::MAX - 3),
             ..root_config.clone()
         },
         PerfUiEntryCursorPosition {

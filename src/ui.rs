@@ -28,11 +28,11 @@ pub(crate) fn rc_any_visible(
     q_root: Query<(
         Option<&Visibility>,
         Option<&InheritedVisibility>,
-        Option<&Style>,
+        Option<&Node>,
     ), With<PerfUiRoot>>,
 ) -> bool {
     q_root.iter()
-        .any(|(visibility, inherited, style)| {
+        .any(|(visibility, inherited, node)| {
             let vis = match visibility {
                 None => true,
                 Some(Visibility::Hidden) => false,
@@ -41,7 +41,7 @@ pub(crate) fn rc_any_visible(
                     .map(|x| x.get())
                     .unwrap_or(true),
             };
-            let display = style
+            let display = node
                 .map(|s| s.display != Display::None)
                 .unwrap_or(true);
             vis && display
