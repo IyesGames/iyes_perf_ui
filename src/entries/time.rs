@@ -5,11 +5,13 @@ use bevy::ecs::system::lifetimeless::SRes;
 use bevy::ecs::system::SystemParam;
 use bevy::utils::Duration;
 
+use crate::prelude::*;
 use crate::entry::*;
 use crate::utils::*;
 
 /// Perf UI Entry to display the time the Bevy app has been running.
 #[derive(Component, Debug, Clone)]
+#[require(PerfUiRoot)]
 pub struct PerfUiEntryRunningTime {
     /// Custom label. If empty (default), the default label will be used.
     pub label: String,
@@ -63,6 +65,7 @@ impl Default for PerfUiEntryRunningTime {
 /// This time is in UTC, unless you enable the optional `chrono` dependency on
 /// this crate. If `chrono` is enabled, it will be in local time.
 #[derive(Component, Debug, Clone)]
+#[require(PerfUiRoot)]
 pub struct PerfUiEntryClock {
     /// Custom label. If empty (default), the default label will be used.
     pub label: String,
@@ -94,6 +97,7 @@ impl Default for PerfUiEntryClock {
 
 /// Perf UI Entry to display Bevy's Fixed Time Step duration.
 #[derive(Component, Debug, Clone)]
+#[require(PerfUiRoot)]
 pub struct PerfUiEntryFixedTimeStep {
     /// Custom label. If empty (default), the default label will be used.
     pub label: String,
@@ -132,6 +136,7 @@ impl Default for PerfUiEntryFixedTimeStep {
 
 /// Perf UI Entry to display Bevy's Fixed Time overstep.
 #[derive(Component, Debug, Clone)]
+#[require(PerfUiRoot)]
 pub struct PerfUiEntryFixedOverstep {
     /// Custom label. If empty (default), the default label will be used.
     pub label: String,

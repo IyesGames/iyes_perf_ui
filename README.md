@@ -12,6 +12,7 @@ Bevy Compatibility:
 
 | Bevy Version | Plugin Version |
 |--------------|----------------|
+| `0.15-rc.3`  | `main`         |
 | `0.14`       | `0.3`          |
 | `0.13`       | `0.2`,`0.1`    |
 
@@ -37,22 +38,22 @@ The goal of this crate is to make it as useful as possible for any Bevy project:
 Spawning a Perf UI can be as simple as:
 
 ```rust
-commands.spawn(PerfUiBundle::default());
+commands.spawn(PerfUiDefaultEntries::default());
 ```
 
 This creates a Perf UI with a curated selection of entries, which are in
 my opinion the most useful out of everything provided in this crate.
 
-If you want a UI with all the available entries (not recommended due
-to performance overhead):
+If you want a UI with all the available entries (note: may have significant
+performance overhead):
 
 ```rust
-commands.spawn(PerfUiCompleteBundle::default());
+commands.spawn(PerfUiAllEntries::default());
 ```
 
-If you want to create a Perf UI with specific entries of your choice,
-just spawn an entity with `PerfUiRoot` + your desired entries, instead
-of using the above bundles.
+If you want to create a Perf UI with specific entries of your choice, just
+spawn an entity with the components representing your desired entries,
+instead of using the above bundles.
 
 ```rust
 commands.spawn((
@@ -67,7 +68,6 @@ There are also some bundles to help you add some common groups of entries:
 
 ```rust
 commands.spawn((
-   PerfUiRoot::default(),
    // Contains everything related to FPS and frame time
    PerfUiFramerateEntries::default(),
    // Contains everything related to the window and cursor
@@ -110,27 +110,12 @@ the `PerfUiWidget` trait.
 
 ## Performance Warning!
 
-This crate is somewhere in-between "a useful diagnostic/dev tool" and "a tech demo".
+Displaying the Perf UI might add non-negligible overhead to your app, depending
+on configuration. The overhead can be reduced by spawning a simpler UI with
+fewer entries.
 
-Unfortunately, it does introduce significant overhead to your app, especially if you
-spawn a "complete" UI with lots of entries/widgets.
+Just keep this in mind. Your game will run slightly faster when the Perf UI
+is not being displayed. This crate is designed to eliminate all perf overhead
+when the UI is not rendered on-screen.
 
-Please keep this in mind: your game will run faster when you don't have a Perf UI spawned.
-Silver lining: If your performance seems good with the Perf UI, it will be even better
-without. ;)
-
-To make it more representative of your actual performance, consider spawning a more
-minimal Perf UI with just a few entries that are most useful to you (for example: fps,
-frame time), instead of a "complete" UI.
-
----
-
-I know it is ironic that a tool intended to help you measure your performance
-ends up significantly degrading your performance. I am thinking about ways
-to reduce the overhead.
-
-From my own measurements, most of the overhead comes from `bevy_ui`'s layout
-system struggling to update the complex layout of the Perf UI, not from any
-of the actual code in `iyes_perf_ui`. So, to improve perfomance, I will need
-to come up with a way to simplify the UI and make it easier for Bevy to process.
-Or Bevy will have to get better at UI layout. ;)
+I am looking for ways to optimize this crate to reduce its overhead.

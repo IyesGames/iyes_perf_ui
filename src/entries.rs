@@ -5,7 +5,7 @@ use crate::prelude::*;
 
 /// Prelude of predefined entry types.
 pub mod prelude {
-    pub use super::PerfUiCompleteBundle;
+    pub use super::{PerfUiDefaultEntries, PerfUiAllEntries};
 
     pub use super::diagnostics::{
         PerfUiEntryFPS,
@@ -75,21 +75,23 @@ pub(crate) fn predefined_entries_plugin(app: &mut App) {
 /// ```
 ///
 /// If you want to create a Perf UI with specific entries of your choice,
-/// just spawn an entity with [`PerfUiRoot`] + your desired entries, instead
-/// of using this bundle.
+/// just spawn an entity with your desired entries, instead of using
+/// this bundle.
 ///
 /// ```rust
 /// commands.spawn((
-///     PerfUiRoot::default(),
 ///     PerfUiEntryFPS::default(),
 ///     PerfUiEntryClock::default(),
 ///     // ...
 /// ));
 /// ```
+///
+/// If you'd like to customize the formatting and presentation, also add
+/// the [`PerfUiRoot`] component. If omitted, it will be added automatically
+/// with default settings, as it is required by the various entries.
 #[allow(missing_docs)]
 #[derive(Bundle, Default)]
-pub struct PerfUiCompleteBundle {
-    pub root: PerfUiRoot,
+pub struct PerfUiAllEntries {
     pub fps: PerfUiEntryFPS,
     pub fps_worst: PerfUiEntryFPSWorst,
     pub frametime: PerfUiEntryFrameTime,
@@ -118,28 +120,30 @@ pub struct PerfUiCompleteBundle {
 /// It will contain an opinionated curated selection of what I consider to
 /// be the most useful of the entries provided by this crate.
 ///
-/// Also see [`PerfUiCompleteBundle`].
+/// Also see [`PerfUiAllEntries`].
 ///
 /// ```rust
 /// commands.spawn(PerfUiBundle::default());
 /// ```
 ///
 /// If you want to create a Perf UI with specific entries of your choice,
-/// just spawn an entity with [`PerfUiRoot`] + your desired entries, instead
-/// of using this bundle.
+/// just spawn an entity with your desired entries, instead of using
+/// this bundle.
 ///
 /// ```rust
 /// commands.spawn((
-///     PerfUiRoot::default(),
 ///     PerfUiEntryFPS::default(),
 ///     PerfUiEntryClock::default(),
 ///     // ...
 /// ));
 /// ```
+///
+/// If you'd like to customize the formatting and presentation, also add
+/// the [`PerfUiRoot`] component. If omitted, it will be added automatically
+/// with default settings, as it is required by the various entries.
 #[allow(missing_docs)]
 #[derive(Bundle, Default)]
-pub struct PerfUiBundle {
-    pub root: PerfUiRoot,
+pub struct PerfUiDefaultEntries {
     pub fps: PerfUiEntryFPS,
     pub fps_worst: PerfUiEntryFPSWorst,
     pub frametime: PerfUiEntryFrameTime,
@@ -149,15 +153,10 @@ pub struct PerfUiBundle {
     pub window_resolution: PerfUiEntryWindowResolution,
 }
 
-/// Entries related to framerate.
-///
-/// This bundle exists to help you when spawning a Perf Ui with a custom
-/// selection of entries, if you want to include everything related to
-/// framerate, without listing them one by one.
+/// All entries related to framerate.
 ///
 /// ```rust
 /// commands.spawn((
-///     PerfUiRoot::default(),
 ///     PerfUiFramerateEntries::default(),
 ///     // ...
 /// ));
@@ -171,15 +170,10 @@ pub struct PerfUiFramerateEntries {
     pub frametime_worst: PerfUiEntryFrameTimeWorst,
 }
 
-/// Entries related to system diagnostics.
-///
-/// This bundle exists to help you when spawning a Perf Ui with a custom
-/// selection of entries, if you want to include everything related to
-/// system diagnostics, without listing them one by one.
+/// All entries related to system diagnostics.
 ///
 /// ```rust
 /// commands.spawn((
-///     PerfUiRoot::default(),
 ///     PerfUiSystemEntries::default(),
 ///     // ...
 /// ));
@@ -192,15 +186,10 @@ pub struct PerfUiSystemEntries {
     pub mem_usage: PerfUiEntryMemUsage,
 }
 
-/// Entries related to fixed timestep.
-///
-/// This bundle exists to help you when spawning a Perf Ui with a custom
-/// selection of entries, if you want to include everything related to
-/// fixed timestep, without listing them one by one.
+/// All entries related to fixed timestep.
 ///
 /// ```rust
 /// commands.spawn((
-///     PerfUiRoot::default(),
 ///     PerfUiFixedTimeEntries::default(),
 ///     // ...
 /// ));
@@ -212,15 +201,10 @@ pub struct PerfUiFixedTimeEntries {
     pub fixed_overstep: PerfUiEntryFixedOverstep,
 }
 
-/// Entries related to windowing.
-///
-/// This bundle exists to help you when spawning a Perf Ui with a custom
-/// selection of entries, if you want to include everything related to
-/// windowing, without listing them one by one.
+/// All entries related to windowing.
 ///
 /// ```rust
 /// commands.spawn((
-///     PerfUiRoot::default(),
 ///     PerfUiWindowEntries::default(),
 ///     // ...
 /// ));

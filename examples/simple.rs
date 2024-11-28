@@ -25,5 +25,5 @@ fn setup(mut commands: Commands) {
 
     // create a simple Perf UI with default settings
     // and all entries provided by the crate:
-    commands.spawn(PerfUiCompleteBundle::default());
+    commands.spawn(PerfUiAllEntries::default());
 }

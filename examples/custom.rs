@@ -66,6 +66,7 @@ pub struct TimeSinceLastClick {
 
 /// Custom Perf UI entry to show the time since the last mouse click
 #[derive(Component)]
+#[require(PerfUiRoot)]
 pub struct PerfUiTimeSinceLastClick {
     /// The label text to display, to allow customization
     pub label: String,

@@ -9,11 +9,13 @@ use bevy::math::FloatOrd;
 #[cfg(feature = "sysinfo")]
 use bevy::diagnostic::SystemInformationDiagnosticsPlugin;
 
+use crate::prelude::*;
 use crate::entry::*;
 use crate::utils::*;
 
 /// Perf UI Entry to display Bevy's built-in FPS measurement diagnostic.
 #[derive(Component, Debug, Clone)]
+#[require(PerfUiRoot)]
 pub struct PerfUiEntryFPS {
     /// Custom label. If empty (default), the default label will be used.
     pub label: String,
@@ -69,6 +71,7 @@ impl Default for PerfUiEntryFPS {
 ///
 /// Displays the worst (lowest) value in recent history.
 #[derive(Component, Debug, Clone)]
+#[require(PerfUiRoot)]
 pub struct PerfUiEntryFPSWorst {
     /// Custom label. If empty (default), the default label will be used.
     pub label: String,
@@ -119,6 +122,7 @@ impl Default for PerfUiEntryFPSWorst {
 ///
 /// Displays the frame time in *milliseconds*.
 #[derive(Component, Debug, Clone)]
+#[require(PerfUiRoot)]
 pub struct PerfUiEntryFrameTime {
     /// Custom label. If empty (default), the default label will be used.
     pub label: String,
@@ -185,6 +189,7 @@ impl Default for PerfUiEntryFrameTime {
 ///
 /// Displays the frame time in *milliseconds*.
 #[derive(Component, Debug, Clone)]
+#[require(PerfUiRoot)]
 pub struct PerfUiEntryFrameTimeWorst {
     /// Custom label. If empty (default), the default label will be used.
     pub label: String,
@@ -242,6 +247,7 @@ impl Default for PerfUiEntryFrameTimeWorst {
 
 /// Perf UI Entry to display Bevy's built-in frame counter.
 #[derive(Component, Debug, Clone)]
+#[require(PerfUiRoot)]
 pub struct PerfUiEntryFrameCount {
     /// Custom label. If empty (default), the default label will be used.
     pub label: String,
@@ -265,6 +271,7 @@ impl Default for PerfUiEntryFrameCount {
 
 /// Perf UI Entry to display Bevy's built-in ECS entity counter.
 #[derive(Component, Debug, Clone)]
+#[require(PerfUiRoot)]
 pub struct PerfUiEntryEntityCount {
     /// Custom label. If empty (default), the default label will be used.
     pub label: String,
@@ -311,6 +318,7 @@ impl Default for PerfUiEntryEntityCount {
 /// Displays the usage as a percentage.
 #[cfg(feature = "sysinfo")]
 #[derive(Component, Debug, Clone)]
+#[require(PerfUiRoot)]
 pub struct PerfUiEntryCpuUsage {
     /// Custom label. If empty (default), the default label will be used.
     pub label: String,
@@ -355,6 +363,7 @@ impl Default for PerfUiEntryCpuUsage {
 /// Displays the usage as a percentage.
 #[cfg(feature = "sysinfo")]
 #[derive(Component, Debug, Clone)]
+#[require(PerfUiRoot)]
 pub struct PerfUiEntryMemUsage {
     /// Custom label. If empty (default), the default label will be used.
     pub label: String,

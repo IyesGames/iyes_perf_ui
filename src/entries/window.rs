@@ -7,11 +7,13 @@ use bevy::window::PresentMode;
 use bevy::window::PrimaryWindow;
 use bevy::window::WindowMode;
 
+use crate::prelude::*;
 use crate::entry::*;
 use crate::utils::*;
 
 /// Perf UI Entry to display the window mode (windowed, fullscreen, etc).
 #[derive(Component, Debug, Clone)]
+#[require(PerfUiRoot)]
 pub struct PerfUiEntryWindowMode {
     /// Custom label. If empty (default), the default label will be used.
     pub label: String,
@@ -35,6 +37,7 @@ impl Default for PerfUiEntryWindowMode {
 
 /// Perf UI Entry to display the window present mode (vsync).
 #[derive(Component, Debug, Clone)]
+#[require(PerfUiRoot)]
 pub struct PerfUiEntryWindowPresentMode {
     /// Custom label. If empty (default), the default label will be used.
     pub label: String,
@@ -58,6 +61,7 @@ impl Default for PerfUiEntryWindowPresentMode {
 
 /// Perf UI Entry to display the window size / resolution.
 #[derive(Component, Debug, Clone)]
+#[require(PerfUiRoot)]
 pub struct PerfUiEntryWindowScaleFactor {
     /// Custom label. If empty (default), the default label will be used.
     pub label: String,
@@ -91,6 +95,7 @@ impl Default for PerfUiEntryWindowScaleFactor {
 
 /// Perf UI Entry to display the window size / resolution.
 #[derive(Component, Debug, Clone)]
+#[require(PerfUiRoot)]
 pub struct PerfUiEntryWindowResolution {
     /// Custom label. If empty (default), the default label will be used.
     pub label: String,
@@ -144,6 +149,7 @@ impl Default for PerfUiEntryWindowResolution {
 
 /// Perf UI Entry to display the current coordinates of the mouse cursor.
 #[derive(Component, Debug, Clone)]
+#[require(PerfUiRoot)]
 pub struct PerfUiEntryCursorPosition {
     /// Custom label. If empty (default), the default label will be used.
     pub label: String,
