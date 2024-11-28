@@ -22,7 +22,7 @@ fn main() {
 
 fn setup(mut commands: Commands) {
     // spawn a camera to be able to see anything
-    commands.spawn(Camera2d::default());
+    commands.spawn(Camera2d);
 }
 
 fn toggle(

@@ -46,6 +46,8 @@
 //! `app.add_perf_ui_entry_type::<T>()`.
 
 #![warn(missing_docs)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::collapsible_else_if)]
 
 use bevy::prelude::*;
 

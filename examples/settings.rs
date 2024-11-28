@@ -21,7 +21,7 @@ fn main() {
 
 fn setup(mut commands: Commands, ass: Res<AssetServer>) {
     // spawn a camera to be able to see anything
-    commands.spawn(Camera2d::default());
+    commands.spawn(Camera2d);
 
     // Let's create multiple Perf UIs!
 

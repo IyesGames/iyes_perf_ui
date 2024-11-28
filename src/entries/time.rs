@@ -365,7 +365,7 @@ fn get_system_clock_local() -> Option<(u32, u32, u32, u32)> {
     let m = now.minute();
     let s = now.second();
     let nanos = now.timestamp_subsec_nanos();
-    Some((h as u32, m as u32, s as u32, nanos))
+    Some((h, m, s, nanos))
 }
 
 fn get_system_clock_utc() -> Option<(u32, u32, u32, u32)> {

@@ -1,6 +1,6 @@
 [package]
 name = "iyes_perf_ui"
-version = "0.3.0"
+version = "0.4.0-rc.1"
 authors = ["Ida 'Iyes'"]
 edition = "2021"
 license = "MIT OR Apache-2.0"
@@ -15,7 +15,7 @@ exclude = ["assets/*", "screenshots/*"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-default = [ "entries", "widgets", "sysinfo" ]
+default = [ "entries", "widgets", "sysinfo", "chrono" ]
 # Enable the collection of built-in Perf UI Entries
 entries = []
 # Enable the collection of additional built-in Perf UI Widgets
@@ -25,7 +25,7 @@ sysinfo = ["bevy/sysinfo_plugin", "bevy/multi_threaded"]
 chrono = ["dep:chrono"]
 
 [dependencies]
-num-traits = "0.2.18"
+num-traits = "0.2.19"
 
 [dependencies.bevy]
 version = "0.15.0-rc.3"
@@ -35,7 +35,7 @@ features = [
 ]
 
 [dependencies.chrono]
-version = "0.4.35"
+version = "0.4.38"
 optional = true
 default-features = false
 features = [

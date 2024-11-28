@@ -21,7 +21,7 @@ fn main() {
 
 fn setup(mut commands: Commands) {
     // spawn a camera to be able to see anything
-    commands.spawn(Camera2d::default());
+    commands.spawn(Camera2d);
 
     // Instead of using `PerfUiCompleteBundle`,
     // spawn an entity with `PerfUiRoot` + whatever entries you want!

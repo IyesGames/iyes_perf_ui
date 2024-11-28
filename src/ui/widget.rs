@@ -124,7 +124,7 @@ pub(crate) fn setup_perf_ui_widget<E: PerfUiEntry, W: PerfUiWidget<E>>(
         }
 
         let e_widget = widget.spawn(
-            &root, e_root, &mut commands, &mut widget_param
+            root, e_root, &mut commands, &mut widget_param
         );
         commands.entity(e_widget).insert((
             PerfUiWidgetMarker::<W> {
