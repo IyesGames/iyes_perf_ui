@@ -2,6 +2,12 @@
 
 Notable user-facing changes with each release version will be described in this file.
 
+
+## [0.4.0]: 2024-12-xx
+
+Changed:
+- Bevy 0.15 support
+
 ## [0.3.0]: 2024-07-06
 
 Added:

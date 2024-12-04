@@ -1,6 +1,6 @@
 [package]
 name = "iyes_perf_ui"
-version = "0.4.0-rc.1"
+version = "0.4.0"
 authors = ["Ida 'Iyes'"]
 edition = "2021"
 license = "MIT OR Apache-2.0"
@@ -28,7 +28,7 @@ chrono = ["dep:chrono"]
 num-traits = "0.2.19"
 
 [dependencies.bevy]
-version = "0.15.0-rc.3"
+version = "0.15.0"
 default-features = false
 features = [
     "bevy_ui",
@@ -43,5 +43,5 @@ features = [
 ]
 
 [dev-dependencies.bevy]
-version = "0.15.0-rc.3"
+version = "0.15.0"
 default-features = true
