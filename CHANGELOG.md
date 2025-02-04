@@ -2,6 +2,11 @@
 
 Notable user-facing changes with each release version will be described in this file.
 
+## Unreleased
+
+Fixed:
+ - Default PerfUi component was lacking a name in the entity hierarchy.
+
 ## [0.3.0]: 2024-07-06
 
 Added:

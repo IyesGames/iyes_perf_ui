@@ -209,6 +209,7 @@ pub(crate) fn setup_perf_ui(
             *style = new_style;
         } else {
             commands.entity(e).insert((
+                Name::new("PerfUi"),
                 BackgroundColor(perf_ui.background_color),
                 new_style
             ));
