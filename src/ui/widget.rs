@@ -202,6 +202,10 @@ impl<E: PerfUiEntry> PerfUiWidget<E> for E {
                     font_size: root.fontsize_label,
                     ..default()
                 },
+                TextLayout {
+                    linebreak: LineBreak::NoWrap,
+                    justify: JustifyText::Left,
+                },
             )).id();
             commands.entity(e_label_wrapper).add_child(e_label);
             commands.entity(e_widget).add_child(e_label_wrapper);
@@ -225,6 +229,10 @@ impl<E: PerfUiEntry> PerfUiWidget<E> for E {
                 ..default()
             },
             TextColor(root.err_color),
+            TextLayout {
+                linebreak: LineBreak::NoWrap,
+                justify: JustifyText::Right,
+            },
         )).id();
         commands.entity(e_text_wrapper).add_child(e_text);
         commands.entity(e_widget).add_child(e_text_wrapper);
