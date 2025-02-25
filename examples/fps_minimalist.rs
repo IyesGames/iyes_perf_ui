@@ -26,6 +26,7 @@ fn setup(mut commands: Commands) {
         PerfUiRoot {
             display_labels: false,
             layout_horizontal: true,
+            values_col_width: 32.0,
             ..default()
         },
         PerfUiEntryFPSWorst::default(),

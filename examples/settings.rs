@@ -40,7 +40,7 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
         padding: 2.0,
         inner_margin: 2.0,
         inner_padding: 4.0,
-        values_col_width: Some(128.0),
+        values_col_width: 128.0,
         font_label: ass.load("Ubuntu-B.ttf"),
         font_value: ass.load("Ubuntu-R.ttf"),
         font_highlight: ass.load("Ubuntu-RI.ttf"),

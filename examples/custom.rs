@@ -49,8 +49,6 @@ fn setup(mut commands: Commands, ass: Res<AssetServer>) {
             font_label: ass.load("Ubuntu-B.ttf"),
             font_value: ass.load("Ubuntu-R.ttf"),
             font_highlight: ass.load("Ubuntu-RI.ttf"),
-            // just so things don't move around (Ubuntu font is not fixed width)
-            values_col_width: Some(64.0),
             ..default()
         },
         PerfUiEntryFPS::default(),
@@ -141,20 +139,6 @@ impl PerfUiEntry for PerfUiTimeSinceLastClick {
             s.push_str(" s");
         }
         s
-    }
-
-    // (optional) We should add a width hint, so that the displayed
-    // strings in the UI can be correctly aligned.
-    // This value represents the largest length the formatted string
-    // is expected to have.
-    fn width_hint(&self) -> usize {
-        // there is a helper we can use, since we use `format_pretty_float`
-        let w = iyes_perf_ui::utils::width_hint_pretty_float(self.digits, self.precision);
-        if self.display_units {
-            w + 2
-        } else {
-            w
-        }
     }
 
     // (optional) Called every frame to determine if a custom color should be used for the value

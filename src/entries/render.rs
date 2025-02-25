@@ -1,10 +1,9 @@
 //! Perf UI Entries for Bevy Render
 
 use bevy::prelude::*;
-use bevy::diagnostic::{DiagnosticsStore, EntityCountDiagnosticsPlugin, FrameTimeDiagnosticsPlugin};
+use bevy::diagnostic::DiagnosticsStore;
 use bevy::ecs::system::lifetimeless::SRes;
 use bevy::ecs::system::SystemParam;
-use bevy::math::FloatOrd;
 
 use crate::prelude::*;
 use crate::entry::*;
