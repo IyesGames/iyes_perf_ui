@@ -25,4 +25,6 @@ pub(crate) fn predefined_widgets_plugin(app: &mut App) {
     #[cfg(feature = "sysinfo")]
     app.add_perf_ui_widget::<bar::PerfUiWidgetBar<PerfUiEntryMemUsage>, _>();
     app.add_perf_ui_widget::<bar::PerfUiWidgetBar<PerfUiEntryFixedOverstep>, _>();
+    app.add_perf_ui_widget::<bar::PerfUiWidgetBar<PerfUiEntryRenderCpuTime>, _>();
+    app.add_perf_ui_widget::<bar::PerfUiWidgetBar<PerfUiEntryRenderGpuTime>, _>();
 }

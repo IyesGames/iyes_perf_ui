@@ -22,6 +22,11 @@ pub mod prelude {
         PerfUiEntryMemUsage,
     };
 
+    pub use super::render::{
+        PerfUiEntryRenderCpuTime,
+        PerfUiEntryRenderGpuTime,
+    };
+
     pub use super::time::{
         PerfUiEntryClock,
         PerfUiEntryRunningTime,
@@ -38,6 +43,7 @@ pub mod prelude {
 }
 
 pub mod diagnostics;
+pub mod render;
 pub mod time;
 pub mod window;
 
@@ -53,6 +59,9 @@ pub(crate) fn predefined_entries_plugin(app: &mut App) {
     app.add_perf_ui_simple_entry::<PerfUiEntryCpuUsage>();
     #[cfg(feature = "sysinfo")]
     app.add_perf_ui_simple_entry::<PerfUiEntryMemUsage>();
+
+    app.add_perf_ui_simple_entry::<PerfUiEntryRenderCpuTime>();
+    app.add_perf_ui_simple_entry::<PerfUiEntryRenderGpuTime>();
 
     app.add_perf_ui_simple_entry::<PerfUiEntryClock>();
     app.add_perf_ui_simple_entry::<PerfUiEntryRunningTime>();
@@ -71,7 +80,7 @@ pub(crate) fn predefined_entries_plugin(app: &mut App) {
 /// This gives you a simple one-liner to spawn a comprehensive Perf UI!
 ///
 /// ```rust
-/// commands.spawn(PerfUiCompleteBundle::default());
+/// commands.spawn(PerfUiAllEntries::default());
 /// ```
 ///
 /// If you want to create a Perf UI with specific entries of your choice,
@@ -102,6 +111,8 @@ pub struct PerfUiAllEntries {
     pub cpu_usage: PerfUiEntryCpuUsage,
     #[cfg(feature = "sysinfo")]
     pub mem_usage: PerfUiEntryMemUsage,
+    pub render_cpu: PerfUiEntryRenderCpuTime,
+    pub render_gpu: PerfUiEntryRenderGpuTime,
     pub fixed_timestep: PerfUiEntryFixedTimeStep,
     pub fixed_overstep: PerfUiEntryFixedOverstep,
     pub time_running: PerfUiEntryRunningTime,
@@ -123,7 +134,7 @@ pub struct PerfUiAllEntries {
 /// Also see [`PerfUiAllEntries`].
 ///
 /// ```rust
-/// commands.spawn(PerfUiBundle::default());
+/// commands.spawn(PerfUiDefaultEntries::default());
 /// ```
 ///
 /// If you want to create a Perf UI with specific entries of your choice,
@@ -145,9 +156,9 @@ pub struct PerfUiAllEntries {
 #[derive(Bundle, Default)]
 pub struct PerfUiDefaultEntries {
     pub fps: PerfUiEntryFPS,
-    pub fps_worst: PerfUiEntryFPSWorst,
     pub frametime: PerfUiEntryFrameTime,
-    pub frametime_worst: PerfUiEntryFrameTimeWorst,
+    pub render_cpu: PerfUiEntryRenderCpuTime,
+    pub render_gpu: PerfUiEntryRenderGpuTime,
     pub entity_count: PerfUiEntryEntityCount,
     pub cursor_position: PerfUiEntryCursorPosition,
     pub window_resolution: PerfUiEntryWindowResolution,
@@ -168,6 +179,21 @@ pub struct PerfUiFramerateEntries {
     pub fps_worst: PerfUiEntryFPSWorst,
     pub frametime: PerfUiEntryFrameTime,
     pub frametime_worst: PerfUiEntryFrameTimeWorst,
+}
+
+/// All entries related to rendering.
+///
+/// ```rust
+/// commands.spawn((
+///     PerfUiRenderEntries::default(),
+///     // ...
+/// ));
+/// ```
+#[allow(missing_docs)]
+#[derive(Bundle, Default)]
+pub struct PerfUiRenderEntries {
+    pub render_cpu: PerfUiEntryRenderCpuTime,
+    pub render_gpu: PerfUiEntryRenderGpuTime,
 }
 
 /// All entries related to system diagnostics.
