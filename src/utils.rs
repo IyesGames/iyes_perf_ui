@@ -17,7 +17,7 @@ static NEXT_SORT_KEY: AtomicI32 = AtomicI32::new(1);
 /// that whenever a user constructs a new entry, it always
 /// appears after any previously-constructed entries.
 pub fn next_sort_key() -> i32 {
-    NEXT_SORT_KEY.fetch_add(1, Ordering::SeqCst)
+    NEXT_SORT_KEY.fetch_add(1, Ordering::Relaxed)
 }
 
 /// Represents a color gradient with any number of stops.

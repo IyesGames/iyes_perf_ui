@@ -41,6 +41,9 @@ pub trait PerfUiWidget<T: PerfUiEntry>: Component {
     /// into `type SystemParamSpawn` and access them via `param`.
     ///
     /// Use the provided `commands` for spawning your entities.
+    ///
+    /// Do not add yourself as a child of `e_root`! `iyes_perf_ui` will take
+    /// care of that for you!
     fn spawn(
         &self,
         root: &PerfUiRoot,
