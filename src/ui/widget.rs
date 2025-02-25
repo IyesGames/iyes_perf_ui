@@ -209,11 +209,7 @@ impl<E: PerfUiEntry> PerfUiWidget<E> for E {
         let e_text_wrapper = commands.spawn((
             Node {
                 padding: UiRect::all(Val::Px(4.0)),
-                width: if let Some(w) = root.values_col_width {
-                    Val::Px(w)
-                } else {
-                    Val::Auto
-                },
+                width: Val::Px(root.values_col_width),
                 justify_content: JustifyContent::FlexEnd,
                 ..default()
             },
@@ -252,12 +248,7 @@ impl<E: PerfUiEntry> PerfUiWidget<E> for E {
                 let new_color = self.value_color(&value)
                     .unwrap_or(root.default_value_color);
                 let s = self.format_value(&value);
-                let width_hint = self.width_hint();
-                *text = if s.len() < width_hint {
-                    Text(format!("{:>w$}", s, w = width_hint))
-                } else {
-                    Text(s)
-                };
+                *text = Text(s);
                 *color = TextColor(new_color);
                 if self.value_highlight(&value) {
                     font.font = root.font_highlight.clone();
@@ -267,12 +258,7 @@ impl<E: PerfUiEntry> PerfUiWidget<E> for E {
                 }
             } else {
                 let s = root.text_err.clone();
-                let width_hint = self.width_hint();
-                *text = if s.len() < width_hint {
-                    Text(format!("{:>w$}", s, w = width_hint))
-                } else {
-                    Text(s)
-                };
+                *text = Text(s);
                 *color = TextColor(root.err_color);
                 font.font = root.font_value.clone();
             }

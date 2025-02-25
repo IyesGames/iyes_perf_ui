@@ -245,16 +245,8 @@ where
         let e_bar_wrapper = commands.spawn((
             Node {
                 padding: UiRect::all(Val::Px(4.0)),
-                width: if let Some(w) = root.values_col_width {
-                    Val::Px(w)
-                } else {
-                    Val::Auto
-                },
-                flex_grow: if root.values_col_width.is_some() {
-                    0.0
-                } else {
-                    1.0
-                },
+                width: Val::Px(root.values_col_width),
+                flex_grow: 0.0,
                 justify_content: JustifyContent::SpaceBetween,
                 flex_direction: match self.text_position {
                     BarTextPosition::OutsideStart => FlexDirection::RowReverse,

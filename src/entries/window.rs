@@ -276,9 +276,6 @@ impl PerfUiEntry for PerfUiEntryWindowScaleFactor {
     fn sort_key(&self) -> i32 {
         self.sort_key
     }
-    fn width_hint(&self) -> usize {
-        width_hint_pretty_float(self.digits, self.precision)
-    }
     fn update_value(
         &self,
         (q_primary, q_any): &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
@@ -313,14 +310,6 @@ impl PerfUiEntry for PerfUiEntryWindowResolution {
     }
     fn sort_key(&self) -> i32 {
         self.sort_key
-    }
-    fn width_hint(&self) -> usize {
-        match (self.display_axis, self.display_units) {
-            (true, true) => self.width as usize + self.separator.len() + 12,
-            (true, false) => self.width as usize + self.separator.len() + 6,
-            (false, true) => self.width as usize + self.separator.len() + 6,
-            (false, false) => self.width as usize + self.separator.len(),
-        }
     }
     fn update_value(
         &self,
@@ -393,14 +382,6 @@ impl PerfUiEntry for PerfUiEntryCursorPosition {
     }
     fn sort_key(&self) -> i32 {
         self.sort_key
-    }
-    fn width_hint(&self) -> usize {
-        match (self.display_axis, self.display_units) {
-            (true, true) => self.width as usize + self.separator.len() + 12,
-            (true, false) => self.width as usize + self.separator.len() + 6,
-            (false, true) => self.width as usize + self.separator.len() + 6,
-            (false, false) => self.width as usize + self.separator.len(),
-        }
     }
     fn update_value(
         &self,

@@ -154,6 +154,6 @@ pub enum PerfUiSet {
     Setup,
     /// Systems that update the values of Perf UI entries (of any type).
     ///
-    /// If you care about a specific entry only, refer to the `update_perf_ui_entry::<T>` system instead.
+    /// If you care about a specific entry only, refer to the `update_perf_ui_widget::<T>` system instead.
     Update,
 }

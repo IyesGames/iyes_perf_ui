@@ -187,13 +187,6 @@ impl PerfUiEntry for PerfUiEntryRunningTime {
     fn sort_key(&self) -> i32 {
         self.sort_key
     }
-    fn width_hint(&self) -> usize {
-        match (self.format_hms, self.display_units) {
-            (true, _) => width_hint_pretty_time(self.precision),
-            (false, true) => width_hint_pretty_float(self.digits, self.precision) + 2,
-            (false, false) => width_hint_pretty_float(self.digits, self.precision),
-        }
-    }
     fn update_value(
         &self,
         time: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
@@ -240,9 +233,6 @@ impl PerfUiEntry for PerfUiEntryClock {
     fn sort_key(&self) -> i32 {
         self.sort_key
     }
-    fn width_hint(&self) -> usize {
-        width_hint_pretty_time(self.precision)
-    }
     fn update_value(
         &self,
         _: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
@@ -275,14 +265,6 @@ impl PerfUiEntry for PerfUiEntryFixedTimeStep {
     }
     fn sort_key(&self) -> i32 {
         self.sort_key
-    }
-    fn width_hint(&self) -> usize {
-        let w = width_hint_pretty_float(self.digits, self.precision);
-        if self.display_units {
-            w + 3
-        } else {
-            w
-        }
     }
     fn update_value(
         &self,
@@ -320,14 +302,6 @@ impl PerfUiEntry for PerfUiEntryFixedOverstep {
     }
     fn sort_key(&self) -> i32 {
         self.sort_key
-    }
-    fn width_hint(&self) -> usize {
-        let w = width_hint_pretty_float(self.digits, self.precision);
-        match (self.as_percent, self.display_units) {
-            (true, _) => w + 1,
-            (false, true) => w + 3,
-            (false, false) => w,
-        }
     }
     fn update_value(
         &self,

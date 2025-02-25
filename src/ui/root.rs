@@ -117,10 +117,10 @@ pub struct PerfUiRoot {
     ///
     /// Default: `0.0`
     pub inner_padding: f32,
-    /// Force a fixed width (in pixels) for the values column
+    /// The width (in pixels) of the values column
     ///
-    /// Default: `None`
-    pub values_col_width: Option<f32>,
+    /// Default: `128.0`
+    pub values_col_width: f32,
 }
 
 impl Default for PerfUiRoot {
@@ -146,7 +146,7 @@ impl Default for PerfUiRoot {
             padding: 2.0,
             inner_margin: 0.0,
             inner_padding: 0.0,
-            values_col_width: None,
+            values_col_width: 128.0,
         }
     }
 }
