@@ -2,6 +2,22 @@
 
 Notable user-facing changes with each release version will be described in this file.
 
+## [0.4.0]: 2025-02-26
+
+Added:
+ - `PerfUiEntryRenderCpuTime`, `PerfUiEntryRenderGpuTime` entries.
+
+Changed:
+ - Bevy 0.15 support.
+ - Default text parameters and font size, due to Bevy's new text backend.
+ - `PerfUiRoot` is now added automatically as a "required component".
+ - Bundles renamed and no longer contain `PerfUiRoot`, just entry types:
+   - `PerfUiCompleteBundle` -> `PerfUiAllEntries`
+   - `PerfUiBundle` -> `PerfUiDefaultEntries`
+
+Removed:
+ - Width hints and automatic sizing of the values column. The values column now has a constant size.
+
 ## [0.3.0]: 2024-07-06
 
 Added:
@@ -76,6 +92,7 @@ Removed:
 
 Initial Release
 
+[0.4.0]: https://github.com/IyesGames/iyes_perf_ui/tree/v0.4.0
 [0.3.0]: https://github.com/IyesGames/iyes_perf_ui/tree/v0.3.0
 [0.2.3]: https://github.com/IyesGames/iyes_perf_ui/tree/v0.2.3
 [0.2.2]: https://github.com/IyesGames/iyes_perf_ui/tree/v0.2.2
