@@ -9,8 +9,9 @@ pub mod prelude {
 
     pub use super::diagnostics::{
         PerfUiEntryFPS,
-        PerfUiEntryFrameTime,
+        PerfUiEntryFPSPctLow,
         PerfUiEntryFPSWorst,
+        PerfUiEntryFrameTime,
         PerfUiEntryFrameTimeWorst,
         PerfUiEntryFrameCount,
         PerfUiEntryEntityCount,
@@ -53,8 +54,9 @@ pub mod window;
 
 pub(crate) fn predefined_entries_plugin(app: &mut App) {
     app.add_perf_ui_simple_entry::<PerfUiEntryFPS>();
-    app.add_perf_ui_simple_entry::<PerfUiEntryFrameTime>();
+    app.add_perf_ui_simple_entry::<PerfUiEntryFPSPctLow>();
     app.add_perf_ui_simple_entry::<PerfUiEntryFPSWorst>();
+    app.add_perf_ui_simple_entry::<PerfUiEntryFrameTime>();
     app.add_perf_ui_simple_entry::<PerfUiEntryFrameTimeWorst>();
     app.add_perf_ui_simple_entry::<PerfUiEntryFrameCount>();
     app.add_perf_ui_simple_entry::<PerfUiEntryEntityCount>();
@@ -109,6 +111,7 @@ pub(crate) fn predefined_entries_plugin(app: &mut App) {
 #[derive(Bundle, Default)]
 pub struct PerfUiAllEntries {
     pub fps: PerfUiEntryFPS,
+    pub fps_low: PerfUiEntryFPSPctLow,
     pub fps_worst: PerfUiEntryFPSWorst,
     pub frametime: PerfUiEntryFrameTime,
     pub frametime_worst: PerfUiEntryFrameTimeWorst,
@@ -168,14 +171,11 @@ pub struct PerfUiAllEntries {
 #[derive(Bundle, Default)]
 pub struct PerfUiDefaultEntries {
     pub fps: PerfUiEntryFPS,
+    pub fps_low: PerfUiEntryFPSPctLow,
     pub frametime: PerfUiEntryFrameTime,
     pub render_cpu: PerfUiEntryRenderCpuTime,
     pub render_gpu: PerfUiEntryRenderGpuTime,
     pub entity_count: PerfUiEntryEntityCount,
-    #[cfg(feature = "window")]
-    pub cursor_position: PerfUiEntryCursorPosition,
-    #[cfg(feature = "window")]
-    pub window_resolution: PerfUiEntryWindowResolution,
 }
 
 /// All entries related to framerate.

@@ -118,6 +118,76 @@ impl Default for PerfUiEntryFPSWorst {
     }
 }
 
+/// Perf UI Entry to display Bevy's built-in FPS measurement diagnostic.
+///
+/// Computes the average of the lowest N percent of values in recent history.
+///
+/// This is akin to the "1% low" metric that is commonly used to measure
+/// frame rate stability. By comparing it to the average or current FPS,
+/// you get an idea of how much the frame rate fluctuates. If the values are
+/// close, that indicates a smooth experience. If the difference is large,
+/// that indicates lag spikes / inconsistent framerate.
+///
+/// The percentage of values to select is customizable, defaulting to 10%.
+/// See the `filter_fraction` field.
+///
+/// The reason for using 10% instead of 1% as the default is that Bevy only
+/// keeps a history buffer of 120 values. Using 1% would only leave 2 values
+/// (rounded up). 10% is 12 values, which arguably gives a better indication
+/// of framerate stability.
+#[derive(Component, Debug, Clone)]
+#[require(PerfUiRoot)]
+pub struct PerfUiEntryFPSPctLow {
+    /// Custom label. If empty (default), the default label will be used.
+    pub label: String,
+    /// Enable color based on value.
+    ///
+    /// To disable (always use default color), set to empty `ColorGradient::default()`.
+    ///
+    /// Default: Red-Yellow-Green gradient between 30-60-120 FPS.
+    pub color_gradient: ColorGradient,
+    /// Highlight the value if FPS is below this threshold.
+    ///
+    /// Default: `20.0`
+    pub threshold_highlight: Option<f32>,
+    /// If displayed using a Bar (or other similar) widget that can
+    /// show the value within a range, what should its max value be?
+    ///
+    /// If `None`, the value will be computed from the color gradient.
+    ///
+    /// Default: `None`
+    pub max_value_hint: Option<f32>,
+    /// Number of digits to display for the integer (whole number) part.
+    ///
+    /// Default: `4`
+    pub digits: u8,
+    /// Number of digits to display for the fractional (after the decimal point) part.
+    ///
+    /// Default: `0`
+    pub precision: u8,
+    /// What fraction of values to select?
+    ///
+    /// Default: `0.1` (i.e "10% low")
+    pub filter_fraction: f32,
+    /// Sort Key (control where the entry will appear in the Perf UI).
+    pub sort_key: i32,
+}
+
+impl Default for PerfUiEntryFPSPctLow {
+    fn default() -> Self {
+        PerfUiEntryFPSPctLow {
+            label: String::new(),
+            color_gradient: ColorGradient::new_preset_ryg(30.0, 60.0, 120.0).unwrap(),
+            threshold_highlight: Some(20.0),
+            max_value_hint: None,
+            digits: 4,
+            precision: 0,
+            filter_fraction: 0.1,
+            sort_key: next_sort_key(),
+        }
+    }
+}
+
 /// Perf UI Entry to display Bevy's built-in frame time measurement diagnostic.
 ///
 /// Displays the frame time in *milliseconds*.
@@ -467,7 +537,7 @@ impl PerfUiEntry for PerfUiEntryFPSWorst {
 
     fn label(&self) -> &str {
         if self.label.is_empty() {
-            "FPS (min)"
+            "FPS (worst)"
         } else {
             &self.label
         }
@@ -512,6 +582,81 @@ impl PerfUiEntry for PerfUiEntryFPSWorst {
 }
 
 impl PerfUiEntryDisplayRange for PerfUiEntryFPSWorst {
+    fn max_value_hint(&self) -> Option<Self::Value> {
+        self.max_value_hint.or(
+            self.color_gradient.max_stop()
+                .map(|(v, _)| *v)
+        )
+    }
+    fn min_value_hint(&self) -> Option<Self::Value> {
+        Some(0.0)
+    }
+}
+
+impl PerfUiEntry for PerfUiEntryFPSPctLow {
+    type SystemParam = SRes<DiagnosticsStore>;
+    type Value = f32;
+
+    fn label(&self) -> &str {
+        if self.label.is_empty() {
+            "FPS (low)"
+        } else {
+            &self.label
+        }
+    }
+    fn update_value(
+        &self,
+        diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
+    ) -> Option<Self::Value> {
+        let mut values: Vec<_> = diagnostics
+            .get(&FrameTimeDiagnosticsPlugin::FPS)?
+            .values()
+            .filter_map(|f| if !f.is_nan() {
+                Some(FloatOrd(*f as f32))
+            } else {
+                None
+            })
+            .collect();
+
+        if values.is_empty() {
+            return None;
+        }
+        let bottom_len = (values.len() as f32 * self.filter_fraction).ceil() as usize;
+        if bottom_len == 0 {
+            return None;
+        }
+
+        values.sort_unstable();
+
+        let sum: f32 = values.into_iter().take(bottom_len).map(|fo| fo.0).sum();
+        Some(sum / bottom_len as f32)
+    }
+    fn format_value(
+        &self,
+        value: &Self::Value,
+    ) -> String {
+        format_pretty_float(self.digits, self.precision, *value as f64)
+    }
+    fn value_color(
+        &self,
+        value: &Self::Value,
+    ) -> Option<Color> {
+        self.color_gradient.get_color_for_value(*value)
+    }
+    fn value_highlight(
+        &self,
+        value: &Self::Value,
+    ) -> bool {
+        self.threshold_highlight
+            .map(|t| *value < t)
+            .unwrap_or(false)
+    }
+    fn sort_key(&self) -> i32 {
+        self.sort_key
+    }
+}
+
+impl PerfUiEntryDisplayRange for PerfUiEntryFPSPctLow {
     fn max_value_hint(&self) -> Option<Self::Value> {
         self.max_value_hint.or(
             self.color_gradient.max_stop()
