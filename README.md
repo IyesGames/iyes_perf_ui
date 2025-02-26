@@ -119,8 +119,8 @@ Just keep this in mind. Your game will run slightly faster when the Perf UI
 is not being displayed. This crate is designed to eliminate all perf overhead
 when the UI is not rendered on-screen.
 
-A "full" UI with all the entries offered by this crate can add around 100-200
-us of frame time on typical gaming hardware, most of which is CPU time spent
-in Bevy's UI layout systems (in `PostUpdate`).
+A "full" UI with all the entries offered by this crate can add a few hundred
+microseconds of frame time on typical gaming hardware, most of which is CPU
+time spent in Bevy's UI layout systems (in `PostUpdate`).
 
 I am looking for ways to optimize this crate to reduce its overhead.
