@@ -33,6 +33,8 @@ pub mod prelude {
         PerfUiEntryFixedTimeStep,
         PerfUiEntryFixedOverstep,
     };
+
+    #[cfg(feature = "window")]
     pub use super::window::{
         PerfUiEntryWindowResolution,
         PerfUiEntryWindowScaleFactor,
@@ -45,6 +47,8 @@ pub mod prelude {
 pub mod diagnostics;
 pub mod render;
 pub mod time;
+
+#[cfg(feature = "window")]
 pub mod window;
 
 pub(crate) fn predefined_entries_plugin(app: &mut App) {
@@ -68,11 +72,14 @@ pub(crate) fn predefined_entries_plugin(app: &mut App) {
     app.add_perf_ui_simple_entry::<PerfUiEntryFixedTimeStep>();
     app.add_perf_ui_simple_entry::<PerfUiEntryFixedOverstep>();
 
-    app.add_perf_ui_simple_entry::<PerfUiEntryWindowResolution>();
-    app.add_perf_ui_simple_entry::<PerfUiEntryWindowScaleFactor>();
-    app.add_perf_ui_simple_entry::<PerfUiEntryWindowMode>();
-    app.add_perf_ui_simple_entry::<PerfUiEntryWindowPresentMode>();
-    app.add_perf_ui_simple_entry::<PerfUiEntryCursorPosition>();
+    #[cfg(feature = "window")]
+    {
+        app.add_perf_ui_simple_entry::<PerfUiEntryWindowResolution>();
+        app.add_perf_ui_simple_entry::<PerfUiEntryWindowScaleFactor>();
+        app.add_perf_ui_simple_entry::<PerfUiEntryWindowMode>();
+        app.add_perf_ui_simple_entry::<PerfUiEntryWindowPresentMode>();
+        app.add_perf_ui_simple_entry::<PerfUiEntryCursorPosition>();
+    }
 }
 
 /// Bundle for a Perf UI with all entry types provided by `iyes_perf_ui`.
@@ -117,10 +124,15 @@ pub struct PerfUiAllEntries {
     pub fixed_overstep: PerfUiEntryFixedOverstep,
     pub time_running: PerfUiEntryRunningTime,
     pub time_clock: PerfUiEntryClock,
+    #[cfg(feature = "window")]
     pub cursor_position: PerfUiEntryCursorPosition,
+    #[cfg(feature = "window")]
     pub window_resolution: PerfUiEntryWindowResolution,
+    #[cfg(feature = "window")]
     pub window_scale_factor: PerfUiEntryWindowScaleFactor,
+    #[cfg(feature = "window")]
     pub window_mode: PerfUiEntryWindowMode,
+    #[cfg(feature = "window")]
     pub window_present_mode: PerfUiEntryWindowPresentMode,
 }
 
@@ -160,7 +172,9 @@ pub struct PerfUiDefaultEntries {
     pub render_cpu: PerfUiEntryRenderCpuTime,
     pub render_gpu: PerfUiEntryRenderGpuTime,
     pub entity_count: PerfUiEntryEntityCount,
+    #[cfg(feature = "window")]
     pub cursor_position: PerfUiEntryCursorPosition,
+    #[cfg(feature = "window")]
     pub window_resolution: PerfUiEntryWindowResolution,
 }
 
@@ -235,6 +249,7 @@ pub struct PerfUiFixedTimeEntries {
 ///     // ...
 /// ));
 /// ```
+#[cfg(feature = "window")]
 #[allow(missing_docs)]
 #[derive(Bundle, Default)]
 pub struct PerfUiWindowEntries {

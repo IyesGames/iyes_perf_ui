@@ -14,6 +14,7 @@ Changed:
  - Bundles renamed and no longer contain `PerfUiRoot`, just entry types:
    - `PerfUiCompleteBundle` -> `PerfUiAllEntries`
    - `PerfUiBundle` -> `PerfUiDefaultEntries`
+ - Built-in entries based on `bevy_window` are now behind a `window` cargo feature (enabled by default)
 
 Removed:
  - Width hints and automatic sizing of the values column. The values column now has a constant size.
