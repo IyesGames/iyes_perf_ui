@@ -46,7 +46,7 @@ pub struct PerfUiEntryRenderCpuTime {
     pub max_value_hint: Option<f32>,
     /// Should we display the smoothed value or the raw value?
     ///
-    /// Default: true (smoothed)
+    /// Default: false (raw)
     pub smoothed: bool,
     /// Number of digits to display for the integer (whole number) part.
     ///
@@ -72,7 +72,7 @@ impl Default for PerfUiEntryRenderCpuTime {
             ).unwrap(),
             threshold_highlight: Some(1000.0 / 20.0),
             max_value_hint: None,
-            smoothed: true,
+            smoothed: false,
             digits: 2,
             precision: 3,
             sort_key: next_sort_key(),
@@ -116,7 +116,7 @@ pub struct PerfUiEntryRenderGpuTime {
     pub max_value_hint: Option<f32>,
     /// Should we display the smoothed value or the raw value?
     ///
-    /// Default: true (smoothed)
+    /// Default: false (raw)
     pub smoothed: bool,
     /// Number of digits to display for the integer (whole number) part.
     ///
@@ -142,7 +142,7 @@ impl Default for PerfUiEntryRenderGpuTime {
             ).unwrap(),
             threshold_highlight: Some(1000.0 / 20.0),
             max_value_hint: None,
-            smoothed: true,
+            smoothed: false,
             digits: 2,
             precision: 3,
             sort_key: next_sort_key(),
