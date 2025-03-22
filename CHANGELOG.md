@@ -2,6 +2,20 @@
 
 Notable user-facing changes with each release version will be described in this file.
 
+## Unreleased
+
+Added:
+ - `PerfUiEntryFPSPctLow` entry (Average of the slowest N% of frames).
+ - `PerfUiEntrySystemCpuUsage`/`PerfUiEntrySystemMemUsage` entries (equivalent to the old `PerfUiEntryCpuUsage`/`PerfUiEntryMemUsage`)
+
+Changed:
+ - Bevy 0.16 support.
+ - `PerfUiEntryCpuUsage`/`PerfUiEntryMemUsage` now report the CPU/RAM usage of the current process (your game/app), rather than total system usage. `PerfUiEntryMemUsage` now reports GiB instead of percentage.
+ - `PerfUiEntryFrameTime`/`PerfUiEntryRenderCpuTime`/`PerfUiEntryRenderGpuTime` now default to un-smoothed (raw) values, to help identify slow frames from screenshots.
+
+Fixed:
+ - Entries with a `max_value_hint` now fallback to the max of either the color gradient or the highlight threshold, if set to None. Previously, only the color gradient was used.
+
 ## [0.4.0]: 2025-02-26
 
 Added:
