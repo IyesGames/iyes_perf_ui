@@ -32,7 +32,8 @@ pub struct PerfUiEntryFPS {
     /// If displayed using a Bar (or other similar) widget that can
     /// show the value within a range, what should its max value be?
     ///
-    /// If `None`, the value will be computed from the color gradient.
+    /// If `None`, the value will be computed from the maximum of the
+    /// color gradient and the highlight threshold.
     ///
     /// Default: `None`
     pub max_value_hint: Option<f32>,
@@ -88,7 +89,8 @@ pub struct PerfUiEntryFPSWorst {
     /// If displayed using a Bar (or other similar) widget that can
     /// show the value within a range, what should its max value be?
     ///
-    /// If `None`, the value will be computed from the color gradient.
+    /// If `None`, the value will be computed from the maximum of the
+    /// color gradient and the highlight threshold.
     ///
     /// Default: `None`
     pub max_value_hint: Option<f32>,
@@ -153,7 +155,8 @@ pub struct PerfUiEntryFPSPctLow {
     /// If displayed using a Bar (or other similar) widget that can
     /// show the value within a range, what should its max value be?
     ///
-    /// If `None`, the value will be computed from the color gradient.
+    /// If `None`, the value will be computed from the maximum of the
+    /// color gradient and the highlight threshold.
     ///
     /// Default: `None`
     pub max_value_hint: Option<f32>,
@@ -213,7 +216,8 @@ pub struct PerfUiEntryFrameTime {
     /// If displayed using a Bar (or other similar) widget that can
     /// show the value within a range, what should its max value be?
     ///
-    /// If `None`, the value will be computed from the color gradient.
+    /// If `None`, the value will be computed from the maximum of the
+    /// color gradient and the highlight threshold.
     ///
     /// Default: `None`
     pub max_value_hint: Option<f32>,
@@ -280,7 +284,8 @@ pub struct PerfUiEntryFrameTimeWorst {
     /// If displayed using a Bar (or other similar) widget that can
     /// show the value within a range, what should its max value be?
     ///
-    /// If `None`, the value will be computed from the color gradient.
+    /// If `None`, the value will be computed from the maximum of the
+    /// color gradient and the highlight threshold.
     ///
     /// Default: `None`
     pub max_value_hint: Option<f32>,
@@ -358,10 +363,11 @@ pub struct PerfUiEntryEntityCount {
     /// If displayed using a Bar (or other similar) widget that can
     /// show the value within a range, what should its max value be?
     ///
-    /// If `None`, the value will be computed from the color gradient.
+    /// If `None`, the value will be computed from the maximum of the
+    /// color gradient and the highlight threshold.
     ///
     /// Default: `None`
-    pub max_value_hint: Option<f32>,
+    pub max_value_hint: Option<u32>,
     /// Number of digits to display.
     ///
     /// Default: `6`
@@ -499,9 +505,10 @@ pub struct PerfUiEntryMemUsage {
     /// If displayed using a Bar (or other similar) widget that can
     /// show the value within a range, what should its max value be?
     ///
-    /// If `None`, the value will be computed from the color gradient.
+    /// If `None`, the value will be computed from the maximum of the
+    /// color gradient and the highlight threshold.
     ///
-    /// Default: `Some(4.0)`
+    /// Default: `Some(4.0)`.
     pub max_value_hint: Option<f32>,
     /// Should we display the smoothed value or the raw value?
     ///
@@ -625,8 +632,12 @@ impl PerfUiEntry for PerfUiEntryFPS {
 impl PerfUiEntryDisplayRange for PerfUiEntryFPS {
     fn max_value_hint(&self) -> Option<Self::Value> {
         self.max_value_hint.or(
-            self.color_gradient.max_stop()
-                .map(|(v, _)| *v)
+            match (self.threshold_highlight, self.color_gradient.max_stop()) {
+                (Some(x), None) => Some(x),
+                (None, Some((x, _))) => Some(*x),
+                (Some(a), Some((b, _))) => Some(a.max(*b)),
+                (None, None) => None,
+            }
         ).map(|v| v as f64)
     }
     fn min_value_hint(&self) -> Option<Self::Value> {
@@ -687,8 +698,12 @@ impl PerfUiEntry for PerfUiEntryFPSWorst {
 impl PerfUiEntryDisplayRange for PerfUiEntryFPSWorst {
     fn max_value_hint(&self) -> Option<Self::Value> {
         self.max_value_hint.or(
-            self.color_gradient.max_stop()
-                .map(|(v, _)| *v)
+            match (self.threshold_highlight, self.color_gradient.max_stop()) {
+                (Some(x), None) => Some(x),
+                (None, Some((x, _))) => Some(*x),
+                (Some(a), Some((b, _))) => Some(a.max(*b)),
+                (None, None) => None,
+            }
         )
     }
     fn min_value_hint(&self) -> Option<Self::Value> {
@@ -762,8 +777,12 @@ impl PerfUiEntry for PerfUiEntryFPSPctLow {
 impl PerfUiEntryDisplayRange for PerfUiEntryFPSPctLow {
     fn max_value_hint(&self) -> Option<Self::Value> {
         self.max_value_hint.or(
-            self.color_gradient.max_stop()
-                .map(|(v, _)| *v)
+            match (self.threshold_highlight, self.color_gradient.max_stop()) {
+                (Some(x), None) => Some(x),
+                (None, Some((x, _))) => Some(*x),
+                (Some(a), Some((b, _))) => Some(a.max(*b)),
+                (None, None) => None,
+            }
         )
     }
     fn min_value_hint(&self) -> Option<Self::Value> {
@@ -824,8 +843,12 @@ impl PerfUiEntry for PerfUiEntryFrameTime {
 impl PerfUiEntryDisplayRange for PerfUiEntryFrameTime {
     fn max_value_hint(&self) -> Option<Self::Value> {
         self.max_value_hint.or(
-            self.color_gradient.max_stop()
-                .map(|(v, _)| *v)
+            match (self.threshold_highlight, self.color_gradient.max_stop()) {
+                (Some(x), None) => Some(x),
+                (None, Some((x, _))) => Some(*x),
+                (Some(a), Some((b, _))) => Some(a.max(*b)),
+                (None, None) => None,
+            }
         ).map(|v| v as f64)
     }
     fn min_value_hint(&self) -> Option<Self::Value> {
@@ -890,8 +913,12 @@ impl PerfUiEntry for PerfUiEntryFrameTimeWorst {
 impl PerfUiEntryDisplayRange for PerfUiEntryFrameTimeWorst {
     fn max_value_hint(&self) -> Option<Self::Value> {
         self.max_value_hint.or(
-            self.color_gradient.max_stop()
-                .map(|(v, _)| *v)
+            match (self.threshold_highlight, self.color_gradient.max_stop()) {
+                (Some(x), None) => Some(x),
+                (None, Some((x, _))) => Some(*x),
+                (Some(a), Some((b, _))) => Some(a.max(*b)),
+                (None, None) => None,
+            }
         )
     }
     fn min_value_hint(&self) -> Option<Self::Value> {
@@ -972,9 +999,13 @@ impl PerfUiEntry for PerfUiEntryEntityCount {
 impl PerfUiEntryDisplayRange for PerfUiEntryEntityCount {
     fn max_value_hint(&self) -> Option<Self::Value> {
         self.max_value_hint.or(
-            self.color_gradient.max_stop()
-                .map(|(v, _)| *v)
-        ).map(|v| v as u32)
+            match (self.threshold_highlight, self.color_gradient.max_stop()) {
+                (Some(x), None) => Some(x),
+                (None, Some((x, _))) => Some(*x as u32),
+                (Some(a), Some((b, _))) => Some(a.max(*b as u32)),
+                (None, None) => None,
+            }
+        )
     }
     fn min_value_hint(&self) -> Option<Self::Value> {
         Some(0)
@@ -1154,8 +1185,12 @@ impl PerfUiEntry for PerfUiEntryMemUsage {
 impl PerfUiEntryDisplayRange for PerfUiEntryMemUsage {
     fn max_value_hint(&self) -> Option<Self::Value> {
         self.max_value_hint.or(
-            self.color_gradient.max_stop()
-                .map(|(v, _)| *v)
+            match (self.threshold_highlight, self.color_gradient.max_stop()) {
+                (Some(x), None) => Some(x),
+                (None, Some((x, _))) => Some(*x),
+                (Some(a), Some((b, _))) => Some(a.max(*b)),
+                (None, None) => None,
+            }
         ).map(|v| v as f64)
     }
     fn min_value_hint(&self) -> Option<Self::Value> {

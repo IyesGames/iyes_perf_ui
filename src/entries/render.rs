@@ -40,7 +40,8 @@ pub struct PerfUiEntryRenderCpuTime {
     /// If displayed using a Bar (or other similar) widget that can
     /// show the value within a range, what should its max value be?
     ///
-    /// If `None`, the value will be computed from the color gradient.
+    /// If `None`, the value will be computed from the maximum of the
+    /// color gradient and the highlight threshold.
     ///
     /// Default: `None`
     pub max_value_hint: Option<f32>,
@@ -110,7 +111,8 @@ pub struct PerfUiEntryRenderGpuTime {
     /// If displayed using a Bar (or other similar) widget that can
     /// show the value within a range, what should its max value be?
     ///
-    /// If `None`, the value will be computed from the color gradient.
+    /// If `None`, the value will be computed from the maximum of the
+    /// color gradient and the highlight threshold.
     ///
     /// Default: `None`
     pub max_value_hint: Option<f32>,
@@ -218,8 +220,12 @@ impl PerfUiEntry for PerfUiEntryRenderCpuTime {
 impl PerfUiEntryDisplayRange for PerfUiEntryRenderCpuTime {
     fn max_value_hint(&self) -> Option<Self::Value> {
         self.max_value_hint.or(
-            self.color_gradient.max_stop()
-                .map(|(v, _)| *v)
+            match (self.threshold_highlight, self.color_gradient.max_stop()) {
+                (Some(x), None) => Some(x),
+                (None, Some((x, _))) => Some(*x),
+                (Some(a), Some((b, _))) => Some(a.max(*b)),
+                (None, None) => None,
+            }
         ).map(|v| v as f64)
     }
     fn min_value_hint(&self) -> Option<Self::Value> {
@@ -295,8 +301,12 @@ impl PerfUiEntry for PerfUiEntryRenderGpuTime {
 impl PerfUiEntryDisplayRange for PerfUiEntryRenderGpuTime {
     fn max_value_hint(&self) -> Option<Self::Value> {
         self.max_value_hint.or(
-            self.color_gradient.max_stop()
-                .map(|(v, _)| *v)
+            match (self.threshold_highlight, self.color_gradient.max_stop()) {
+                (Some(x), None) => Some(x),
+                (None, Some((x, _))) => Some(*x),
+                (Some(a), Some((b, _))) => Some(a.max(*b)),
+                (None, None) => None,
+            }
         ).map(|v| v as f64)
     }
     fn min_value_hint(&self) -> Option<Self::Value> {
