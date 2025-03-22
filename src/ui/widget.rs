@@ -105,9 +105,7 @@ pub(crate) fn setup_perf_ui_widget<E: PerfUiEntry, W: PerfUiWidget<E>>(
             .find(|(_, marker)| marker.e_root == e_removed)
             .map(|(e, _)| e)
         {
-            commands.entity(e_removed)
-                .remove_children(&[e_entry]);
-            commands.entity(e_entry).despawn_recursive();
+            commands.entity(e_entry).despawn();
         }
     }
     // handle any additions or reconfigurations:
@@ -121,9 +119,7 @@ pub(crate) fn setup_perf_ui_widget<E: PerfUiEntry, W: PerfUiWidget<E>>(
             .find(|(_, marker)| marker.e_root == e_root)
             .map(|(e, _)| e)
         {
-            commands.entity(e_root)
-                .remove_children(&[e_widget]);
-            commands.entity(e_widget).despawn_recursive();
+            commands.entity(e_widget).despawn();
         }
 
         let e_widget = widget.spawn(

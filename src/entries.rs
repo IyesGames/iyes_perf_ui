@@ -21,6 +21,8 @@ pub mod prelude {
     pub use super::diagnostics::{
         PerfUiEntryCpuUsage,
         PerfUiEntryMemUsage,
+        PerfUiEntrySystemCpuUsage,
+        PerfUiEntrySystemMemUsage,
     };
 
     pub use super::render::{
@@ -65,6 +67,10 @@ pub(crate) fn predefined_entries_plugin(app: &mut App) {
     app.add_perf_ui_simple_entry::<PerfUiEntryCpuUsage>();
     #[cfg(feature = "sysinfo")]
     app.add_perf_ui_simple_entry::<PerfUiEntryMemUsage>();
+    #[cfg(feature = "sysinfo")]
+    app.add_perf_ui_simple_entry::<PerfUiEntrySystemCpuUsage>();
+    #[cfg(feature = "sysinfo")]
+    app.add_perf_ui_simple_entry::<PerfUiEntrySystemMemUsage>();
 
     app.add_perf_ui_simple_entry::<PerfUiEntryRenderCpuTime>();
     app.add_perf_ui_simple_entry::<PerfUiEntryRenderGpuTime>();
@@ -121,6 +127,10 @@ pub struct PerfUiAllEntries {
     pub cpu_usage: PerfUiEntryCpuUsage,
     #[cfg(feature = "sysinfo")]
     pub mem_usage: PerfUiEntryMemUsage,
+    #[cfg(feature = "sysinfo")]
+    pub system_cpu_usage: PerfUiEntrySystemCpuUsage,
+    #[cfg(feature = "sysinfo")]
+    pub system_mem_usage: PerfUiEntrySystemMemUsage,
     pub render_cpu: PerfUiEntryRenderCpuTime,
     pub render_gpu: PerfUiEntryRenderGpuTime,
     pub fixed_timestep: PerfUiEntryFixedTimeStep,

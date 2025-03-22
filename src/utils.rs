@@ -4,9 +4,9 @@
 //! formatting of values.
 
 use std::sync::atomic::{AtomicI32, Ordering};
+use std::time::Duration;
 
 use bevy::prelude::*;
-use bevy::utils::Duration;
 use bevy::math::FloatOrd;
 
 static NEXT_SORT_KEY: AtomicI32 = AtomicI32::new(1);

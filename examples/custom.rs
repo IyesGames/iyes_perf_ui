@@ -11,7 +11,6 @@
 //! see the `custom_minimal` example instead.
 
 use bevy::prelude::*;
-use bevy::utils::Duration;
 use bevy::input::mouse::MouseButtonInput;
 use bevy::input::ButtonState;
 use bevy::ecs::system::lifetimeless::SRes;
@@ -19,12 +18,14 @@ use bevy::ecs::system::SystemParam;
 use iyes_perf_ui::prelude::*;
 use iyes_perf_ui::entry::PerfUiEntry;
 
+use std::time::Duration;
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
 
         // we want Bevy to measure these values for us:
-        .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin)
+        .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin::default())
 
         .add_plugins(PerfUiPlugin)
 

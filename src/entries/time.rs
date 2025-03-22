@@ -3,7 +3,7 @@
 use bevy::prelude::*;
 use bevy::ecs::system::lifetimeless::SRes;
 use bevy::ecs::system::SystemParam;
-use bevy::utils::Duration;
+use std::time::Duration;
 
 use crate::prelude::*;
 use crate::entry::*;
