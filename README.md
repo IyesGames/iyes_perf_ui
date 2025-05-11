@@ -12,15 +12,10 @@ Bevy Compatibility:
 
 | Bevy Version | Plugin Version |
 |--------------|----------------|
+| `0.16`       | `0.5`          |
 | `0.15`       | `0.4`          |
 | `0.14`       | `0.3`          |
 | `0.13`       | `0.2`,`0.1`    |
-
-The `main` branch currently contains provisional code for
-Bevy 0.16. It currently does not compile, as it requires PR
-[18476](https://github.com/bevyengine/bevy/pull/18476). The bevy dependency
-in `Cargo.toml` is listed as version `0.16.0-rc.2` in hopes that it will be
-merged by then.
 
 ---
 
