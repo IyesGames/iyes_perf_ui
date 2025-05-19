@@ -204,6 +204,7 @@ pub struct PerfUiDefaultEntries {
 pub struct PerfUiFramerateEntries {
     pub fps: PerfUiEntryFPS,
     pub fps_avg: PerfUiEntryFPSAverage,
+    pub fps_low: PerfUiEntryFPSPctLow,
     pub fps_worst: PerfUiEntryFPSWorst,
     pub frametime: PerfUiEntryFrameTime,
     pub frametime_worst: PerfUiEntryFrameTimeWorst,
