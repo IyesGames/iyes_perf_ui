@@ -42,14 +42,22 @@ The goal of this crate is to make it as useful as possible for any Bevy project:
  - Support for highlighting values using a custom font or color!
    - Allows you to quickly notice if something demands your attention.
 
-Spawning a Perf UI can be as simple as:
+---
+
+First, make sure to add the plugin to your app:
+
+```rust
+app.add_plugins(PerfUiPlugin);
+```
+
+And then, spawning a Perf UI can be as simple as:
 
 ```rust
 commands.spawn(PerfUiDefaultEntries::default());
 ```
 
-This creates a Perf UI with a curated selection of entries, which are in
-my opinion the most useful out of everything provided in this crate.
+This creates a Perf UI with a curated selection of entries, which are,
+in my opinion, the most useful out of everything provided in this crate.
 
 If you want a UI with all the available entries (note: may have significant
 performance overhead):
@@ -86,9 +94,12 @@ commands.spawn((
 ));
 ```
 
-If you want to customize the appearance, set the various fields in each of the
-structs, instead of using `default()`. To customize settings that apply to all entries,
-add the `PerfUiRoot` component.
+If you want to customize the appearance, set the various fields in each of
+the structs, instead of using `default()`. To customize settings that apply
+to all entries, add the `PerfUiRoot` component.
+
+NOTE: if you disable Bevy's built-in default font, you must specify the
+fonts that you would like to use, by customizing `PerfUiRoot`.
 
 ![Screenshot of the simple example showing default configuration](screenshots/simple.png)
 

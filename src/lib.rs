@@ -19,7 +19,15 @@
 //!  - Support for highlighting values using a custom font or color!
 //!    - Allows you to quickly notice if something demands your attention.
 //!
-//! Spawning a Perf UI can be as simple as:
+//! ---
+//!
+//! First, make sure to add the plugin to your app:
+//!
+//! ```rust
+//! app.add_plugins(PerfUiPlugin);
+//! ```
+//!
+//! And then, pawning a Perf UI can be as simple as:
 //!
 //! ```rust
 //! commands.spawn(PerfUiAllEntries::default());
