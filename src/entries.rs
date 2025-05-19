@@ -11,6 +11,7 @@ pub mod prelude {
         PerfUiEntryFPS,
         PerfUiEntryFPSPctLow,
         PerfUiEntryFPSWorst,
+        PerfUiEntryFPSAverage,
         PerfUiEntryFrameTime,
         PerfUiEntryFrameTimeWorst,
         PerfUiEntryFrameCount,
@@ -58,6 +59,7 @@ pub(crate) fn predefined_entries_plugin(app: &mut App) {
     app.add_perf_ui_simple_entry::<PerfUiEntryFPS>();
     app.add_perf_ui_simple_entry::<PerfUiEntryFPSPctLow>();
     app.add_perf_ui_simple_entry::<PerfUiEntryFPSWorst>();
+    app.add_perf_ui_simple_entry::<PerfUiEntryFPSAverage>();
     app.add_perf_ui_simple_entry::<PerfUiEntryFrameTime>();
     app.add_perf_ui_simple_entry::<PerfUiEntryFrameTimeWorst>();
     app.add_perf_ui_simple_entry::<PerfUiEntryFrameCount>();
@@ -117,6 +119,7 @@ pub(crate) fn predefined_entries_plugin(app: &mut App) {
 #[derive(Bundle, Default)]
 pub struct PerfUiAllEntries {
     pub fps: PerfUiEntryFPS,
+    pub fps_avg: PerfUiEntryFPSAverage,
     pub fps_low: PerfUiEntryFPSPctLow,
     pub fps_worst: PerfUiEntryFPSWorst,
     pub frametime: PerfUiEntryFrameTime,
@@ -180,7 +183,7 @@ pub struct PerfUiAllEntries {
 #[allow(missing_docs)]
 #[derive(Bundle, Default)]
 pub struct PerfUiDefaultEntries {
-    pub fps: PerfUiEntryFPS,
+    pub fps_avg: PerfUiEntryFPSAverage,
     pub fps_low: PerfUiEntryFPSPctLow,
     pub frametime: PerfUiEntryFrameTime,
     pub render_cpu: PerfUiEntryRenderCpuTime,
@@ -200,6 +203,7 @@ pub struct PerfUiDefaultEntries {
 #[derive(Bundle, Default)]
 pub struct PerfUiFramerateEntries {
     pub fps: PerfUiEntryFPS,
+    pub fps_avg: PerfUiEntryFPSAverage,
     pub fps_worst: PerfUiEntryFPSWorst,
     pub frametime: PerfUiEntryFrameTime,
     pub frametime_worst: PerfUiEntryFrameTimeWorst,

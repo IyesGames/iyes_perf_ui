@@ -122,6 +122,58 @@ impl Default for PerfUiEntryFPSWorst {
 
 /// Perf UI Entry to display Bevy's built-in FPS measurement diagnostic.
 ///
+/// Displays the average of the values Bevy keeps in its history buffer.
+#[derive(Component, Debug, Clone)]
+#[require(PerfUiRoot)]
+pub struct PerfUiEntryFPSAverage {
+    /// Custom label. If empty (default), the default label will be used.
+    pub label: String,
+    /// Enable color based on value.
+    ///
+    /// To disable (always use default color), set to empty `ColorGradient::default()`.
+    ///
+    /// Default: Red-Yellow-Green gradient between 30-60-120 FPS.
+    pub color_gradient: ColorGradient,
+    /// Highlight the value if FPS is below this threshold.
+    ///
+    /// Default: `20.0`
+    pub threshold_highlight: Option<f32>,
+    /// If displayed using a Bar (or other similar) widget that can
+    /// show the value within a range, what should its max value be?
+    ///
+    /// If `None`, the value will be computed from the maximum of the
+    /// color gradient and the highlight threshold.
+    ///
+    /// Default: `None`
+    pub max_value_hint: Option<f32>,
+    /// Number of digits to display for the integer (whole number) part.
+    ///
+    /// Default: `4`
+    pub digits: u8,
+    /// Number of digits to display for the fractional (after the decimal point) part.
+    ///
+    /// Default: `0`
+    pub precision: u8,
+    /// Sort Key (control where the entry will appear in the Perf UI).
+    pub sort_key: i32,
+}
+
+impl Default for PerfUiEntryFPSAverage {
+    fn default() -> Self {
+        PerfUiEntryFPSAverage {
+            label: String::new(),
+            color_gradient: ColorGradient::new_preset_ryg(30.0, 60.0, 120.0).unwrap(),
+            threshold_highlight: Some(20.0),
+            max_value_hint: None,
+            digits: 4,
+            precision: 0,
+            sort_key: next_sort_key(),
+        }
+    }
+}
+
+/// Perf UI Entry to display Bevy's built-in FPS measurement diagnostic.
+///
 /// Computes the average of the lowest N percent of values in recent history.
 ///
 /// This is akin to the "1% low" metric that is commonly used to measure
@@ -696,6 +748,66 @@ impl PerfUiEntry for PerfUiEntryFPSWorst {
 }
 
 impl PerfUiEntryDisplayRange for PerfUiEntryFPSWorst {
+    fn max_value_hint(&self) -> Option<Self::Value> {
+        self.max_value_hint.or(
+            match (self.threshold_highlight, self.color_gradient.max_stop()) {
+                (Some(x), None) => Some(x),
+                (None, Some((x, _))) => Some(*x),
+                (Some(a), Some((b, _))) => Some(a.max(*b)),
+                (None, None) => None,
+            }
+        )
+    }
+    fn min_value_hint(&self) -> Option<Self::Value> {
+        Some(0.0)
+    }
+}
+
+impl PerfUiEntry for PerfUiEntryFPSAverage {
+    type SystemParam = SRes<DiagnosticsStore>;
+    type Value = f32;
+
+    fn label(&self) -> &str {
+        if self.label.is_empty() {
+            "FPS (avg)"
+        } else {
+            &self.label
+        }
+    }
+    fn update_value(
+        &self,
+        diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
+    ) -> Option<Self::Value> {
+        Some(diagnostics.get(&FrameTimeDiagnosticsPlugin::FPS)?
+            .average()? as f32
+        )
+    }
+    fn format_value(
+        &self,
+        value: &Self::Value,
+    ) -> String {
+        format_pretty_float(self.digits, self.precision, *value as f64)
+    }
+    fn value_color(
+        &self,
+        value: &Self::Value,
+    ) -> Option<Color> {
+        self.color_gradient.get_color_for_value(*value)
+    }
+    fn value_highlight(
+        &self,
+        value: &Self::Value,
+    ) -> bool {
+        self.threshold_highlight
+            .map(|t| *value < t)
+            .unwrap_or(false)
+    }
+    fn sort_key(&self) -> i32 {
+        self.sort_key
+    }
+}
+
+impl PerfUiEntryDisplayRange for PerfUiEntryFPSAverage {
     fn max_value_hint(&self) -> Option<Self::Value> {
         self.max_value_hint.or(
             match (self.threshold_highlight, self.color_gradient.max_stop()) {
