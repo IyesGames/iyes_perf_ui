@@ -12,9 +12,15 @@ Bevy Compatibility:
 
 | Bevy Version | Plugin Version |
 |--------------|----------------|
-| `0.15-rc.3`  | `main`         |
+| `0.15`       | `0.4`          |
 | `0.14`       | `0.3`          |
 | `0.13`       | `0.2`,`0.1`    |
+
+The `main` branch currently contains provisional code for
+Bevy 0.16. It currently does not compile, as it requires PR
+[18476](https://github.com/bevyengine/bevy/pull/18476). The bevy dependency
+in `Cargo.toml` is listed as version `0.16.0-rc.2` in hopes that it will be
+merged by then.
 
 ---
 
@@ -27,6 +33,7 @@ The goal of this crate is to make it as useful as possible for any Bevy project:
  - Modular! You decide what info you want to display!
    - Choose any combination of predefined entries (see [`specific_entries`](examples/specific_entries.rs) example):
      - Framerate (FPS), Frame Time, Frame Count, ECS Entity Count, CPU Usage, RAM Usage,
+       Render CPU Time, Render GPU Time,
        Wall Clock, Running Time, Fixed Time Step, Fixed Overstep,
        Cursor Position, Window Resolution, Window Scale Factor, Window Mode, Present Mode
    - Implement your own custom entries to display anything you like!
@@ -57,7 +64,6 @@ instead of using the above bundles.
 
 ```rust
 commands.spawn((
-   PerfUiRoot::default(),
    PerfUiEntryFPS::default(),
    PerfUiEntryClock::default(),
    // ...
@@ -81,7 +87,8 @@ commands.spawn((
 ```
 
 If you want to customize the appearance, set the various fields in each of the
-structs, instead of using `default()`.
+structs, instead of using `default()`. To customize settings that apply to all entries,
+add the `PerfUiRoot` component.
 
 ![Screenshot of the simple example showing default configuration](screenshots/simple.png)
 
@@ -117,5 +124,9 @@ fewer entries.
 Just keep this in mind. Your game will run slightly faster when the Perf UI
 is not being displayed. This crate is designed to eliminate all perf overhead
 when the UI is not rendered on-screen.
+
+A "full" UI with all the entries offered by this crate can add a few hundred
+microseconds of frame time on typical gaming hardware, most of which is CPU
+time spent in Bevy's UI layout systems (in `PostUpdate`).
 
 I am looking for ways to optimize this crate to reduce its overhead.

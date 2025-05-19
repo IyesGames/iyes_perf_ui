@@ -87,11 +87,11 @@ pub struct PerfUiRoot {
     pub font_highlight: Handle<Font>,
     /// The font size for labels.
     ///
-    /// Default: `16.0`
+    /// Default: `12.0`
     pub fontsize_label: f32,
     /// The font size for values.
     ///
-    /// Default: `18.0`
+    /// Default: `12.0`
     pub fontsize_value: f32,
     /// The ZIndex of the UI.
     ///
@@ -117,10 +117,10 @@ pub struct PerfUiRoot {
     ///
     /// Default: `0.0`
     pub inner_padding: f32,
-    /// Force a fixed width (in pixels) for the values column
+    /// The width (in pixels) of the values column
     ///
-    /// Default: `None`
-    pub values_col_width: Option<f32>,
+    /// Default: `128.0`
+    pub values_col_width: f32,
 }
 
 impl Default for PerfUiRoot {
@@ -138,15 +138,15 @@ impl Default for PerfUiRoot {
             font_label: default(),
             font_value: default(),
             font_highlight: default(),
-            fontsize_label: 16.0,
-            fontsize_value: 18.0,
+            fontsize_label: 12.0,
+            fontsize_value: 12.0,
             z_index: GlobalZIndex(i32::MAX),
             position: default(),
             margin: 16.0,
             padding: 2.0,
             inner_margin: 0.0,
             inner_padding: 0.0,
-            values_col_width: None,
+            values_col_width: 128.0,
         }
     }
 }

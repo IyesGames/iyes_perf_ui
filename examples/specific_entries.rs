@@ -9,9 +9,10 @@ fn main() {
         .add_plugins(DefaultPlugins)
 
         // we want Bevy to measure these values for us:
-        .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin)
+        .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin::default())
         .add_plugins(bevy::diagnostic::EntityCountDiagnosticsPlugin)
         .add_plugins(bevy::diagnostic::SystemInformationDiagnosticsPlugin)
+        .add_plugins(bevy::render::diagnostic::RenderDiagnosticsPlugin)
 
         .add_plugins(PerfUiPlugin)
         .add_systems(Startup, setup)
@@ -25,11 +26,6 @@ fn setup(mut commands: Commands) {
 
     // Customize your Perf UI by explicitly listing the entries you want.
     commands.spawn((
-        PerfUiRoot {
-            // set a fixed width to make all the bars line up
-            values_col_width: Some(160.0),
-            ..Default::default()
-        },
         // when we have lots of entries, we have to group them
         // into tuples, because of Bevy Rust syntax limitations
         (
@@ -37,6 +33,8 @@ fn setup(mut commands: Commands) {
             PerfUiWidgetBar::new(PerfUiEntryFPSWorst::default()),
             PerfUiWidgetBar::new(PerfUiEntryFrameTime::default()),
             PerfUiWidgetBar::new(PerfUiEntryFrameTimeWorst::default()),
+            PerfUiWidgetBar::new(PerfUiEntryRenderCpuTime::default()),
+            PerfUiWidgetBar::new(PerfUiEntryRenderGpuTime::default()),
             PerfUiWidgetBar::new(PerfUiEntryEntityCount::default()),
             PerfUiWidgetBar::new(PerfUiEntryCpuUsage::default()),
             PerfUiWidgetBar::new(PerfUiEntryMemUsage::default()),

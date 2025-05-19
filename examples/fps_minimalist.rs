@@ -10,7 +10,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
 
         // we want Bevy to measure these values for us:
-        .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin)
+        .add_plugins(bevy::diagnostic::FrameTimeDiagnosticsPlugin::default())
 
         .add_plugins(PerfUiPlugin)
         .add_systems(Startup, setup)
@@ -26,6 +26,7 @@ fn setup(mut commands: Commands) {
         PerfUiRoot {
             display_labels: false,
             layout_horizontal: true,
+            values_col_width: 32.0,
             ..default()
         },
         PerfUiEntryFPSWorst::default(),

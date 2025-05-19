@@ -24,5 +24,11 @@ pub(crate) fn predefined_widgets_plugin(app: &mut App) {
     app.add_perf_ui_widget::<bar::PerfUiWidgetBar<PerfUiEntryCpuUsage>, _>();
     #[cfg(feature = "sysinfo")]
     app.add_perf_ui_widget::<bar::PerfUiWidgetBar<PerfUiEntryMemUsage>, _>();
+    #[cfg(feature = "sysinfo")]
+    app.add_perf_ui_widget::<bar::PerfUiWidgetBar<PerfUiEntrySystemCpuUsage>, _>();
+    #[cfg(feature = "sysinfo")]
+    app.add_perf_ui_widget::<bar::PerfUiWidgetBar<PerfUiEntrySystemMemUsage>, _>();
     app.add_perf_ui_widget::<bar::PerfUiWidgetBar<PerfUiEntryFixedOverstep>, _>();
+    app.add_perf_ui_widget::<bar::PerfUiWidgetBar<PerfUiEntryRenderCpuTime>, _>();
+    app.add_perf_ui_widget::<bar::PerfUiWidgetBar<PerfUiEntryRenderGpuTime>, _>();
 }

@@ -79,17 +79,6 @@ pub trait PerfUiEntry: Component {
     ) -> bool {
         false
     }
-
-    /// Optional: provide a desired width for the value string.
-    ///
-    /// The formatted value will be padded with spaces. This allows
-    /// everything to line up nicely in the UI and prevents the UI from
-    /// spontaneously resizing as the values change.
-    ///
-    /// (assuming a monospace font)
-    fn width_hint(&self) -> usize {
-        0
-    }
 }
 
 /// Extension to [`PerfUiEntry`] to provide an expected range of values.

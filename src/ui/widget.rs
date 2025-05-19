@@ -41,6 +41,9 @@ pub trait PerfUiWidget<T: PerfUiEntry>: Component {
     /// into `type SystemParamSpawn` and access them via `param`.
     ///
     /// Use the provided `commands` for spawning your entities.
+    ///
+    /// Do not add yourself as a child of `e_root`! `iyes_perf_ui` will take
+    /// care of that for you!
     fn spawn(
         &self,
         root: &PerfUiRoot,
@@ -102,9 +105,7 @@ pub(crate) fn setup_perf_ui_widget<E: PerfUiEntry, W: PerfUiWidget<E>>(
             .find(|(_, marker)| marker.e_root == e_removed)
             .map(|(e, _)| e)
         {
-            commands.entity(e_removed)
-                .remove_children(&[e_entry]);
-            commands.entity(e_entry).despawn_recursive();
+            commands.entity(e_entry).despawn();
         }
     }
     // handle any additions or reconfigurations:
@@ -118,9 +119,7 @@ pub(crate) fn setup_perf_ui_widget<E: PerfUiEntry, W: PerfUiWidget<E>>(
             .find(|(_, marker)| marker.e_root == e_root)
             .map(|(e, _)| e)
         {
-            commands.entity(e_root)
-                .remove_children(&[e_widget]);
-            commands.entity(e_widget).despawn_recursive();
+            commands.entity(e_widget).despawn();
         }
 
         let e_widget = widget.spawn(
@@ -202,6 +201,10 @@ impl<E: PerfUiEntry> PerfUiWidget<E> for E {
                     font_size: root.fontsize_label,
                     ..default()
                 },
+                TextLayout {
+                    linebreak: LineBreak::NoWrap,
+                    justify: JustifyText::Left,
+                },
             )).id();
             commands.entity(e_label_wrapper).add_child(e_label);
             commands.entity(e_widget).add_child(e_label_wrapper);
@@ -209,11 +212,7 @@ impl<E: PerfUiEntry> PerfUiWidget<E> for E {
         let e_text_wrapper = commands.spawn((
             Node {
                 padding: UiRect::all(Val::Px(4.0)),
-                width: if let Some(w) = root.values_col_width {
-                    Val::Px(w)
-                } else {
-                    Val::Auto
-                },
+                width: Val::Px(root.values_col_width),
                 justify_content: JustifyContent::FlexEnd,
                 ..default()
             },
@@ -229,6 +228,10 @@ impl<E: PerfUiEntry> PerfUiWidget<E> for E {
                 ..default()
             },
             TextColor(root.err_color),
+            TextLayout {
+                linebreak: LineBreak::NoWrap,
+                justify: JustifyText::Right,
+            },
         )).id();
         commands.entity(e_text_wrapper).add_child(e_text);
         commands.entity(e_widget).add_child(e_text_wrapper);
@@ -252,12 +255,7 @@ impl<E: PerfUiEntry> PerfUiWidget<E> for E {
                 let new_color = self.value_color(&value)
                     .unwrap_or(root.default_value_color);
                 let s = self.format_value(&value);
-                let width_hint = self.width_hint();
-                *text = if s.len() < width_hint {
-                    Text(format!("{:>w$}", s, w = width_hint))
-                } else {
-                    Text(s)
-                };
+                *text = Text(s);
                 *color = TextColor(new_color);
                 if self.value_highlight(&value) {
                     font.font = root.font_highlight.clone();
@@ -267,12 +265,7 @@ impl<E: PerfUiEntry> PerfUiWidget<E> for E {
                 }
             } else {
                 let s = root.text_err.clone();
-                let width_hint = self.width_hint();
-                *text = if s.len() < width_hint {
-                    Text(format!("{:>w$}", s, w = width_hint))
-                } else {
-                    Text(s)
-                };
+                *text = Text(s);
                 *color = TextColor(root.err_color);
                 font.font = root.font_value.clone();
             }

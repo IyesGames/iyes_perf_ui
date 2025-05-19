@@ -32,7 +32,8 @@ pub struct PerfUiEntryFPS {
     /// If displayed using a Bar (or other similar) widget that can
     /// show the value within a range, what should its max value be?
     ///
-    /// If `None`, the value will be computed from the color gradient.
+    /// If `None`, the value will be computed from the maximum of the
+    /// color gradient and the highlight threshold.
     ///
     /// Default: `None`
     pub max_value_hint: Option<f32>,
@@ -88,7 +89,8 @@ pub struct PerfUiEntryFPSWorst {
     /// If displayed using a Bar (or other similar) widget that can
     /// show the value within a range, what should its max value be?
     ///
-    /// If `None`, the value will be computed from the color gradient.
+    /// If `None`, the value will be computed from the maximum of the
+    /// color gradient and the highlight threshold.
     ///
     /// Default: `None`
     pub max_value_hint: Option<f32>,
@@ -113,6 +115,77 @@ impl Default for PerfUiEntryFPSWorst {
             max_value_hint: None,
             digits: 4,
             precision: 0,
+            sort_key: next_sort_key(),
+        }
+    }
+}
+
+/// Perf UI Entry to display Bevy's built-in FPS measurement diagnostic.
+///
+/// Computes the average of the lowest N percent of values in recent history.
+///
+/// This is akin to the "1% low" metric that is commonly used to measure
+/// frame rate stability. By comparing it to the average or current FPS,
+/// you get an idea of how much the frame rate fluctuates. If the values are
+/// close, that indicates a smooth experience. If the difference is large,
+/// that indicates lag spikes / inconsistent framerate.
+///
+/// The percentage of values to select is customizable, defaulting to 10%.
+/// See the `filter_fraction` field.
+///
+/// The reason for using 10% instead of 1% as the default is that Bevy only
+/// keeps a history buffer of 120 values. Using 1% would only leave 2 values
+/// (rounded up). 10% is 12 values, which arguably gives a better indication
+/// of framerate stability.
+#[derive(Component, Debug, Clone)]
+#[require(PerfUiRoot)]
+pub struct PerfUiEntryFPSPctLow {
+    /// Custom label. If empty (default), the default label will be used.
+    pub label: String,
+    /// Enable color based on value.
+    ///
+    /// To disable (always use default color), set to empty `ColorGradient::default()`.
+    ///
+    /// Default: Red-Yellow-Green gradient between 30-60-120 FPS.
+    pub color_gradient: ColorGradient,
+    /// Highlight the value if FPS is below this threshold.
+    ///
+    /// Default: `20.0`
+    pub threshold_highlight: Option<f32>,
+    /// If displayed using a Bar (or other similar) widget that can
+    /// show the value within a range, what should its max value be?
+    ///
+    /// If `None`, the value will be computed from the maximum of the
+    /// color gradient and the highlight threshold.
+    ///
+    /// Default: `None`
+    pub max_value_hint: Option<f32>,
+    /// Number of digits to display for the integer (whole number) part.
+    ///
+    /// Default: `4`
+    pub digits: u8,
+    /// Number of digits to display for the fractional (after the decimal point) part.
+    ///
+    /// Default: `0`
+    pub precision: u8,
+    /// What fraction of values to select?
+    ///
+    /// Default: `0.1` (i.e "10% low")
+    pub filter_fraction: f32,
+    /// Sort Key (control where the entry will appear in the Perf UI).
+    pub sort_key: i32,
+}
+
+impl Default for PerfUiEntryFPSPctLow {
+    fn default() -> Self {
+        PerfUiEntryFPSPctLow {
+            label: String::new(),
+            color_gradient: ColorGradient::new_preset_ryg(30.0, 60.0, 120.0).unwrap(),
+            threshold_highlight: Some(20.0),
+            max_value_hint: None,
+            digits: 4,
+            precision: 0,
+            filter_fraction: 0.1,
             sort_key: next_sort_key(),
         }
     }
@@ -143,13 +216,14 @@ pub struct PerfUiEntryFrameTime {
     /// If displayed using a Bar (or other similar) widget that can
     /// show the value within a range, what should its max value be?
     ///
-    /// If `None`, the value will be computed from the color gradient.
+    /// If `None`, the value will be computed from the maximum of the
+    /// color gradient and the highlight threshold.
     ///
     /// Default: `None`
     pub max_value_hint: Option<f32>,
     /// Should we display the smoothed value or the raw value?
     ///
-    /// Default: true (smoothed)
+    /// Default: false (raw)
     pub smoothed: bool,
     /// Number of digits to display for the integer (whole number) part.
     ///
@@ -175,7 +249,7 @@ impl Default for PerfUiEntryFrameTime {
             ).unwrap(),
             threshold_highlight: Some(1000.0 / 20.0),
             max_value_hint: None,
-            smoothed: true,
+            smoothed: false,
             digits: 2,
             precision: 3,
             sort_key: next_sort_key(),
@@ -210,7 +284,8 @@ pub struct PerfUiEntryFrameTimeWorst {
     /// If displayed using a Bar (or other similar) widget that can
     /// show the value within a range, what should its max value be?
     ///
-    /// If `None`, the value will be computed from the color gradient.
+    /// If `None`, the value will be computed from the maximum of the
+    /// color gradient and the highlight threshold.
     ///
     /// Default: `None`
     pub max_value_hint: Option<f32>,
@@ -288,10 +363,11 @@ pub struct PerfUiEntryEntityCount {
     /// If displayed using a Bar (or other similar) widget that can
     /// show the value within a range, what should its max value be?
     ///
-    /// If `None`, the value will be computed from the color gradient.
+    /// If `None`, the value will be computed from the maximum of the
+    /// color gradient and the highlight threshold.
     ///
     /// Default: `None`
-    pub max_value_hint: Option<f32>,
+    pub max_value_hint: Option<u32>,
     /// Number of digits to display.
     ///
     /// Default: `6`
@@ -313,9 +389,9 @@ impl Default for PerfUiEntryEntityCount {
     }
 }
 
-/// Perf UI Entry to display Bevy's built-in CPU Usage measurement diagnostic.
+/// Perf UI Entry to display Bevy's built-in Process CPU Usage measurement diagnostic.
 ///
-/// Displays the usage as a percentage.
+/// Displays the CPU usage of the current process (your game) as a percentage.
 #[cfg(feature = "sysinfo")]
 #[derive(Component, Debug, Clone)]
 #[require(PerfUiRoot)]
@@ -358,13 +434,13 @@ impl Default for PerfUiEntryCpuUsage {
     }
 }
 
-/// Perf UI Entry to display Bevy's built-in Memory (RAM) Usage measurement diagnostic.
+/// Perf UI Entry to display Bevy's built-in System CPU Usage measurement diagnostic.
 ///
-/// Displays the usage as a percentage.
+/// Displays the Total System CPU usage as a percentage.
 #[cfg(feature = "sysinfo")]
 #[derive(Component, Debug, Clone)]
 #[require(PerfUiRoot)]
-pub struct PerfUiEntryMemUsage {
+pub struct PerfUiEntrySystemCpuUsage {
     /// Custom label. If empty (default), the default label will be used.
     pub label: String,
     /// Enable color based on value.
@@ -390,9 +466,113 @@ pub struct PerfUiEntryMemUsage {
 }
 
 #[cfg(feature = "sysinfo")]
+impl Default for PerfUiEntrySystemCpuUsage {
+    fn default() -> Self {
+        PerfUiEntrySystemCpuUsage {
+            label: String::new(),
+            color_gradient: ColorGradient::new_preset_gyr(25.0, 50.0, 75.0).unwrap(),
+            threshold_highlight: Some(90.0),
+            smoothed: true,
+            precision: 2,
+            sort_key: next_sort_key(),
+        }
+    }
+}
+
+/// Perf UI Entry to display Bevy's built-in Process Memory (RAM) Usage measurement diagnostic.
+///
+/// Displays the amount of RAM used by the current process (your game) in GiB.
+#[cfg(feature = "sysinfo")]
+#[derive(Component, Debug, Clone)]
+#[require(PerfUiRoot)]
+pub struct PerfUiEntryMemUsage {
+    /// Custom label. If empty (default), the default label will be used.
+    pub label: String,
+    /// Display the unit ("GiB") alongside the number.
+    ///
+    /// Default: `true`
+    pub display_units: bool,
+    /// Enable color based on value.
+    ///
+    /// To disable (always use default color), set to empty `ColorGradient::default()`.
+    ///
+    /// Default: Green-Yellow-Red gradient between 0.5-1.0-2.0 GiB.
+    pub color_gradient: ColorGradient,
+    /// Highlight the value if above this threshold.
+    ///
+    /// Default: 3.0 GiB.
+    pub threshold_highlight: Option<f32>,
+    /// If displayed using a Bar (or other similar) widget that can
+    /// show the value within a range, what should its max value be?
+    ///
+    /// If `None`, the value will be computed from the maximum of the
+    /// color gradient and the highlight threshold.
+    ///
+    /// Default: `Some(4.0)`.
+    pub max_value_hint: Option<f32>,
+    /// Should we display the smoothed value or the raw value?
+    ///
+    /// Default: true (smoothed)
+    pub smoothed: bool,
+    /// Number of digits to display for the fractional (after the decimal point) part.
+    ///
+    /// Default: `3`
+    pub precision: u8,
+    /// Sort Key (control where the entry will appear in the Perf UI).
+    pub sort_key: i32,
+}
+
+#[cfg(feature = "sysinfo")]
 impl Default for PerfUiEntryMemUsage {
     fn default() -> Self {
         PerfUiEntryMemUsage {
+            label: String::new(),
+            display_units: true,
+            color_gradient: ColorGradient::new_preset_gyr(0.5, 1.0, 2.0).unwrap(),
+            threshold_highlight: Some(3.0),
+            max_value_hint: Some(4.0),
+            smoothed: true,
+            precision: 3,
+            sort_key: next_sort_key(),
+        }
+    }
+}
+
+/// Perf UI Entry to display Bevy's built-in System Memory (RAM) Usage measurement diagnostic.
+///
+/// Displays the Total System RAM usage as a percentage.
+#[cfg(feature = "sysinfo")]
+#[derive(Component, Debug, Clone)]
+#[require(PerfUiRoot)]
+pub struct PerfUiEntrySystemMemUsage {
+    /// Custom label. If empty (default), the default label will be used.
+    pub label: String,
+    /// Enable color based on value.
+    ///
+    /// To disable (always use default color), set to empty `ColorGradient::default()`.
+    ///
+    /// Default: Green-Yellow-Red gradient between 25%-50%-75%.
+    pub color_gradient: ColorGradient,
+    /// Highlight the value if above this threshold.
+    ///
+    /// Default: 90%
+    pub threshold_highlight: Option<f32>,
+    /// Should we display the smoothed value or the raw value?
+    ///
+    /// Default: true (smoothed)
+    pub smoothed: bool,
+    /// Number of digits to display for the fractional (after the decimal point) part.
+    ///
+    /// Default: `2`
+    pub precision: u8,
+    /// Sort Key (control where the entry will appear in the Perf UI).
+    pub sort_key: i32,
+}
+
+#[cfg(feature = "sysinfo")]
+impl Default for PerfUiEntrySystemMemUsage {
+    fn default() -> Self {
+        PerfUiEntrySystemMemUsage {
             label: String::new(),
             color_gradient: ColorGradient::new_preset_gyr(25.0, 50.0, 75.0).unwrap(),
             threshold_highlight: Some(90.0),
@@ -413,9 +593,6 @@ impl PerfUiEntry for PerfUiEntryFPS {
         } else {
             &self.label
         }
-    }
-    fn width_hint(&self) -> usize {
-        width_hint_pretty_float(self.digits, self.precision)
     }
     fn update_value(
         &self,
@@ -455,8 +632,12 @@ impl PerfUiEntry for PerfUiEntryFPS {
 impl PerfUiEntryDisplayRange for PerfUiEntryFPS {
     fn max_value_hint(&self) -> Option<Self::Value> {
         self.max_value_hint.or(
-            self.color_gradient.max_stop()
-                .map(|(v, _)| *v)
+            match (self.threshold_highlight, self.color_gradient.max_stop()) {
+                (Some(x), None) => Some(x),
+                (None, Some((x, _))) => Some(*x),
+                (Some(a), Some((b, _))) => Some(a.max(*b)),
+                (None, None) => None,
+            }
         ).map(|v| v as f64)
     }
     fn min_value_hint(&self) -> Option<Self::Value> {
@@ -470,13 +651,10 @@ impl PerfUiEntry for PerfUiEntryFPSWorst {
 
     fn label(&self) -> &str {
         if self.label.is_empty() {
-            "FPS (min)"
+            "FPS (worst)"
         } else {
             &self.label
         }
-    }
-    fn width_hint(&self) -> usize {
-        width_hint_pretty_float(self.digits, self.precision)
     }
     fn update_value(
         &self,
@@ -520,8 +698,91 @@ impl PerfUiEntry for PerfUiEntryFPSWorst {
 impl PerfUiEntryDisplayRange for PerfUiEntryFPSWorst {
     fn max_value_hint(&self) -> Option<Self::Value> {
         self.max_value_hint.or(
-            self.color_gradient.max_stop()
-                .map(|(v, _)| *v)
+            match (self.threshold_highlight, self.color_gradient.max_stop()) {
+                (Some(x), None) => Some(x),
+                (None, Some((x, _))) => Some(*x),
+                (Some(a), Some((b, _))) => Some(a.max(*b)),
+                (None, None) => None,
+            }
+        )
+    }
+    fn min_value_hint(&self) -> Option<Self::Value> {
+        Some(0.0)
+    }
+}
+
+impl PerfUiEntry for PerfUiEntryFPSPctLow {
+    type SystemParam = SRes<DiagnosticsStore>;
+    type Value = f32;
+
+    fn label(&self) -> &str {
+        if self.label.is_empty() {
+            "FPS (low)"
+        } else {
+            &self.label
+        }
+    }
+    fn update_value(
+        &self,
+        diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
+    ) -> Option<Self::Value> {
+        let mut values: Vec<_> = diagnostics
+            .get(&FrameTimeDiagnosticsPlugin::FPS)?
+            .values()
+            .filter_map(|f| if !f.is_nan() {
+                Some(FloatOrd(*f as f32))
+            } else {
+                None
+            })
+            .collect();
+
+        if values.is_empty() {
+            return None;
+        }
+        let bottom_len = (values.len() as f32 * self.filter_fraction).ceil() as usize;
+        if bottom_len == 0 {
+            return None;
+        }
+
+        values.sort_unstable();
+
+        let sum: f32 = values.into_iter().take(bottom_len).map(|fo| fo.0).sum();
+        Some(sum / bottom_len as f32)
+    }
+    fn format_value(
+        &self,
+        value: &Self::Value,
+    ) -> String {
+        format_pretty_float(self.digits, self.precision, *value as f64)
+    }
+    fn value_color(
+        &self,
+        value: &Self::Value,
+    ) -> Option<Color> {
+        self.color_gradient.get_color_for_value(*value)
+    }
+    fn value_highlight(
+        &self,
+        value: &Self::Value,
+    ) -> bool {
+        self.threshold_highlight
+            .map(|t| *value < t)
+            .unwrap_or(false)
+    }
+    fn sort_key(&self) -> i32 {
+        self.sort_key
+    }
+}
+
+impl PerfUiEntryDisplayRange for PerfUiEntryFPSPctLow {
+    fn max_value_hint(&self) -> Option<Self::Value> {
+        self.max_value_hint.or(
+            match (self.threshold_highlight, self.color_gradient.max_stop()) {
+                (Some(x), None) => Some(x),
+                (None, Some((x, _))) => Some(*x),
+                (Some(a), Some((b, _))) => Some(a.max(*b)),
+                (None, None) => None,
+            }
         )
     }
     fn min_value_hint(&self) -> Option<Self::Value> {
@@ -538,14 +799,6 @@ impl PerfUiEntry for PerfUiEntryFrameTime {
             "Frame Time"
         } else {
             &self.label
-        }
-    }
-    fn width_hint(&self) -> usize {
-        let w = width_hint_pretty_float(self.digits, self.precision);
-        if self.display_units {
-            w + 3
-        } else {
-            w
         }
     }
     fn update_value(
@@ -590,8 +843,12 @@ impl PerfUiEntry for PerfUiEntryFrameTime {
 impl PerfUiEntryDisplayRange for PerfUiEntryFrameTime {
     fn max_value_hint(&self) -> Option<Self::Value> {
         self.max_value_hint.or(
-            self.color_gradient.max_stop()
-                .map(|(v, _)| *v)
+            match (self.threshold_highlight, self.color_gradient.max_stop()) {
+                (Some(x), None) => Some(x),
+                (None, Some((x, _))) => Some(*x),
+                (Some(a), Some((b, _))) => Some(a.max(*b)),
+                (None, None) => None,
+            }
         ).map(|v| v as f64)
     }
     fn min_value_hint(&self) -> Option<Self::Value> {
@@ -608,14 +865,6 @@ impl PerfUiEntry for PerfUiEntryFrameTimeWorst {
             "Frame Time (max)"
         } else {
             &self.label
-        }
-    }
-    fn width_hint(&self) -> usize {
-        let w = width_hint_pretty_float(self.digits, self.precision);
-        if self.display_units {
-            w + 3
-        } else {
-            w
         }
     }
     fn update_value(
@@ -664,8 +913,12 @@ impl PerfUiEntry for PerfUiEntryFrameTimeWorst {
 impl PerfUiEntryDisplayRange for PerfUiEntryFrameTimeWorst {
     fn max_value_hint(&self) -> Option<Self::Value> {
         self.max_value_hint.or(
-            self.color_gradient.max_stop()
-                .map(|(v, _)| *v)
+            match (self.threshold_highlight, self.color_gradient.max_stop()) {
+                (Some(x), None) => Some(x),
+                (None, Some((x, _))) => Some(*x),
+                (Some(a), Some((b, _))) => Some(a.max(*b)),
+                (None, None) => None,
+            }
         )
     }
     fn min_value_hint(&self) -> Option<Self::Value> {
@@ -683,9 +936,6 @@ impl PerfUiEntry for PerfUiEntryFrameCount {
         } else {
             &self.label
         }
-    }
-    fn width_hint(&self) -> usize {
-        width_hint_pretty_int(self.digits)
     }
     fn update_value(
         &self,
@@ -714,9 +964,6 @@ impl PerfUiEntry for PerfUiEntryEntityCount {
         } else {
             &self.label
         }
-    }
-    fn width_hint(&self) -> usize {
-        width_hint_pretty_int(self.digits)
     }
     fn update_value(
         &self,
@@ -752,9 +999,13 @@ impl PerfUiEntry for PerfUiEntryEntityCount {
 impl PerfUiEntryDisplayRange for PerfUiEntryEntityCount {
     fn max_value_hint(&self) -> Option<Self::Value> {
         self.max_value_hint.or(
-            self.color_gradient.max_stop()
-                .map(|(v, _)| *v)
-        ).map(|v| v as u32)
+            match (self.threshold_highlight, self.color_gradient.max_stop()) {
+                (Some(x), None) => Some(x),
+                (None, Some((x, _))) => Some(*x as u32),
+                (Some(a), Some((b, _))) => Some(a.max(*b as u32)),
+                (None, None) => None,
+            }
+        )
     }
     fn min_value_hint(&self) -> Option<Self::Value> {
         Some(0)
@@ -768,22 +1019,19 @@ impl PerfUiEntry for PerfUiEntryCpuUsage {
 
     fn label(&self) -> &str {
         if self.label.is_empty() {
-            "Total CPU Usage"
+            "CPU Usage"
         } else {
             &self.label
         }
-    }
-    fn width_hint(&self) -> usize {
-        width_hint_pretty_float(2, self.precision) + 1
     }
     fn update_value(
         &self,
         diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         Some(if self.smoothed {
-            diagnostics.get(&SystemInformationDiagnosticsPlugin::CPU_USAGE)?.smoothed()?
+            diagnostics.get(&SystemInformationDiagnosticsPlugin::PROCESS_CPU_USAGE)?.smoothed()?
         } else {
-            diagnostics.get(&SystemInformationDiagnosticsPlugin::CPU_USAGE)?.value()?
+            diagnostics.get(&SystemInformationDiagnosticsPlugin::PROCESS_CPU_USAGE)?.value()?
         })
     }
     fn format_value(
@@ -824,28 +1072,25 @@ impl PerfUiEntryDisplayRange for PerfUiEntryCpuUsage {
 }
 
 #[cfg(feature = "sysinfo")]
-impl PerfUiEntry for PerfUiEntryMemUsage {
+impl PerfUiEntry for PerfUiEntrySystemCpuUsage {
     type SystemParam = SRes<DiagnosticsStore>;
     type Value = f64;
 
     fn label(&self) -> &str {
         if self.label.is_empty() {
-            "Total RAM Usage"
+            "System CPU Usage"
         } else {
             &self.label
         }
-    }
-    fn width_hint(&self) -> usize {
-        width_hint_pretty_float(2, self.precision) + 1
     }
     fn update_value(
         &self,
         diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
     ) -> Option<Self::Value> {
         Some(if self.smoothed {
-            diagnostics.get(&SystemInformationDiagnosticsPlugin::MEM_USAGE)?.smoothed()?
+            diagnostics.get(&SystemInformationDiagnosticsPlugin::SYSTEM_CPU_USAGE)?.smoothed()?
         } else {
-            diagnostics.get(&SystemInformationDiagnosticsPlugin::MEM_USAGE)?.value()?
+            diagnostics.get(&SystemInformationDiagnosticsPlugin::SYSTEM_CPU_USAGE)?.value()?
         })
     }
     fn format_value(
@@ -876,7 +1121,134 @@ impl PerfUiEntry for PerfUiEntryMemUsage {
 }
 
 #[cfg(feature = "sysinfo")]
+impl PerfUiEntryDisplayRange for PerfUiEntrySystemCpuUsage {
+    fn max_value_hint(&self) -> Option<Self::Value> {
+        Some(100.0)
+    }
+    fn min_value_hint(&self) -> Option<Self::Value> {
+        Some(0.0)
+    }
+}
+
+#[cfg(feature = "sysinfo")]
+impl PerfUiEntry for PerfUiEntryMemUsage {
+    type SystemParam = SRes<DiagnosticsStore>;
+    type Value = f64;
+
+    fn label(&self) -> &str {
+        if self.label.is_empty() {
+            "RAM Usage"
+        } else {
+            &self.label
+        }
+    }
+    fn update_value(
+        &self,
+        diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
+    ) -> Option<Self::Value> {
+        Some(if self.smoothed {
+            diagnostics.get(&SystemInformationDiagnosticsPlugin::PROCESS_MEM_USAGE)?.smoothed()?
+        } else {
+            diagnostics.get(&SystemInformationDiagnosticsPlugin::PROCESS_MEM_USAGE)?.value()?
+        })
+    }
+    fn format_value(
+        &self,
+        value: &Self::Value,
+    ) -> String {
+        let mut s = format_pretty_float(2, self.precision, *value);
+        if self.display_units {
+            s.push_str(" GiB");
+        }
+        s
+    }
+    fn value_color(
+        &self,
+        value: &Self::Value,
+    ) -> Option<Color> {
+        self.color_gradient.get_color_for_value(*value as f32)
+    }
+    fn value_highlight(
+        &self,
+        value: &Self::Value,
+    ) -> bool {
+        self.threshold_highlight
+            .map(|t| (*value as f32) > t)
+            .unwrap_or(false)
+    }
+    fn sort_key(&self) -> i32 {
+        self.sort_key
+    }
+}
+
+#[cfg(feature = "sysinfo")]
 impl PerfUiEntryDisplayRange for PerfUiEntryMemUsage {
+    fn max_value_hint(&self) -> Option<Self::Value> {
+        self.max_value_hint.or(
+            match (self.threshold_highlight, self.color_gradient.max_stop()) {
+                (Some(x), None) => Some(x),
+                (None, Some((x, _))) => Some(*x),
+                (Some(a), Some((b, _))) => Some(a.max(*b)),
+                (None, None) => None,
+            }
+        ).map(|v| v as f64)
+    }
+    fn min_value_hint(&self) -> Option<Self::Value> {
+        Some(0.0)
+    }
+}
+
+#[cfg(feature = "sysinfo")]
+impl PerfUiEntry for PerfUiEntrySystemMemUsage {
+    type SystemParam = SRes<DiagnosticsStore>;
+    type Value = f64;
+
+    fn label(&self) -> &str {
+        if self.label.is_empty() {
+            "System RAM Usage"
+        } else {
+            &self.label
+        }
+    }
+    fn update_value(
+        &self,
+        diagnostics: &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
+    ) -> Option<Self::Value> {
+        Some(if self.smoothed {
+            diagnostics.get(&SystemInformationDiagnosticsPlugin::SYSTEM_MEM_USAGE)?.smoothed()?
+        } else {
+            diagnostics.get(&SystemInformationDiagnosticsPlugin::SYSTEM_MEM_USAGE)?.value()?
+        })
+    }
+    fn format_value(
+        &self,
+        value: &Self::Value,
+    ) -> String {
+        let mut s = format_pretty_float(2, self.precision, *value);
+        s.push('%');
+        s
+    }
+    fn value_color(
+        &self,
+        value: &Self::Value,
+    ) -> Option<Color> {
+        self.color_gradient.get_color_for_value(*value as f32)
+    }
+    fn value_highlight(
+        &self,
+        value: &Self::Value,
+    ) -> bool {
+        self.threshold_highlight
+            .map(|t| (*value as f32) > t)
+            .unwrap_or(false)
+    }
+    fn sort_key(&self) -> i32 {
+        self.sort_key
+    }
+}
+
+#[cfg(feature = "sysinfo")]
+impl PerfUiEntryDisplayRange for PerfUiEntrySystemMemUsage {
     fn max_value_hint(&self) -> Option<Self::Value> {
         Some(100.0)
     }

@@ -225,7 +225,7 @@ impl PerfUiEntry for PerfUiEntryWindowMode {
         if let Some(e) = self.window {
             Some(q_any.get(e).ok()?.mode)
         } else {
-            Some(q_primary.get_single().ok()?.mode)
+            Some(q_primary.single().ok()?.mode)
         }
     }
 }
@@ -254,7 +254,7 @@ impl PerfUiEntry for PerfUiEntryWindowPresentMode {
         if let Some(e) = self.window {
             Some(q_any.get(e).ok()?.present_mode)
         } else {
-            Some(q_primary.get_single().ok()?.present_mode)
+            Some(q_primary.single().ok()?.present_mode)
         }
     }
 }
@@ -276,9 +276,6 @@ impl PerfUiEntry for PerfUiEntryWindowScaleFactor {
     fn sort_key(&self) -> i32 {
         self.sort_key
     }
-    fn width_hint(&self) -> usize {
-        width_hint_pretty_float(self.digits, self.precision)
-    }
     fn update_value(
         &self,
         (q_primary, q_any): &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
@@ -286,7 +283,7 @@ impl PerfUiEntry for PerfUiEntryWindowScaleFactor {
         if let Some(e) = self.window {
             q_any.get(e).ok().map(|w| w.scale_factor())
         } else {
-            q_primary.get_single().ok().map(|w| w.scale_factor())
+            q_primary.single().ok().map(|w| w.scale_factor())
         }
     }
     fn format_value(
@@ -314,14 +311,6 @@ impl PerfUiEntry for PerfUiEntryWindowResolution {
     fn sort_key(&self) -> i32 {
         self.sort_key
     }
-    fn width_hint(&self) -> usize {
-        match (self.display_axis, self.display_units) {
-            (true, true) => self.width as usize + self.separator.len() + 12,
-            (true, false) => self.width as usize + self.separator.len() + 6,
-            (false, true) => self.width as usize + self.separator.len() + 6,
-            (false, false) => self.width as usize + self.separator.len(),
-        }
-    }
     fn update_value(
         &self,
         (q_primary, q_any): &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
@@ -340,12 +329,12 @@ impl PerfUiEntry for PerfUiEntryWindowResolution {
             }
         } else {
             if self.physical_pixels {
-                q_primary.get_single().ok().map(|w| Vec2::new(
+                q_primary.single().ok().map(|w| Vec2::new(
                     w.physical_width() as f32,
                     w.physical_height() as f32,
                 ))
             } else {
-                q_primary.get_single().ok().map(|w| Vec2::new(
+                q_primary.single().ok().map(|w| Vec2::new(
                     w.width(),
                     w.height(),
                 ))
@@ -394,14 +383,6 @@ impl PerfUiEntry for PerfUiEntryCursorPosition {
     fn sort_key(&self) -> i32 {
         self.sort_key
     }
-    fn width_hint(&self) -> usize {
-        match (self.display_axis, self.display_units) {
-            (true, true) => self.width as usize + self.separator.len() + 12,
-            (true, false) => self.width as usize + self.separator.len() + 6,
-            (false, true) => self.width as usize + self.separator.len() + 6,
-            (false, false) => self.width as usize + self.separator.len(),
-        }
-    }
     fn update_value(
         &self,
         (q_primary, q_any): &mut <Self::SystemParam as SystemParam>::Item<'_, '_>,
@@ -414,9 +395,9 @@ impl PerfUiEntry for PerfUiEntryCursorPosition {
             }
         } else {
             if self.physical_pixels {
-                q_primary.get_single().ok()?.physical_cursor_position()
+                q_primary.single().ok()?.physical_cursor_position()
             } else {
-                q_primary.get_single().ok()?.cursor_position()
+                q_primary.single().ok()?.cursor_position()
             }
         }
     }

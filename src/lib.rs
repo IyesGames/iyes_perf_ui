@@ -10,6 +10,7 @@
 //!    - Choose any combination of predefined entries
 //!      (see [`specific_entries`](https://github.com/IyesGames/iyes_perf_ui/blob/v0.2.3/examples/specific_entries.rs) example):
 //!      - Framerate (FPS), Frame Time, Frame Count, ECS Entity Count, CPU Usage, RAM Usage,
+//!        Render CPU Time, Render GPU Time,
 //!        Wall Clock, Running Time, Fixed Time Step, Fixed Overstep,
 //!        Cursor Position, Window Resolution, Window Scale Factor, Window Mode, Present Mode
 //!    - Implement your own custom entries to display anything you like!
@@ -21,16 +22,15 @@
 //! Spawning a Perf UI can be as simple as:
 //!
 //! ```rust
-//! commands.spawn(PerfUiCompleteBundle::default());
+//! commands.spawn(PerfUiAllEntries::default());
 //! ```
 //!
 //! If you want to create a Perf UI with specific entries of your choice,
-//! just spawn an entity with [`PerfUiRoot`] + your desired entries, instead
+//! just spawn an entity with your desired entries, instead
 //! of using this bundle.
 //!
 //! ```rust
 //! commands.spawn((
-//!     PerfUiRoot::default(),
 //!     PerfUiEntryFPS::default(),
 //!     PerfUiEntryClock::default(),
 //!     // ...
@@ -38,7 +38,8 @@
 //! ```
 //!
 //! If you want to customize the appearance, set the various fields in each of the
-//! structs, instead of using `default()`.
+//! structs, instead of using `default()`. To customize settings that apply to all
+//! entries, add the [`PerfUiRoot`] component.
 //!
 //! If you want to implement your own custom entry, create a component type
 //! to represent your entry (you can use it to store any settings),
@@ -154,6 +155,6 @@ pub enum PerfUiSet {
     Setup,
     /// Systems that update the values of Perf UI entries (of any type).
     ///
-    /// If you care about a specific entry only, refer to the `update_perf_ui_entry::<T>` system instead.
+    /// If you care about a specific entry only, refer to the `update_perf_ui_widget::<T>` system instead.
     Update,
 }

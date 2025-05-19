@@ -4,8 +4,35 @@ Notable user-facing changes with each release version will be described in this 
 
 ## Unreleased
 
+Added:
+ - `PerfUiEntryFPSPctLow` entry (Average of the slowest N% of frames).
+ - `PerfUiEntrySystemCpuUsage`/`PerfUiEntrySystemMemUsage` entries (equivalent to the old `PerfUiEntryCpuUsage`/`PerfUiEntryMemUsage`)
+
+Changed:
+ - Bevy 0.16 support.
+ - `PerfUiEntryCpuUsage`/`PerfUiEntryMemUsage` now report the CPU/RAM usage of the current process (your game/app), rather than total system usage. `PerfUiEntryMemUsage` now reports GiB instead of percentage.
+ - `PerfUiEntryFrameTime`/`PerfUiEntryRenderCpuTime`/`PerfUiEntryRenderGpuTime` now default to un-smoothed (raw) values, to help identify slow frames from screenshots.
+
 Fixed:
- - Default PerfUi component was lacking a name in the entity hierarchy.
+ - UI Root entity now has a `Name` component to help with debugging tools.
+ - Entries with a `max_value_hint` now fallback to the max of either the color gradient or the highlight threshold, if set to None. Previously, only the color gradient was used.
+
+## [0.4.0]: 2025-02-26
+
+Added:
+ - `PerfUiEntryRenderCpuTime`, `PerfUiEntryRenderGpuTime` entries.
+
+Changed:
+ - Bevy 0.15 support.
+ - Default text parameters and font size, due to Bevy's new text backend.
+ - `PerfUiRoot` is now added automatically as a "required component".
+ - Bundles renamed and no longer contain `PerfUiRoot`, just entry types:
+   - `PerfUiCompleteBundle` -> `PerfUiAllEntries`
+   - `PerfUiBundle` -> `PerfUiDefaultEntries`
+ - Built-in entries based on `bevy_window` are now behind a `window` cargo feature (enabled by default)
+
+Removed:
+ - Width hints and automatic sizing of the values column. The values column now has a constant size.
 
 ## [0.3.0]: 2024-07-06
 
@@ -81,6 +108,7 @@ Removed:
 
 Initial Release
 
+[0.4.0]: https://github.com/IyesGames/iyes_perf_ui/tree/v0.4.0
 [0.3.0]: https://github.com/IyesGames/iyes_perf_ui/tree/v0.3.0
 [0.2.3]: https://github.com/IyesGames/iyes_perf_ui/tree/v0.2.3
 [0.2.2]: https://github.com/IyesGames/iyes_perf_ui/tree/v0.2.2
