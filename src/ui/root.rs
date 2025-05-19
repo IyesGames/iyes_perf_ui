@@ -186,9 +186,17 @@ pub(crate) fn rc_setup_perf_ui(
 
 pub(crate) fn setup_perf_ui(
     mut commands: Commands,
+    fonts: Res<Assets<Font>>,
     mut q_root: Query<(Entity, &PerfUiRoot, Option<&mut BackgroundColor>, Option<&mut Node>), Changed<PerfUiRoot>>,
 ) {
     for (e, perf_ui, background, style) in &mut q_root {
+        if (perf_ui.font_label == Handle::default()
+            || perf_ui.font_value == Handle::default()
+            || perf_ui.font_highlight == Handle::default())
+            && !fonts.contains(&Handle::default())
+        {
+            error!("Bevy's default font is missing. Either enable Bevy's `default_font` cargo feature, or specify custom fonts in `PerfUiRoot`.");
+        }
         let new_style = Node {
             position_type: PositionType::Absolute,
             top: perf_ui.position.top(perf_ui.margin),
