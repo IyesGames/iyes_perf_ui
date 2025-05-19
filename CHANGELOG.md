@@ -14,6 +14,7 @@ Changed:
  - `PerfUiEntryFrameTime`/`PerfUiEntryRenderCpuTime`/`PerfUiEntryRenderGpuTime` now default to un-smoothed (raw) values, to help identify slow frames from screenshots.
 
 Fixed:
+ - UI Root entity now has a `Name` component to help with debugging tools.
  - Entries with a `max_value_hint` now fallback to the max of either the color gradient or the highlight threshold, if set to None. Previously, only the color gradient was used.
 
 ## [0.4.0]: 2025-02-26
