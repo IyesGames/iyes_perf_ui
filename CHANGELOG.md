@@ -2,10 +2,11 @@
 
 Notable user-facing changes with each release version will be described in this file.
 
-## Unreleased
+## [0.5.0]: 2025-05-20
 
 Added:
- - `PerfUiEntryFPSPctLow` entry (Average of the slowest N% of frames).
+ - `PerfUiEntryFPSAverage` entry (Average of recent frames).
+ - `PerfUiEntryFPSPctLow` entry (Average of the slowest N% of recent frames).
  - `PerfUiEntrySystemCpuUsage`/`PerfUiEntrySystemMemUsage` entries (equivalent to the old `PerfUiEntryCpuUsage`/`PerfUiEntryMemUsage`)
 
 Changed:
@@ -108,6 +109,7 @@ Removed:
 
 Initial Release
 
+[0.5.0]: https://github.com/IyesGames/iyes_perf_ui/tree/v0.5.0
 [0.4.0]: https://github.com/IyesGames/iyes_perf_ui/tree/v0.4.0
 [0.3.0]: https://github.com/IyesGames/iyes_perf_ui/tree/v0.3.0
 [0.2.3]: https://github.com/IyesGames/iyes_perf_ui/tree/v0.2.3
